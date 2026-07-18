@@ -1,36 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
   <title>扬软</title>
-  <!-- 禁用移动端缩放（提升手机浏览体验） -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: #DEB887; /* 原木色背景 */
+      font-family: "Microsoft YaHei", sans-serif;
       max-width: 800px;
       margin: 0 auto;
-      padding: 2rem;
-      line-height: 1.6;
+      padding: 40px 20px;
+      text-align: center; /* 内容整体居中 */
     }
-    h1 { color: #24292e; }
-    .highlight { background-color: #fff8e5; padding: 1rem; border-radius: 4px; }
+    h1 {
+      color: #5D4037; /* 深棕色标题 */
+      font-size: 3.5em;
+      margin: 20px 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2); /* 标题阴影效果 */
+    }
+    .content {
+      font-size: 1.4em;
+      line-height: 1.8;
+      background: rgba(255, 255, 255, 0.8); /* 白色半透明内容框 */
+      padding: 25px;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+    img {
+      max-width: 100%;
+      border: 3px solid #8B4513; /* 深棕色边框 */
+      border-radius: 8px;
+      margin: 25px auto; /* 图片水平居中 */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .link-button {
+      display: inline-block;
+      background: #8B4513; /* 深棕色按钮 */
+      color: white !important;
+      padding: 12px 30px;
+      font-size: 1.2em;
+      border-radius: 30px;
+      text-decoration: none;
+      margin-top: 15px;
+      transition: all 0.3s;
+    }
+    .link-button:hover {
+      background: #5D4037;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
   </style>
 </head>
 <body>
-  <h1>扬古韵今风，琢时光入软</h1>
-  <p>欢迎来到【绒颜工艺馆】，这里是一处用绒花与缠花编织的诗意空间，每一件作品都承载着匠人的温度与时光的馈赠。我们以传统手工艺为根，以创新设计为翼，将千年非遗技艺与现代美学相融，用丝线、绒布、金属丝等天然材质，勾勒出花朵的灵韵与生命的诗意。
-【关于工艺】
-绒花： 以蚕丝绒布为材，经剪、搓、捻、粘等多道工序手工塑形，花瓣层层叠叠，如真花般柔软逼真，色彩温润雅致，每一朵都是对自然的细腻诠释。
-缠花： 以细金属丝为骨，丝线缠绕出立体形态，一缠一绕间，勾勒出花卉的纤薄与精致，金属的光泽与丝线的色彩交织，绽放出刚柔并济的东方美学。
-所有绒花缠花均为纯手工制作，无机器复刻的冰冷，每一片花瓣的弧度、每一缕丝线的缠绕，都倾注了匠人的专注与情感，细微处的灵动，让作品焕发独一无二的生命力。</p>
-
-  <div class="highlight">
-    <strong>联系方式</strong>: 
-    <a href="mailto: youremail@example.com "> 10210917@qq.com </a>
+  <h1>扬古韵今风，琢时光入软
+  欢迎来到扬软•【绒颜®工艺馆】</h1> <!-- 居中标题 -->
+  <div class="content">
+    <p>这里是一处用绒花与缠花编织的诗意空间，每一件作品都承载着匠人的温度与时光的馈赠。我们以传统手工艺为根，以创新设计为翼，将千年非遗技艺与现代美学相融，用丝线、绒布、金属丝等天然材质，勾勒出花朵的灵韵与生命的诗意。 
+      【关于工艺】 
+      绒花： 以蚕丝绒布为材，经剪、搓、捻、粘等多道工序手工塑形，花瓣层层叠叠，如真花般柔软逼真，色彩温润雅致，每一朵都是对自然的细腻诠释。
+      缠花： 以细金属丝为骨，丝线缠绕出立体形态，一缠一绕间，勾勒出花卉的纤薄与精致，金属的光泽与丝线的色彩交织，绽放出刚柔并济的东方美学。
+      所有绒花缠花均为纯手工制作，无机器复刻的冰冷，每一片花瓣的弧度、每一缕丝线的缠绕，都倾注了匠人的专注与情感，细微处的灵动，让作品焕发独一无二的生命力。</p> <!-- 内容 -->
+    <img src="my-photo.jpg" alt="我的照片"> <!-- 自定义图片 -->
+    <a href=" https://www.example.com " target="_blank" class="link-button">点击查看</a> <!-- 高亮链接 -->
   </div>
-
-  <!-- 替换此处为您的图片链接（支持本地上传） -->
-  <img src=" https://via.placeholder.com/800x400?text= 您的图片" alt="示例图片" style="max-width:100%">
 </body>
 </html>

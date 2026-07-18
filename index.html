@@ -1,70 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>绒颜</title>
-  <!-- 👇👇👇 就是这一行代码，加在 <head> 里面 👇👇👇 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>扬软</title>
+<!-- 这里是你之前问的Favicon图标设置 -->
     <link rel="icon" href="shangbiao.png" type="image/png">
-  <style>
-    body {
-      background-color: #DEB887; /* 原木色背景 */
-      font-family: "Microsoft YaHei", sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 40px 20px;
-      text-align: center; /* 内容整体居中 */
-    }
-    h1 {
-      color: #5D4037; /* 深棕色标题 */
-      font-size: 3.5em;
-      margin: 20px 0;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.2); /* 标题阴影效果 */
-    }
-    .content {
-      font-size: 1.4em;
-      line-height: 1.8;
-      background: rgba(255, 255, 255, 0.8); /* 白色半透明内容框 */
-      padding: 25px;
-      border-radius: 12px;
-      margin-top: 20px;
-    }
-    img {
-      max-width: 100%;
-      border: 3px solid #8B4513; /* 深棕色边框 */
-      border-radius: 8px;
-      margin: 25px auto; /* 图片水平居中 */
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    .link-button {
-      display: inline-block;
-      background: #8B4513; /* 深棕色按钮 */
-      color: white !important;
-      padding: 12px 30px;
-      font-size: 1.2em;
-      border-radius: 30px;
-      text-decoration: none;
-      margin-top: 15px;
-      transition: all 0.3s;
-    }
-    .link-button:hover {
-      background: #5D4037;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-    }
-  </style>
+    <style>
+        /* --- 全局样式 --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Songti SC", "SimSun", serif; /* 使用宋体，更具文化感 */
+            background-color: #f4efe6; /* 米黄色底色，模拟纸张/布料感 */
+            color: #333;
+            line-height: 1.8;
+        }
+
+        /* 容器：限制最大宽度，保持阅读体验 */
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: rgba(255, 255, 255, 0.6); /* 半透明白底，让文字更清晰 */
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* --- 头部标题 --- */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #dcdcdc;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #2c2c2c;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        /* 副标题/诗句 */
+        .subtitle {
+            text-align: center; /* 诗句通常居中更好看，如果你想左对齐也可以改成 left */
+            color: #666;
+            font-style: italic;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        /* --- 正文内容区 --- */
+        p {
+            line-height: 1.6; /* 行间距，让阅读更舒适 */
+            color: #444;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+        /* 小标题样式 */
+        h3.section-title {
+            text-align: center; /* 小标题居中 */
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: bold;
+        }
+        /* --- 底部展示区 --- */
+        .gallery-section {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px dashed #ccc;
+        }
+
+        /* 图片样式 */
+        .product-img {
+            width: 100%;
+            max-width: 400px; /* 限制图片最大宽度 */
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 链接按钮样式 */
+        .view-link {
+            display: inline-block;
+            padding: 12px 35px;
+            background-color: #8b5e3c; /* 古铜色/木色按钮 */
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 16px;
+            transition: background 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .view-link:hover {
+            background-color: #6d462b;
+        }
+
+    </style>
 </head>
 <body>
-  <h1>欢迎来到【绒颜工艺馆】</h1> <!-- 居中标题 -->
- 
-  <div class="content">
-    <p>扬古韵今风，琢时光入软</p> <!-- 内容 -->
-     <p>这里是一处用绒花与缠花编织的诗意空间，每一件作品都承载着匠人的温度与时光的馈赠。我们以传统手工艺为根，以创新设计为翼，将千年非遗技艺与现代美学相融，用丝线、绒布、金属丝等天然材质，勾勒出花朵的灵韵与生命的诗意。</p> <!-- 内容 --> 
-     <p>【关于工艺】</p> <!-- 内容 -->
-     <p> 绒花： 以蚕丝绒布为材，经剪、搓、捻、粘等多道工序手工塑形，花瓣层层叠叠，如真花般柔软逼真，色彩温润雅致，每一朵都是对自然的细腻诠释。</p> <!-- 内容 -->
-     <p> 缠花： 以细金属丝为骨，丝线缠绕出立体形态，一缠一绕间，勾勒出花卉的纤薄与精致，金属的光泽与丝线的色彩交织，绽放出刚柔并济的东方美学。</p> <!-- 内容 -->
-     <p> 所有绒花缠花均为纯手工制作，无机器复刻的冰冷，每一片花瓣的弧度、每一缕丝线的缠绕，都倾注了匠人的专注与情感。</p> <!-- 内容 -->
-    <img src="my-photo.jpg" alt="我的照片"> <!-- 自定义图片 -->
-    <a href=" https://qr61.cn/opfHx6/qj3M323 " target="_blank" class="link-button">点击查看产品</a> <!-- 高亮链接 -->
-  </div>
+
+<div class="container">
+    
+    <!-- 1. 顶部标题 -->
+    <header>
+        <h1>绒颜 非遗·绒花|缠花</h1>
+    </header>
+
+    <!-- 正文内容：左对齐 -->
+        <p>这里是一处用绒花与缠花编织的诗意空间，每一件作品都承载着匠人的温度与时光的馈赠。我们以传统手工艺为根，以创新设计为翼，将千年非遗技艺与现代美学相融，用丝线、绒布、金属丝等天然材质，勾勒出花朵的灵韵与生命的诗意。</p>
+
+        <!-- 小标题 -->
+        <h3 class="section-title">【关于工艺】</h3>
+
+        <p><strong>绒花：</strong>以蚕丝绒布为材，经剪、搓、捻、粘等多道工序手工塑形，花瓣层层叠叠，如真花般柔软逼真，色彩温润雅致，每一朵都是对自然的细腻诠释。</p>
+
+        <p><strong>缠花：</strong>以细金属丝为骨，丝线缠绕出立体形态，一缠一绕间，勾勒出花卉的纤薄与精致，金属的光泽与丝线的色彩交织，绽放出刚柔并济的东方美学。</p>
+
+        <p>所有绒花缠花均为纯手工制作，无机器复刻的冰冷，每一片花瓣的弧度、每一缕丝线的缠绕，都倾注了匠人的专注与情感。</p>
+    </div>
+
+    <!-- 3. 底部图片与链接 -->
+    <div class="gallery-section">
+        <!-- 这里的 src="my-photo.jpg" 需要你在GitHub里上传一张名为 my-photo.jpg 的图片 -->
+        <img src="show.jpg" alt="绒花作品展示" class="product-img">
+        
+        <!-- 这里的 href="#" 替换成你想跳转的链接，比如淘宝店或视频链接 -->
+        <a href="   https://qr61.cn/opfHx6/qj3M323   " class="view-link">点击观看产品</a>
+    </div>
+
+</div>
+
 </body>
 </html>

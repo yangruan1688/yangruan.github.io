@@ -3,111 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>绒颜工艺馆</title>
-    <!-- Favicon图标设置 -->
-    <link rel="icon" href="shangbiao.png" type="image/png">
-    
+   <title>绒颜</title>
+  <link rel="icon" href="shangbiao.png" type="image/png">
     <style>
-        /* 全局样式设置 */
+        /* 整体背景色设置为原木色，文字默认居中 */
         body {
-            /* 背景颜色设置为棕色 (你可以根据需要调整色值，比如 #8B4513 是更深的棕) */
-            background-color: #8B4513; 
-            /* 字体设置为宋体 */
-            font-family: "SimSun", "Songti SC", serif;
+            background-color: #F5E6D3; 
+            font-family: "Microsoft YaHei", Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            color: #333; /* 文字颜色深灰，保证阅读清晰 */
-            
-            /* 让页面内容垂直水平居中显示（可选，为了让卡片在屏幕中间） */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            padding: 40px 20px;
+            text-align: center;
+            color: #333;
         }
-
-        /* 主容器卡片样式 */
+        /* 内容区域统一宽度，限制最大宽度防止在大屏幕上拉伸 */
         .container {
-            background-color: #ffffff; /* 卡片背景为白色 */
-            width: 100%;
-            max-width: 600px; /* 限制最大宽度 */
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.6); /* 半透明白色背景衬托内容 */
             padding: 40px;
-            border-radius: 10px; /* 圆角 */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3); /* 阴影 */
-            text-align: center; /* 默认所有元素居中 */
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-
-        /* 大标题样式 */
-        h1.main-title {
-            font-size: 36px;
+        /* 居中大标题样式 */
+        h1 {
             margin-bottom: 10px;
-            color: #5D4037; /* 深棕色标题，呼应背景 */
+            color: #5C4033;
         }
-
-        /* 小标题样式 */
-        h2.sub-title {
-            font-size: 20px;
+        /* 居中副标题样式 */
+        .subtitle {
+            font-size: 1.2em;
+            color: #795548;
             margin-bottom: 30px;
-            font-weight: normal;
-            color: #666;
         }
-
-        /* 内容段落样式 */
-        .content-text {
-            font-size: 16px;
+        /* 正文段落：首行缩进2字节，左对齐保证阅读体验 */
+        p {
+            text-align: left;
+            text-indent: 2em;
             line-height: 1.8;
-            text-align: left; /* 文字左对齐 */
-            text-indent: 2em; /* 【关键点】首行缩进2字符 */
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
-
-        /* 图片样式 */
-        .product-image {
-            width: 100%; /* 图片宽度占满容器 */
-            max-width: 400px; /* 限制图片最大宽度，防止太大 */
+        /* 图片自适应宽度，不超出容器 */
+        img {
+            max-width: 100%;
             height: auto;
             border-radius: 5px;
-            margin-bottom: 30px;
-            display: block;
-            margin-left: auto; /* 配合margin-right实现居中 */
-            margin-right: auto;
+            margin: 20px 0;
         }
-
-        /* 按钮链接样式 */
-        .btn-link {
+        /* 链接按钮样式 */
+        .view-link {
             display: inline-block;
-            background-color: #8B4513; /* 按钮背景也是棕色 */
+            padding: 12px 35px;
+            background-color: #8b5e3c; /* 古铜色/木色按钮 */
             color: white;
-            text-decoration: none; /* 去掉下划线 */
-            padding: 12px 30px;
-            border-radius: 25px; /* 圆角按钮 */
+            text-decoration: none;
+            border-radius: 50px;
             font-size: 16px;
-            transition: background-color 0.3s;
+            transition: background 0.3s;
+            letter-spacing: 1px;
         }
 
-        /* 鼠标悬停在按钮上的效果 */
-        .btn-link:hover {
-            background-color: #A0522D; /* 稍微变亮一点 */
+        .view-link:hover {
+            background-color: #6d462b;
         }
-
     </style>
 </head>
 <body>
-
     <div class="container">
-        <!-- 1. 大标题居中 -->
-        <h1 class="main-title">绒颜工艺馆非遗·绒花·缠花</h1>
+        <h1>绒颜工艺馆</h1>
+        <p class="subtitle">扬古韵今风，琢时光入软</p>
         
-        <!-- 2. 小标题居中 -->
-        <h2 class="sub-title">扬古韵今风，琢时光入软</h2>
-        
-        <!-- 3. 内容首行缩进两字符 -->
-        <p class="content-text">
-            这里是一处用绒花与缠花编织的诗意空间，每一件作品都承载着匠人的温度与时光的馈赠。我们以传统手工艺为根，以创新设计为翼，将千年非遗技艺与现代美学相融。
-        </p>
-
-        <!-- 4. 图片居中 (请替换 src 中的图片地址) -->
-        <img src="my-photo.jpg" alt="我的照片"> <!-- 自定义图片 -->
-
-        <!-- 5. 点击查看产品链接居中 -->
-        <a href=" https://qr61.cn/opfHx6/qj3M323" class="btn-link">点击查看产品</a>
+        <p>这里是一处用绒花与缠花编织的诗意空间，每一件作品都承载着匠人的温度与时光的馈赠。我们以传统手工艺为根，以创新设计为翼，将千年非遗技艺与现代美学相融，用丝线、绒布、金属丝等天然材质，勾勒出花朵的灵韵与生命的诗意。</p>
+        <p>绒花：以蚕丝绒布为材，经剪、搓、捻、粘等多道工序手工塑形，花瓣层层叠叠，如真花般柔软逼真，色彩温润雅致，每一朵都是对自然的细腻诠释。</p>
+        <p>缠花：以细金属丝为骨，丝线缠绕出立体形态，一缠一绕间，勾勒出花卉的纤薄与精致，金属的光泽与丝线的色彩交织，绽放出刚柔并济的东方美学。</p>
+        <p>所有绒花缠花均为纯手工制作，无机器复刻的冰冷，每一片花瓣的弧度、每一缕丝线的缠绕，都倾注了匠人的专注与情感，细微处的灵动，让作品焕发独一无二的生命力。</p>
+        <!-- 替换为你自己的图片链接 -->
+        <img src="my-photo.jpg " alt="个人展示图">
+        <!-- 这里的 href="#" 替换成你想跳转的链接，比如淘宝店或视频链接 -->
+        <a href="  https://qr61.cn/opfHx6/qj3M323  " class="view-link">点击观看产品</a>
     </div>
+</body>
+</html>

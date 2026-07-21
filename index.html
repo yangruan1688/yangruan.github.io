@@ -5,258 +5,280 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>扬软</title>
     <style>
+        /* 全局样式 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: "SimSun", "宋体", serif;
         }
-
+        
         body {
-            background-color: #5D4037;
-            color: #FFF8E1;
-            font-family: SimSun, "宋体", serif;
-            min-height: 100vh;
+            background-color: #8B4513; /* 棕色背景 */
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
         }
-
+        
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px 30px;
+            padding: 0 15px;
         }
-
+        
         /* 顶部栏 */
-        .header {
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px 0;
-            border-bottom: 1px solid #8D6E63;
+            padding: 15px 0;
+            border-bottom: 2px solid #5D4037;
+            margin-bottom: 40px;
         }
-
+        
         .logo {
-            font-size: 32px;
+            font-size: 2.2rem;
             font-weight: bold;
-            color: #FFCC80;
-            letter-spacing: 6px;
+            color: #F5F5DC; /* 米白色文字 */
         }
-
-        .phone {
-            font-size: 16px;
-            color: #D7CCC8;
-            letter-spacing: 1px;
+        
+        .contact {
+            font-size: 1.1rem;
+            color: #F5F5DC;
+            background: #5D4037;
+            padding: 5px 15px;
+            border-radius: 20px;
         }
-
+        
         /* 副标题 */
         .subtitle {
             text-align: center;
-            font-size: 22px;
-            color: #FFCC80;
-            padding: 35px 0 10px;
-            letter-spacing: 4px;
-            font-weight: normal;
+            font-size: 1.8rem;
+            color: #F5F5DC;
+            margin: 30px 0 50px;
+            line-height: 1.4;
         }
-
-        .subtitle-line {
-            width: 200px;
-            height: 1px;
-            background: #8D6E63;
-            margin: 15px auto 40px;
+        
+        /* 产品区域通用样式 */
+        .gallery-section {
+            margin: 50px 0;
         }
-
-        /* 小标题 */
-        .section-title {
+        
+        .gallery-title {
             text-align: center;
-            font-size: 20px;
-            color: #FFCC80;
-            margin: 35px 0 18px;
-            letter-spacing: 3px;
-            position: relative;
+            font-size: 1.6rem;
+            color: #F5F5DC;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #A52A2A;
         }
-
-        .section-title::after {
-            content: "";
-            display: block;
-            width: 50px;
-            height: 2px;
-            background: #A1887F;
-            margin: 8px auto 0;
-        }
-
-        /* 滚动图片区域 */
+        
+        /* 滚动容器 */
         .scroll-container {
             overflow: hidden;
-            padding: 12px 0;
-            background-color: #4E342E;
-            border-radius: 6px;
-            margin-bottom: 10px;
+            position: relative;
+            border: 3px solid #5D4037;
+            border-radius: 8px;
+            background: #F5F5DC;
+            padding: 10px;
+            cursor: pointer;
         }
-
+        
         .scroll-content {
-            display: inline-flex;
-            animation: scrollAnim 25s linear infinite;
-            white-space: nowrap;
+            display: flex;
+            animation: scroll 30s linear infinite;
+            gap: 20px;
         }
-
+        
         .scroll-content img {
-            height: 170px;
-            margin: 0 12px;
-            border-radius: 4px;
-            border: 2px solid #8D6E63;
+            min-width: 220px;
+            height: 180px;
             object-fit: cover;
-            flex-shrink: 0;
-            transition: transform 0.3s;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-
-        .scroll-content img:hover {
-            transform: scale(1.05);
-            border-color: #FFCC80;
+        
+        /* 悬停暂停滚动 */
+        .scroll-container:hover .scroll-content {
+            animation-play-state: paused;
         }
-
-        @keyframes scrollAnim {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+        
+        /* 无缝滚动关键帧 */
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } /* 滚动距离为内容总宽的一半 */
         }
-
-        /* 查看全部 */
+        
+        /* 查看全部链接 */
         .view-all {
             text-align: center;
-            margin: 45px 0;
+            margin: 40px 0;
         }
-
+        
         .view-all a {
             display: inline-block;
-            padding: 12px 40px;
-            border: 1px solid #FFCC80;
-            color: #FFCC80;
+            color: #F5F5DC;
+            font-size: 1.2rem;
             text-decoration: none;
-            font-size: 17px;
-            letter-spacing: 3px;
+            padding: 10px 25px;
+            border: 2px solid #F5F5DC;
             border-radius: 30px;
             transition: all 0.3s;
         }
-
+        
         .view-all a:hover {
-            background: #FFCC80;
-            color: #4E342E;
+            background: #5D4037;
+            transform: scale(1.05);
         }
-
+        
         /* 页脚 */
-        .footer {
+        footer {
             text-align: center;
-            padding: 30px 0 20px;
-            border-top: 1px solid #8D6E63;
-            margin-top: 10px;
+            padding: 30px 0;
+            margin-top: 20px;
+            border-top: 2px solid #5D4037;
+            color: #F5F5DC;
         }
-
-        .footer a {
-            color: #D7CCC8;
+        
+        footer a {
+            color: #FFECB3;
             text-decoration: none;
-            font-size: 15px;
-            margin: 0 20px;
-            transition: color 0.3s;
         }
-
-        .footer a:hover {
-            color: #FFCC80;
+        
+        footer a:hover {
+            text-decoration: underline;
         }
-
-        .footer-info {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #A1887F;
-        }
-
-        /* 响应式 */
+        
+        /* 响应式设计 */
         @media (max-width: 768px) {
-            .logo { font-size: 24px; letter-spacing: 3px; }
-            .phone { font-size: 14px; }
-            .subtitle { font-size: 18px; letter-spacing: 2px; }
-            .scroll-content img { height: 130px; margin: 0 8px; }
-            .container { padding: 15px 15px; }
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .subtitle {
+                font-size: 1.4rem;
+                margin: 20px 0 30px;
+            }
+            
+            .scroll-content img {
+                min-width: 160px;
+                height: 130px;
+            }
+            
+            .gallery-title {
+                font-size: 1.3rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .scroll-content img {
+                min-width: 130px;
+                height: 110px;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+            
+            .contact {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-
         <!-- 顶部栏 -->
-        <header class="header">
+        <header>
             <div class="logo">扬软</div>
-            <div class="phone">联系电话：0514-8888 9999</div>
+            <div class="contact">联系电话: 138-1234-5678</div>
         </header>
-
+        
         <!-- 副标题 -->
         <h1 class="subtitle">扬古韵今风，琢时光入软</h1>
-        <div class="subtitle-line"></div>
-
+        
         <!-- 绒花馆 -->
-        <h2 class="section-title">绒花馆</h2>
-        <div class="scroll-container">
-            <div class="scroll-content">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=绒花作品1" alt="绒花作品1">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=绒花作品2" alt="绒花作品2">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=绒花作品3" alt="绒花作品3">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=绒花作品4" alt="绒花作品4">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=绒花作品5" alt="绒花作品5">
-                <!-- 重复一组实现无缝滚动 -->
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=绒花作品1" alt="绒花作品1">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=绒花作品2" alt="绒花作品2">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=绒花作品3" alt="绒花作品3">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=绒花作品4" alt="绒花作品4">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=绒花作品5" alt="绒花作品5">
+        <section class="gallery-section">
+            <h2 class="gallery-title">绒花馆</h2>
+            <div class="scroll-container">
+                <div class="scroll-content">
+                    <!-- 图片列表（实际使用时替换为真实图片URL） -->
+                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=绒花1" alt="绒花产品">
+                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=绒花2" alt="绒花产品">
+                    < img src="https://via.placeholder.com/220x180/A52A2A/FFFFFF?text=绒花3" alt="绒花产品">
+                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=绒花4" alt="绒花产品">
+                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=绒花5" alt="绒花产品">
+                    <!-- 无缝滚动关键：复制一份相同内容 -->
+                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=绒花1" alt="绒花产品">
+                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=绒花2" alt="绒花产品">
+                    < img src="https://via.placeholder.com/220x180/A52A2A/FFFFFF?text=绒花3" alt="绒花产品">
+                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=绒花4" alt="绒花产品">
+                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=绒花5" alt="绒花产品">
+                </div>
             </div>
-        </div>
-
+        </section>
+        
         <!-- 缠花馆 -->
-        <h2 class="section-title">缠花馆</h2>
-        <div class="scroll-container">
-            <div class="scroll-content">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=缠花作品1" alt="缠花作品1">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=缠花作品2" alt="缠花作品2">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=缠花作品3" alt="缠花作品3">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=缠花作品4" alt="缠花作品4">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=缠花作品5" alt="缠花作品5">
-                <!-- 重复一组 -->
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=缠花作品1" alt="缠花作品1">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=缠花作品2" alt="缠花作品2">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=缠花作品3" alt="缠花作品3">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=缠花作品4" alt="缠花作品4">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=缠花作品5" alt="缠花作品5">
+        <section class="gallery-section">
+            <h2 class="gallery-title">缠花馆</h2>
+            <div class="scroll-container">
+                <div class="scroll-content">
+                    < img src="https://via.placeholder.com/220x180/D2691E/FFFFFF?text=缠花1" alt="缠花产品">
+                    < img src="https://via.placeholder.com/220x180/CD853F/FFFFFF?text=缠花2" alt="缠花产品">
+                    < img src="https://via.placeholder.com/220x180/A0522D/FFFFFF?text=缠花3" alt="缠花产品">
+                    < img src="https://via.placeholder.com/220x180/D2691E/FFFFFF?text=缠花4" alt="缠花产品">
+                    < img src="https://via.placeholder.com/220x180/CD853F/FFFFFF?text=缠花5" alt="缠花产品">
+                    <!-- 无缝滚动副本 -->
+                    < img src="https://via.placeholder.com/220x180/D2691E/FFFFFF?text=缠花1" alt="缠花产品">
+                    < img src="https://via.placeholder.com/220x180/CD853F/FFFFFF?text=缠花2" alt="缠花产品">
+                    < img src="https://via.placeholder.com/220x180/A0522D/FFFFFF?text=缠花3" alt="缠花产品">
+                    < img src="https://via.placeholder.com/220x180/D2691E/FFFFFF?text=缠花4" alt="缠花产品">
+                    < img src="https://via.placeholder.com/220x180/CD853F/FFFFFF?text=缠花5" alt="缠花产品">
+                </div>
             </div>
-        </div>
-
+        </section>
+        
         <!-- 饰品馆 -->
-        <h2 class="section-title">饰品馆</h2>
-        <div class="scroll-container">
-            <div class="scroll-content">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=饰品作品1" alt="饰品作品1">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=饰品作品2" alt="饰品作品2">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=饰品作品3" alt="饰品作品3">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=饰品作品4" alt="饰品作品4">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=饰品作品5" alt="饰品作品5">
-                <!-- 重复一组 -->
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=饰品作品1" alt="饰品作品1">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=饰品作品2" alt="饰品作品2">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=饰品作品3" alt="饰品作品3">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=饰品作品4" alt="饰品作品4">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=饰品作品5" alt="饰品作品5">
+        <section class="gallery-section">
+            <h2 class="gallery-title">饰品馆</h2>
+            <div class="scroll-container">
+                <div class="scroll-content">
+                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=饰品1" alt="饰品产品">
+                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=饰品2" alt="饰品产品">
+                    < img src="https://via.placeholder.com/220x180/A52A2A/FFFFFF?text=饰品3" alt="饰品产品">
+                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=饰品4" alt="饰品产品">
+                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=饰品5" alt="饰品产品">
+                    <!-- 无缝滚动副本 -->
+                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=饰品1" alt="饰品产品">
+                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=饰品2" alt="饰品产品">
+                    < img src="https://via.placeholder.com/220x180/A52A2A/FFFFFF?text=饰品3" alt="饰品产品">
+                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=饰品4" alt="饰品产品">
+                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=饰品5" alt="饰品产品">
+                </div>
             </div>
-        </div>
-
-        <!-- 查看全部 -->
+        </section>
+        
+        <!-- 查看全部链接 -->
         <div class="view-all">
             <a href=" ">查看全部</a >
         </div>
-
+        
         <!-- 页脚 -->
-        <footer class="footer">
-            <div>
-                <a href="https://map.baidu.com" target="_blank">查看地图</a >
-                <a href="mailto:yangruan@example.com">邮箱联系</a >
-            </div>
-            <div class="footer-info">© 2026 扬软 版权所有</div>
+        <footer>
+            <p>
+                <a href="https://maps.example.com" target="_blank">地图链接</a > | 
+                邮箱: <a href="mailto:contact@yangruan.com">contact@yangruan.com</a >
+            </p >
         </footer>
-
     </div>
+
+    <script>
+        // 移动端优化：防止长按图片保存时触发默认行为
+        document.querySelectorAll('.scroll-content img').forEach(img => {
+            img.addEventListener('touchstart', e => e.preventDefault());
+        });
+    </script>
 </body>
 </html>

@@ -3,100 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>绒颜</title>
-  <link rel="icon" href="shangbiao.png" type="image/png">
-       <style>
-        /* 整体背景色设置为原木色，文字默认居中 */
-        body {
-            background-color: #F5E6D3; 
-            font-family: "Microsoft YaHei", Arial, sans-serif;
+    <title>扬软体验馆</title>
+    <style>
+        /* 全局样式 - 棕色主题 + 宋体 */
+        * {
             margin: 0;
-            padding: 40px 20px;
-            text-align: center;
-            color: #333;
+            padding: 0;
+            box-sizing: border-box;
         }
-        /* 内容区域统一宽度，限制最大宽度防止在大屏幕上拉伸 */
+        body {
+            background-color: #FFF8E6; /* 浅米棕背景 */
+            color: #3E2723; /* 深棕文字 */
+            font-family: SimSun, "宋体", "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
-            background-color: rgba(255, 255, 255, 0.6); /* 半透明白色背景衬托内容 */
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        /* 居中大标题样式 */
-        h1 {
-            margin-bottom: 10px;
-            color: #5C4033;
-        }
-        /* 居中副标题样式 */
-        h2 {
-            margin-bottom: 20px;
-            color: #5C4033;
-        }
-        /* 正文段落：首行缩进2字节，左对齐保证阅读体验 */
-        p {
-            text-align: left;
-            text-indent: 2em;
-            line-height: 1.8;
-            margin-bottom: 20px;
-        }
-        /* 图片自适应宽度，不超出容器 */
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-        /* 链接按钮样式 */
-        .view-link {
-            display: inline-block;
-            padding: 12px 35px;
-            background-color: #8b5e3c; /* 古铜色/木色按钮 */
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-size: 16px;
-            transition: background 0.3s;
-            letter-spacing: 1px;
         }
 
-        .view-link:hover {
-            background-color: #6d462b;
+        /* 顶部栏 - 左右布局 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 2px solid #8B4513; /* 鞍棕色分隔线 */
+            margin-bottom: 40px;
         }
-         @media screen and (max-width: 768px) {
-    body {
-        padding: 20px 15px;
-        font-size: 14px;
-    }
-    .container {
-        padding: 20px;
-    }
-    h1 {
-        font-size: 1.6em;
-    }
-    h2 {
-        font-size: 1em;
-    }
-    p {
-        font-size: 14px;
-        line-height: 1.7;
-    }
-}
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #5D4037; /* 棕色标题 */
+        }
+        .phone {
+            font-size: 18px;
+            color: #795548;
+            background: #EFEBE9;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid #A1887F;
+        }
+
+        /* 小标题通用样式 */
+        .section-title {
+            text-align: center;
+            font-size: 24px;
+            margin: 30px 0 20px;
+            color: #4E342E;
+            position: relative;
+        }
+        .section-title:after {
+            content: "";
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: #8B4513;
+            margin: 10px auto;
+        }
+
+        /* 滚动图片容器 */
+        .scroll-container {
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 15px 0;
+            background: #EFEBE9;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(94, 55, 28, 0.1);
+        }
+        .scroll-content {
+            display: inline-flex;
+            animation: scroll 30s linear infinite;
+        }
+        .scroll-content img {
+            height: 180px;
+            margin: 0 15px;
+            border: 3px solid #D7CCC8;
+            border-radius: 5px;
+            object-fit: cover;
+            flex: 0 0 auto;
+            transition: transform 0.3s;
+        }
+        .scroll-content img:hover {
+            transform: scale(1.05);
+        }
+
+        /* 查看全部链接 */
+        .view-all {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .view-all a {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #8B4513;
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 18px;
+            transition: background 0.3s;
+        }
+        .view-all a:hover {
+            background: #5D4037;
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 20px;
+            border-top: 2px solid #A1887F;
+        }
+        .footer-links {
+            margin-top: 15px;
+        }
+        .footer-links a {
+            display: inline-block;
+            margin: 0 15px;
+            color: #5D4037;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .wechat-img {
+            width: 120px;
+            height: 120px;
+            border: 2px solid #8B4513;
+            border-radius: 8px;
+            margin-top: 10px;
+            object-fit: cover;
+        }
+
+        /* 滚动动画 */
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .scroll-content img {
+                height: 140px;
+                margin: 0 10px;
+            }
+            .logo { font-size: 22px; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>绒颜工艺馆</h1>
-        <h2>扬古韵今风，琢时光入软</h2>
-        <p>这里是一处用绒花与缠花编织的诗意空间，每一件作品都承载着匠人的温度与时光的馈赠。我们以传统手工艺为根，以创新设计为翼，将千年非遗技艺与现代美学相融，用丝线、绒布、金属丝等天然材质，勾勒出花朵的灵韵与生命的诗意。</p >
-        <p>绒花：以蚕丝绒布为材，经剪、搓、捻、粘等多道工序手工塑形，花瓣层层叠叠，如真花般柔软逼真，色彩温润雅致，每一朵都是对自然的细腻诠释。</p >
-        <p>缠花：以细金属丝为骨，丝线缠绕出立体形态，一缠一绕间，勾勒出花卉的纤薄与精致，金属的光泽与丝线的色彩交织，绽放出刚柔并济的东方美学。</p >
-        <p>所有绒花缠花均为纯手工制作，无机器复刻的冰冷，每一片花瓣的弧度、每一缕丝线的缠绕，都倾注了匠人的专注与情感，细微处的灵动，让作品焕发独一无二的生命力。</p >
-        <!-- 替换为你自己的图片链接 -->
-        < img src="my-photo.jpg " alt="个人展示图">
-        <!-- 这里的 href="#" 替换成你想跳转的链接，比如淘宝店或视频链接 -->
-        <a href=" " class="view-link">点击观看产品</a >
+        <!-- 顶部栏：名称 + 电话 -->
+        <header class="header">
+            <div class="logo">扬软体验馆</div>
+            <div class="phone">联系电话：0571-8888 9999</div>
+        </header>
+
+        <!-- 绒花馆区域 -->
+        <h2 class="section-title">绒花馆</h2>
+        <div class="scroll-container">
+            <div class="scroll-content">
+                <!-- 请替换为您的实际产品图片URL -->
+                < img src="https://fakeimg.pl/300x200/8B4513/FFFFFF/?text=绒花1&font_size=50" alt="绒花产品1">
+                < img src="https://fakeimg.pl/300x200/795548/FFFFFF/?text=绒花2&font_size=50" alt="绒花产品2">
+                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=绒花3&font_size=50" alt="绒花产品3">
+                < img src="https://fakeimg.pl/300x200/8B4513/FFFFFF/?text=绒花4&font_size=50" alt="绒花产品4">
+                < img src="https://fakeimg.pl/300x200/795548/FFFFFF/?text=绒花5&font_size=50" alt="绒花产品5">
+                <!-- 重复序列实现无缝滚动 -->
+                < img src="https://fakeimg.pl/300x200/8B4513/FFFFFF/?text=绒花1&font_size=50" alt="绒花产品1">
+                < img src="https://fakeimg.pl/300x200/795548/FFFFFF/?text=绒花2&font_size=50" alt="绒花产品2">
+                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=绒花3&font_size=50" alt="绒花产品3">
+            </div>
+        </div>
+
+        <!-- 缠花馆区域 -->
+        <h2 class="section-title">缠花馆</h2>
+        <div class="scroll-container">
+            <div class="scroll-content">
+                <!-- 请替换为您的实际产品图片URL -->
+                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=缠花1&font_size=50" alt="缠花产品1">
+                < img src="https://fakeimg.pl/300x200/8B4513/FFFFFF/?text=缠花2&font_size=50" alt="缠花产品2">
+                < img src="https://fakeimg.pl/300x200/795548/FFFFFF/?text=缠花3&font_size=50" alt="缠花产品3">
+                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=缠花4&font_size=50" alt="缠花产品4">
+                < img src="https://fakeimg.pl/300x200/8B4513/FFFFFF/?text=缠花5&font_size=50" alt="缠花产品5">
+                <!-- 重复序列 -->
+                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=缠花1&font_size=50" alt="缠花产品1">
+                < img src="https://fakeimg.pl/300x200/8B4513/FFFFFF/?text=缠花2&font_size=50" alt="缠花产品2">
+            </div>
+        </div>
+
+        <!-- 饰品馆区域 -->
+        <h2 class="section-title">饰品馆</h2>
+        <div class="scroll-container">
+            <div class="scroll-content">
+                <!-- 请替换为您的实际产品图片URL -->
+                < img src="https://fakeimg.pl/300x200/795548/FFFFFF/?text=饰品1&font_size=50" alt="饰品产品1">
+                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=饰品2&font_size=50" alt="饰品产品2">
+                < img src="https://fakeimg.pl/300x200/8B4513/FFFFFF/?text=饰品3&font_size=50" alt="饰品产品3">
+                < img src="https://fakeimg.pl/300x200/795548/FFFFFF/?text=饰品4&font_size=50" alt="饰品产品4">
+                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=饰品5&font_size=50" alt="饰品产品5">
+                <!-- 重复序列 -->
+                < img src="https://fakeimg.pl/300x200/795548/FFFFFF/?text=饰品1&font_size=50" alt="饰品产品1">
+                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=饰品2&font_size=50" alt="饰品产品2">
+            </div>
+        </div>
+
+        <!-- 查看全部链接 -->
+        <div class="view-all">
+            <a href=" ">查看全部产品</a >
+        </div>
+
+        <!-- 页脚：地图 + 微信 -->
+        <footer class="footer">
+            <div>© 2025 扬软体验馆 版权所有</div>
+            <div class="footer-links">
+                <a href="https://map.baidu.com/?newmap=1&s=con%26wd%3D杭州市西湖区文三路459号" target="_blank">查看地图位置</a >
+                <div>
+                    <a href="weixin://contacts/profile/your_wechat_id">微信联系</a >
+                    <div>
+                        < img class="wechat-img" src="https://fakeimg.pl/120x120/8B4513/FFFFFF/?text=微信二维码" alt="微信二维码">
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
+
+    <script>
+        // 无缝滚动优化（解决CSS动画卡顿问题）
+        document.addEventListener('DOMContentLoaded', function() {
+            const scrollContainers = document.querySelectorAll('.scroll-container');
+            
+            scrollContainers.forEach(container => {
+                const content = container.querySelector('.scroll-content');
+                const clone = content.cloneNode(true);
+                container.appendChild(clone);
+                
+                // 鼠标悬停暂停滚动
+                container.addEventListener('mouseenter', () => {
+                    content.style.animationPlayState = 'paused';
+                    clone.style.animationPlayState = 'paused';
+                });
+                
+                container.addEventListener('mouseleave', () => {
+                    content.style.animationPlayState = 'running';
+                    clone.style.animationPlayState = 'running';
+                });
+            });
+        });
+    </script>
 </body>
 </html>

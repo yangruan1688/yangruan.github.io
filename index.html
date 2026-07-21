@@ -3,178 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>扬软</title>
-    <link rel="icon" href="shangbiao.png"
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+   <title>绒颜</title>
+  <link rel="icon" href="shangbiao.png" type="image/png">
+       <style>
+        /* 整体背景色设置为原木色，文字默认居中 */
         body {
-            background-color: #5D4037;
-            color: #FFF8E1;
-            font-family: SimSun, "宋体", serif;
-            min-height: 100vh;
+            background-color: #F5E6D3; 
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            text-align: center;
+            color: #333;
         }
-
+        /* 内容区域统一宽度，限制最大宽度防止在大屏幕上拉伸 */
         .container {
-            max-width: 1100px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 20px 30px;
+            background-color: rgba(255, 255, 255, 0.6); /* 半透明白色背景衬托内容 */
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-
-        /* 顶部栏 */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 18px 0;
-            border-bottom: 1px solid #8D6E63;
+        /* 居中大标题样式 */
+        h1 {
+            margin-bottom: 10px;
+            color: #5C4033;
         }
-
-        .logo {
-            font-size: 32px;
-            font-weight: bold;
-            color: #FFCC80;
-            letter-spacing: 6px;
+        /* 居中副标题样式 */
+        h2 {
+            margin-bottom: 20px;
+            color: #5C4033;
         }
-
-        .phone {
+        /* 正文段落：首行缩进2字节，左对齐保证阅读体验 */
+        p {
+            text-align: left;
+            text-indent: 2em;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        /* 图片自适应宽度，不超出容器 */
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        /* 链接按钮样式 */
+        .view-link {
+            display: inline-block;
+            padding: 12px 35px;
+            background-color: #8b5e3c; /* 古铜色/木色按钮 */
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
             font-size: 16px;
-            color: #D7CCC8;
+            transition: background 0.3s;
             letter-spacing: 1px;
         }
 
-        /* 副标题 */
-        .subtitle {
-            text-align: center;
-            font-size: 22px;
-            color: #FFCC80;
-            padding: 35px 0 10px;
-            letter-spacing: 4px;
-            font-weight: normal;
+        .view-link:hover {
+            background-color: #6d462b;
         }
-
-        .subtitle-line {
-            width: 200px;
-            height: 1px;
-            background: #8D6E63;
-            margin: 15px auto 40px;
-        }
-
-        /* 小标题 */
-        .section-title {
-            text-align: center;
-            font-size: 20px;
-            color: #FFCC80;
-            margin: 35px 0 18px;
-            letter-spacing: 3px;
-            position: relative;
-        }
-
-        .section-title::after {
-            content: "";
-            display: block;
-            width: 50px;
-            height: 2px;
-            background: #A1887F;
-            margin: 8px auto 0;
-        }
-
-        /* 滚动图片区域 */
-        .scroll-container {
-            overflow: hidden;
-            padding: 12px 0;
-            background-color: #4E342E;
-            border-radius: 6px;
-            margin-bottom: 10px;
-        }
-
-        .scroll-content {
-            display: inline-flex;
-            animation: scrollAnim 25s linear infinite;
-            white-space: nowrap;
-        }
-
-        .scroll-content img {
-            height: 170px;
-            margin: 0 12px;
-            border-radius: 4px;
-            border: 2px solid #8D6E63;
-            object-fit: cover;
-            flex-shrink: 0;
-            transition: transform 0.3s;
-        }
-
-        .scroll-content img:hover {
-            transform: scale(1.05);
-            border-color: #FFCC80;
-        }
-
-        @keyframes scrollAnim {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-
-        /* 查看全部 */
-        .view-all {
-            text-align: center;
-            margin: 45px 0;
-        }
-
-        .view-all a {
-            display: inline-block;
-            padding: 12px 40px;
-            border: 1px solid #FFCC80;
-            color: #FFCC80;
-            text-decoration: none;
-            font-size: 17px;
-            letter-spacing: 3px;
-            border-radius: 30px;
-            transition: all 0.3s;
-        }
-
-        .view-all a:hover {
-            background: #FFCC80;
-            color: #4E342E;
-        }
-
-        /* 页脚 */
-        .footer {
-            text-align: center;
-            padding: 30px 0 20px;
-            border-top: 1px solid #8D6E63;
-            margin-top: 10px;
-        }
-
-        .footer a {
-            color: #D7CCC8;
-            text-decoration: none;
-            font-size: 15px;
-            margin: 0 20px;
-            transition: color 0.3s;
-        }
-
-        .footer a:hover {
-            color: #FFCC80;
-        }
-
-        .footer-info {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #A1887F;
-        }
-
-        /* 响应式 */
-        @media (max-width: 768px) {
-            .logo { font-size: 24px; letter-spacing: 3px; }
-            .phone { font-size: 14px; }
-            .subtitle { font-size: 18px; letter-spacing: 2px; }
-            .scroll-content img { height: 130px; margin: 0 8px; }
-            .container { padding: 15px 15px; }
-@media screen and (max-width: 768px) {
+         @media screen and (max-width: 768px) {
     body {
         padding: 20px 15px;
         font-size: 14px;
@@ -197,85 +87,16 @@
 </head>
 <body>
     <div class="container">
-
-        <!-- 顶部栏 -->
-        <header class="header">
-            <div class="logo">扬软</div>
-            <div class="phone">联系电话：0514-8888 9999</div>
-        </header>
-
-        <!-- 副标题 -->
-        <h1 class="subtitle">扬古韵今风，琢时光入软</h1>
-        <div class="subtitle-line"></div>
-
-        <!-- 绒花馆 -->
-        <h2 class="section-title">绒花馆</h2>
-        <div class="scroll-container">
-            <div class="scroll-content">
-                < img src="R1.JPG" alt="绒花作品1">
-                < img src="R2.JPG" alt="绒花作品2">
-                < img src="R3.JPG" alt="绒花作品3">
-                < img src="R4.JPG" alt="绒花作品4">
-                < img src="R5.JPG" alt="绒花作品5">
-                <!-- 重复一组实现无缝滚动 -->
-                < img src="R1.JPG" alt="绒花作品1">
-                < img src="R2.JPG" alt="绒花作品2">
-                < img src="R3.JPG" alt="绒花作品3">
-                < img src="R4.JPG" alt="绒花作品4">
-                < img src="R5.JPG" alt="绒花作品5">
-            </div>
-        </div>
-
-        <!-- 缠花馆 -->
-        <h2 class="section-title">缠花馆</h2>
-        <div class="scroll-container">
-            <div class="scroll-content">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=缠花作品1" alt="缠花作品1">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=缠花作品2" alt="缠花作品2">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=缠花作品3" alt="缠花作品3">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=缠花作品4" alt="缠花作品4">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=缠花作品5" alt="缠花作品5">
-                <!-- 重复一组 -->
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=缠花作品1" alt="缠花作品1">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=缠花作品2" alt="缠花作品2">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=缠花作品3" alt="缠花作品3">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=缠花作品4" alt="缠花作品4">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=缠花作品5" alt="缠花作品5">
-            </div>
-        </div>
-
-        <!-- 饰品馆 -->
-        <h2 class="section-title">饰品馆</h2>
-        <div class="scroll-container">
-            <div class="scroll-content">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=饰品作品1" alt="饰品作品1">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=饰品作品2" alt="饰品作品2">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=饰品作品3" alt="饰品作品3">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=饰品作品4" alt="饰品作品4">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=饰品作品5" alt="饰品作品5">
-                <!-- 重复一组 -->
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=饰品作品1" alt="饰品作品1">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=饰品作品2" alt="饰品作品2">
-                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=饰品作品3" alt="饰品作品3">
-                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=饰品作品4" alt="饰品作品4">
-                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=饰品作品5" alt="饰品作品5">
-            </div>
-        </div>
-
-        <!-- 查看全部 -->
-        <div class="view-all">
-            <a href=" https://qr61.cn/opfHx6/qj3M323">查看更多</a >
-        </div>
-
-        <!-- 页脚 -->
-        <footer class="footer">
-            <div>
-                <a href="https://surl.amap.com/bNjNbjg1p8lQ" target="_blank">位置</a >
-                <a href="18361301686@163.com">邮箱</a >
-            </div>
-            <div class="footer-info">© 2026 扬软 版权所有</div>
-        </footer>
-
+        <h1>绒颜工艺馆</h1>
+        <h2>扬古韵今风，琢时光入软</h2>
+        <p>这里是一处用绒花与缠花编织的诗意空间，每一件作品都承载着匠人的温度与时光的馈赠。我们以传统手工艺为根，以创新设计为翼，将千年非遗技艺与现代美学相融，用丝线、绒布、金属丝等天然材质，勾勒出花朵的灵韵与生命的诗意。</p >
+        <p>绒花：以蚕丝绒布为材，经剪、搓、捻、粘等多道工序手工塑形，花瓣层层叠叠，如真花般柔软逼真，色彩温润雅致，每一朵都是对自然的细腻诠释。</p >
+        <p>缠花：以细金属丝为骨，丝线缠绕出立体形态，一缠一绕间，勾勒出花卉的纤薄与精致，金属的光泽与丝线的色彩交织，绽放出刚柔并济的东方美学。</p >
+        <p>所有绒花缠花均为纯手工制作，无机器复刻的冰冷，每一片花瓣的弧度、每一缕丝线的缠绕，都倾注了匠人的专注与情感，细微处的灵动，让作品焕发独一无二的生命力。</p >
+        <!-- 替换为你自己的图片链接 -->
+        < img src="my-photo.jpg " alt="个人展示图">
+        <!-- 这里的 href="#" 替换成你想跳转的链接，比如淘宝店或视频链接 -->
+        <a href=" " class="view-link">点击观看产品</a >
     </div>
 </body>
 </html>

@@ -4,152 +4,177 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>扬软</title>
-    <link rel="icon" href="shangbiao.png" type="image/png">
+    <link rel="icon" href="shangbiao.png"
     <style>
-        /* 全局样式 - 棕色主题 + 宋体 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            background-color: #FFF8E6; /* 浅米棕背景 */
-            color: #3E2723; /* 深棕文字 */
-            font-family: SimSun, "宋体", "Microsoft YaHei", sans-serif;
-            line-height: 1.6;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            background-color: #5D4037;
+            color: #FFF8E1;
+            font-family: SimSun, "宋体", serif;
+            min-height: 100vh;
         }
 
-        /* 顶部栏 - 左右布局 */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 30px;
+        }
+
+        /* 顶部栏 */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            border-bottom: 2px solid #8B4513; /* 鞍棕色分隔线 */
-            margin-bottom: 40px;
-        }
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #5D4037; /* 棕色标题 */
-        }
-        .phone {
-            font-size: 18px;
-            color: #795548;
-            background: #EFEBE9;
-            padding: 5px 15px;
-            border-radius: 20px;
-            border: 1px solid #A1887F;
+            padding: 18px 0;
+            border-bottom: 1px solid #8D6E63;
         }
 
-        /* 小标题通用样式 */
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #FFCC80;
+            letter-spacing: 6px;
+        }
+
+        .phone {
+            font-size: 16px;
+            color: #D7CCC8;
+            letter-spacing: 1px;
+        }
+
+        /* 副标题 */
+        .subtitle {
+            text-align: center;
+            font-size: 22px;
+            color: #FFCC80;
+            padding: 35px 0 10px;
+            letter-spacing: 4px;
+            font-weight: normal;
+        }
+
+        .subtitle-line {
+            width: 200px;
+            height: 1px;
+            background: #8D6E63;
+            margin: 15px auto 40px;
+        }
+
+        /* 小标题 */
         .section-title {
             text-align: center;
-            font-size: 24px;
-            margin: 30px 0 20px;
-            color: #4E342E;
+            font-size: 20px;
+            color: #FFCC80;
+            margin: 35px 0 18px;
+            letter-spacing: 3px;
             position: relative;
         }
-        .section-title:after {
+
+        .section-title::after {
             content: "";
             display: block;
-            width: 80px;
-            height: 3px;
-            background: #8B4513;
-            margin: 10px auto;
+            width: 50px;
+            height: 2px;
+            background: #A1887F;
+            margin: 8px auto 0;
         }
 
-        /* 滚动图片容器 */
+        /* 滚动图片区域 */
         .scroll-container {
             overflow: hidden;
-            white-space: nowrap;
-            padding: 15px 0;
-            background: #EFEBE9;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(94, 55, 28, 0.1);
-        }
-        .scroll-content {
-            display: inline-flex;
-            animation: scroll 30s linear infinite;
-        }
-        .scroll-content img {
-            height: 180px;
-            margin: 0 15px;
-            border: 3px solid #D7CCC8;
-            border-radius: 5px;
-            object-fit: cover;
-            flex: 0 0 auto;
-            transition: transform 0.3s;
-        }
-        .scroll-content img:hover {
-            transform: scale(1.05);
+            padding: 12px 0;
+            background-color: #4E342E;
+            border-radius: 6px;
+            margin-bottom: 10px;
         }
 
-        /* 查看全部链接 */
+        .scroll-content {
+            display: inline-flex;
+            animation: scrollAnim 25s linear infinite;
+            white-space: nowrap;
+        }
+
+        .scroll-content img {
+            height: 170px;
+            margin: 0 12px;
+            border-radius: 4px;
+            border: 2px solid #8D6E63;
+            object-fit: cover;
+            flex-shrink: 0;
+            transition: transform 0.3s;
+        }
+
+        .scroll-content img:hover {
+            transform: scale(1.05);
+            border-color: #FFCC80;
+        }
+
+        @keyframes scrollAnim {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* 查看全部 */
         .view-all {
             text-align: center;
-            margin: 40px 0;
+            margin: 45px 0;
         }
+
         .view-all a {
             display: inline-block;
-            padding: 12px 30px;
-            background: #8B4513;
-            color: white;
+            padding: 12px 40px;
+            border: 1px solid #FFCC80;
+            color: #FFCC80;
             text-decoration: none;
+            font-size: 17px;
+            letter-spacing: 3px;
             border-radius: 30px;
-            font-size: 18px;
-            transition: background 0.3s;
+            transition: all 0.3s;
         }
+
         .view-all a:hover {
-            background: #5D4037;
+            background: #FFCC80;
+            color: #4E342E;
         }
 
         /* 页脚 */
         .footer {
             text-align: center;
-            padding: 30px 0;
-            margin-top: 20px;
-            border-top: 2px solid #A1887F;
-        }
-        .footer-links {
-            margin-top: 15px;
-        }
-        .footer-links a {
-            display: inline-block;
-            margin: 0 15px;
-            color: #5D4037;
-            text-decoration: none;
-            font-size: 16px;
-        }
-        .wechat-img {
-            width: 120px;
-            height: 120px;
-            border: 2px solid #8B4513;
-            border-radius: 8px;
+            padding: 30px 0 20px;
+            border-top: 1px solid #8D6E63;
             margin-top: 10px;
-            object-fit: cover;
         }
 
-        /* 滚动动画 */
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+        .footer a {
+            color: #D7CCC8;
+            text-decoration: none;
+            font-size: 15px;
+            margin: 0 20px;
+            transition: color 0.3s;
         }
 
-        /* 响应式调整 */
+        .footer a:hover {
+            color: #FFCC80;
+        }
+
+        .footer-info {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #A1887F;
+        }
+
+        /* 响应式 */
         @media (max-width: 768px) {
-            .scroll-content img {
-                height: 140px;
-                margin: 0 10px;
-            }
-            .logo { font-size: 22px; }
-        }
-         @media screen and (max-width: 768px) {
+            .logo { font-size: 24px; letter-spacing: 3px; }
+            .phone { font-size: 14px; }
+            .subtitle { font-size: 18px; letter-spacing: 2px; }
+            .scroll-content img { height: 130px; margin: 0 8px; }
+            .container { padding: 15px 15px; }
+@media screen and (max-width: 768px) {
     body {
         padding: 20px 15px;
         font-size: 14px;
@@ -172,103 +197,85 @@
 </head>
 <body>
     <div class="container">
-        <!-- 顶部栏：名称 + 电话 -->
+
+        <!-- 顶部栏 -->
         <header class="header">
             <div class="logo">扬软</div>
-            <div class="phone">tel：18361301686</div>
+            <div class="phone">联系电话：0514-8888 9999</div>
         </header>
 
-        <!-- 绒花馆区域 -->
+        <!-- 副标题 -->
+        <h1 class="subtitle">扬古韵今风，琢时光入软</h1>
+        <div class="subtitle-line"></div>
+
+        <!-- 绒花馆 -->
         <h2 class="section-title">绒花馆</h2>
         <div class="scroll-container">
             <div class="scroll-content">
-                <!-- 请替换为您的实际产品图片URL -->
-                < img src="https://qr61.cn/opfHx6/qpMkn68" alt="绒花产品1">
-                < img src="https://qr61.cn/opfHx6/qSG3RFw" alt="绒花产品2">
-                < img src="https://qr61.cn/opfHx6/qTmKdLV" alt="绒花产品3">
-                < img src="https://qr61.cn/opfHx6/ql8VYJP" alt="绒花产品4">
-                < img src="https://qr61.cn/opfHx6/qWh7GOo" alt="绒花产品5">
-                <!-- 重复序列实现无缝滚动 -->
-                < img src="https://qr61.cn/opfHx6/qpMkn68" alt="绒花产品1">
-                < img src="https://qr61.cn/opfHx6/qSG3RFw" alt="绒花产品2">
-                < img src="https://qr61.cn/opfHx6/qTmKdLV" alt="绒花产品3">
+                < img src="R1.JPG" alt="绒花作品1">
+                < img src="R2.JPG" alt="绒花作品2">
+                < img src="R3.JPG" alt="绒花作品3">
+                < img src="R4.JPG" alt="绒花作品4">
+                < img src="R5.JPG" alt="绒花作品5">
+                <!-- 重复一组实现无缝滚动 -->
+                < img src="R1.JPG" alt="绒花作品1">
+                < img src="R2.JPG" alt="绒花作品2">
+                < img src="R3.JPG" alt="绒花作品3">
+                < img src="R4.JPG" alt="绒花作品4">
+                < img src="R5.JPG" alt="绒花作品5">
             </div>
         </div>
 
-        <!-- 缠花馆区域 -->
+        <!-- 缠花馆 -->
         <h2 class="section-title">缠花馆</h2>
         <div class="scroll-container">
             <div class="scroll-content">
-                <!-- 请替换为您的实际产品图片URL -->
-                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=缠花1&font_size=50" alt="缠花产品1">
-                < img src="https://fakeimg.pl/300x200/8B4513/FFFFFF/?text=缠花2&font_size=50" alt="缠花产品2">
-                < img src="https://fakeimg.pl/300x200/795548/FFFFFF/?text=缠花3&font_size=50" alt="缠花产品3">
-                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=缠花4&font_size=50" alt="缠花产品4">
-                < img src="https://fakeimg.pl/300x200/8B4513/FFFFFF/?text=缠花5&font_size=50" alt="缠花产品5">
-                <!-- 重复序列 -->
-                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=缠花1&font_size=50" alt="缠花产品1">
-                < img src="https://fakeimg.pl/300x200/8B4513/FFFFFF/?text=缠花2&font_size=50" alt="缠花产品2">
+                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=缠花作品1" alt="缠花作品1">
+                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=缠花作品2" alt="缠花作品2">
+                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=缠花作品3" alt="缠花作品3">
+                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=缠花作品4" alt="缠花作品4">
+                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=缠花作品5" alt="缠花作品5">
+                <!-- 重复一组 -->
+                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=缠花作品1" alt="缠花作品1">
+                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=缠花作品2" alt="缠花作品2">
+                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=缠花作品3" alt="缠花作品3">
+                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=缠花作品4" alt="缠花作品4">
+                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=缠花作品5" alt="缠花作品5">
             </div>
         </div>
 
-        <!-- 饰品馆区域 -->
+        <!-- 饰品馆 -->
         <h2 class="section-title">饰品馆</h2>
         <div class="scroll-container">
             <div class="scroll-content">
-                <!-- 请替换为您的实际产品图片URL -->
-                < img src="https://fakeimg.pl/300x200/795548/FFFFFF/?text=饰品1&font_size=50" alt="饰品产品1">
-                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=饰品2&font_size=50" alt="饰品产品2">
-                < img src="https://fakeimg.pl/300x200/8B4513/FFFFFF/?text=饰品3&font_size=50" alt="饰品产品3">
-                < img src="https://fakeimg.pl/300x200/795548/FFFFFF/?text=饰品4&font_size=50" alt="饰品产品4">
-                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=饰品5&font_size=50" alt="饰品产品5">
-                <!-- 重复序列 -->
-                < img src="https://fakeimg.pl/300x200/795548/FFFFFF/?text=饰品1&font_size=50" alt="饰品产品1">
-                < img src="https://fakeimg.pl/300x200/5D4037/FFFFFF/?text=饰品2&font_size=50" alt="饰品产品2">
+                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=饰品作品1" alt="饰品作品1">
+                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=饰品作品2" alt="饰品作品2">
+                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=饰品作品3" alt="饰品作品3">
+                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=饰品作品4" alt="饰品作品4">
+                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=饰品作品5" alt="饰品作品5">
+                <!-- 重复一组 -->
+                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=饰品作品1" alt="饰品作品1">
+                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=饰品作品2" alt="饰品作品2">
+                < img src="https://fakeimg.pl/280x180/6D4C41/FFCC80/?text=饰品作品3" alt="饰品作品3">
+                < img src="https://fakeimg.pl/280x180/795548/FFCC80/?text=饰品作品4" alt="饰品作品4">
+                < img src="https://fakeimg.pl/280x180/5D4037/FFCC80/?text=饰品作品5" alt="饰品作品5">
             </div>
         </div>
 
-        <!-- 查看全部链接 -->
+        <!-- 查看全部 -->
         <div class="view-all">
-            <a href=" https://qr61.cn/opfHx6/qj3M323">查看全部产品</a >
+            <a href=" https://qr61.cn/opfHx6/qj3M323">查看更多</a >
         </div>
 
-        <!-- 页脚：地图 + 微信 -->
+        <!-- 页脚 -->
         <footer class="footer">
-            <div>扬软 版权所有</div>
-            <div class="footer-links">
-                <a href="https://surl.amap.com/bNjNbjg1p8lQ" target="_blank">查看地图位置</a >
-                <div>
-                    <a href="my-photo.jpg">微信联系</a >
-                    <div>
-                        < img class="wechat-img" src="my-photo.jpg" alt="微信二维码">
-                    </div>
-                </div>
+            <div>
+                <a href="https://surl.amap.com/bNjNbjg1p8lQ" target="_blank">位置</a >
+                <a href="18361301686@163.com">邮箱</a >
             </div>
+            <div class="footer-info">© 2026 扬软 版权所有</div>
         </footer>
-    </div>
 
-    <script>
-        // 无缝滚动优化（解决CSS动画卡顿问题）
-        document.addEventListener('DOMContentLoaded', function() {
-            const scrollContainers = document.querySelectorAll('.scroll-container');
-            
-            scrollContainers.forEach(container => {
-                const content = container.querySelector('.scroll-content');
-                const clone = content.cloneNode(true);
-                container.appendChild(clone);
-                
-                // 鼠标悬停暂停滚动
-                container.addEventListener('mouseenter', () => {
-                    content.style.animationPlayState = 'paused';
-                    clone.style.animationPlayState = 'paused';
-                });
-                
-                container.addEventListener('mouseleave', () => {
-                    content.style.animationPlayState = 'running';
-                    clone.style.animationPlayState = 'running';
-                });
-            });
-        });
-    </script>
+    </div>
 </body>
 </html>

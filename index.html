@@ -40,6 +40,22 @@
             flex-wrap: wrap;
         }
 
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .logo-img {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 2px solid var(--golden);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 4px;
+        }
+
         .company-name {
             font-size: 1.8rem;
             font-weight: 700;
@@ -125,10 +141,10 @@
 
         .gallery-track {
             display: flex;
-            animation: scroll 30s linear infinite;
-            width: 200%;
+            /* 动画由JS在图片克隆完成后动态添加 */
         }
 
+        /* 动画关键帧 */
         @keyframes scroll {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
@@ -154,6 +170,15 @@
             height: 220px;
             object-fit: cover;
             display: block;
+            /* 新增：图片占位背景色 & 淡入效果 */
+            background-color: #d9c4a9; /* 图片加载前显示的占位色 */
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+
+        /* 图片加载完成后的样式 */
+        .gallery-item img.loaded {
+            opacity: 1;
         }
 
         .view-all {
@@ -262,6 +287,15 @@
                 gap: 0.5rem;
             }
             
+            .logo-img {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .brand-area {
+                gap: 0.8rem;
+            }
+
             .company-name {
                 font-size: 1.5rem;
             }
@@ -311,9 +345,12 @@
 <body>
     <!-- 顶部导航 -->
     <header class="header">
-        <div>
-            <h1 class="company-name">扬州•绒花|缠花</h1>
-            <div class="business-type">扬古韵今风，琢时光入软</div>
+        <div class="brand-area">
+            <img src="logo.png" alt="扬州绒花缠花商标" class="logo-img">
+            <div class="brand-text">
+                <h1 class="company-name">扬州•绒花|缠花</h1>
+                <div class="business-type">扬古韵今风，琢时光入软</div>
+            </div>
         </div>
     </header>
 
@@ -326,41 +363,27 @@
         <p>●作为手工爱好，绒颜将以现代审美与传统技法结合，创作这些绒花/缠花作品，将古典之美融入日常。</p>
     </section>
 
-    <!-- 绒花馆 -->
+    <!-- 绒花馆（优化：去掉了HTML中重复的第二组图片） -->
     <section class="gallery-section">
         <h2 class="gallery-title">绒花馆</h2>
         <div class="gallery-container">
             <div class="gallery-track">
-                <div class="gallery-item"><img src="r1.jpg" alt="绒花作品"></div>
-                <div class="gallery-item"><img src="r2.jpg" alt="绒花作品"></div>
-                <div class="gallery-item"><img src="r3.jpg" alt="绒花作品"></div>
-                <div class="gallery-item"><img src="r4.jpg" alt="绒花作品"></div>
-                <div class="gallery-item"><img src="r5.jpg" alt="绒花作品"></div>
-                <div class="gallery-item"><img src="r6.jpg" alt="绒花作品"></div>
-                <!-- 重复一次用于无缝滚动 -->
-                <div class="gallery-item"><img src="r1.jpg" alt="绒花作品"></div>
-                <div class="gallery-item"><img src="r2.jpg" alt="绒花作品"></div>
-                <div class="gallery-item"><img src="r3.jpg" alt="绒花作品"></div>
-                <div class="gallery-item"><img src="r4.jpg" alt="绒花作品"></div>
-                <div class="gallery-item"><img src="r5.jpg" alt="绒花作品"></div>
-                <div class="gallery-item"><img src="r6.jpg" alt="绒花作品"></div>
+                <div class="gallery-item"><img src="r1.jpg" alt="绒花作品" fetchpriority="high"></div>
+                <div class="gallery-item"><img src="r2.jpg" alt="绒花作品" loading="lazy"></div>
+                <div class="gallery-item"><img src="r3.jpg" alt="绒花作品" loading="lazy"></div>
+                <div class="gallery-item"><img src="r4.jpg" alt="绒花作品" loading="lazy"></div>
+                <div class="gallery-item"><img src="r5.jpg" alt="绒花作品" loading="lazy"></div>
+                <div class="gallery-item"><img src="r6.jpg" alt="绒花作品" loading="lazy"></div>
             </div>
         </div>
         <a href="javascript:void(0)" class="view-all">查看全部绒花作品</a>
     </section>
 
-    <!-- 缠花馆 -->
+    <!-- 缠花馆（优化：去掉了HTML中重复的第二组图片） -->
     <section class="gallery-section">
         <h2 class="gallery-title">缠花馆</h2>
         <div class="gallery-container">
             <div class="gallery-track">
-                <div class="gallery-item"><img src="c1.jpg" alt="缠花作品" loading="lazy"></div>
-                <div class="gallery-item"><img src="c2.jpg" alt="缠花作品" loading="lazy"></div>
-                <div class="gallery-item"><img src="c3.jpg" alt="缠花作品" loading="lazy"></div>
-                <div class="gallery-item"><img src="c4.jpg" alt="缠花作品" loading="lazy"></div>
-                <div class="gallery-item"><img src="c5.jpg" alt="缠花作品" loading="lazy"></div>
-                <div class="gallery-item"><img src="c6.jpg" alt="缠花作品" loading="lazy"></div>
-                <!-- 重复一次用于无缝滚动 -->
                 <div class="gallery-item"><img src="c1.jpg" alt="缠花作品" loading="lazy"></div>
                 <div class="gallery-item"><img src="c2.jpg" alt="缠花作品" loading="lazy"></div>
                 <div class="gallery-item"><img src="c3.jpg" alt="缠花作品" loading="lazy"></div>
@@ -372,18 +395,11 @@
         <a href="javascript:void(0)" class="view-all">查看全部缠花作品</a>
     </section>
 
-    <!-- 饰品馆 -->
+    <!-- 饰品馆（优化：去掉了HTML中重复的第二组图片） -->
     <section class="gallery-section">
         <h2 class="gallery-title">饰品馆</h2>
         <div class="gallery-container">
             <div class="gallery-track">
-                <div class="gallery-item"><img src="s1.jpg" alt="饰品作品" loading="lazy"></div>
-                <div class="gallery-item"><img src="s2.jpg" alt="饰品作品" loading="lazy"></div>
-                <div class="gallery-item"><img src="s3.jpg" alt="饰品作品" loading="lazy"></div>
-                <div class="gallery-item"><img src="s4.jpg" alt="饰品作品" loading="lazy"></div>
-                <div class="gallery-item"><img src="s5.jpg" alt="饰品作品" loading="lazy"></div>
-                <div class="gallery-item"><img src="s6.jpg" alt="饰品作品" loading="lazy"></div>
-                <!-- 重复一次用于无缝滚动 -->
                 <div class="gallery-item"><img src="s1.jpg" alt="饰品作品" loading="lazy"></div>
                 <div class="gallery-item"><img src="s2.jpg" alt="饰品作品" loading="lazy"></div>
                 <div class="gallery-item"><img src="s3.jpg" alt="饰品作品" loading="lazy"></div>
@@ -418,21 +434,57 @@
     </div>
 
     <script>
-        // 图片点击放大功能
         document.addEventListener('DOMContentLoaded', function() {
-            const galleryItems = document.querySelectorAll('.gallery-item');
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImage');
             const closeBtn = document.querySelector('.close');
             const tracks = document.querySelectorAll('.gallery-track');
             
-            // 为每个图片项添加点击事件
+            // ==========================================
+            // 优化1：用JS克隆图片实现无缝滚动（避免HTML中重复写两遍图片，减少首屏HTTP请求数量）
+            // ==========================================
+            tracks.forEach(track => {
+                // 克隆所有子元素并追加到后面，实现无缝滚动效果
+                const items = track.innerHTML;
+                track.innerHTML = items + items;
+                
+                // 克隆完成后再添加动画，防止克隆前就触发滚动
+                track.style.width = '200%';
+                track.style.animation = 'scroll 30s linear infinite';
+            });
+
+            // ==========================================
+            // 优化2：图片加载完成后淡入显示（配合CSS的 opacity: 0）
+            // ==========================================
+            const allImages = document.querySelectorAll('.gallery-item img');
+            
+            allImages.forEach(img => {
+                // 如果图片已经加载完成（从缓存读取）
+                if (img.complete) {
+                    img.classList.add('loaded');
+                } else {
+                    img.addEventListener('load', function() {
+                        this.classList.add('loaded');
+                    });
+                    // 图片加载失败时的处理
+                    img.addEventListener('error', function() {
+                        this.classList.add('loaded');
+                        this.alt = '图片加载失败';
+                    });
+                }
+            });
+            
+            // ==========================================
+            // 图片点击放大功能
+            // ==========================================
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            
             galleryItems.forEach(item => {
                 item.addEventListener('click', function() {
                     const imgSrc = this.querySelector('img').src;
                     modalImg.src = imgSrc;
                     modal.style.display = 'flex';
-                    document.body.style.overflow = 'hidden'; // 防止背景滚动
+                    document.body.style.overflow = 'hidden';
                     
                     // 暂停背景轮播动画
                     tracks.forEach(track => {
@@ -446,7 +498,6 @@
                 modal.style.display = 'none';
                 document.body.style.overflow = 'auto';
                 
-                // 恢复背景轮播动画
                 tracks.forEach(track => {
                     track.style.animationPlayState = 'running';
                 });
@@ -458,7 +509,6 @@
                     modal.style.display = 'none';
                     document.body.style.overflow = 'auto';
                     
-                    // 恢复背景轮播动画
                     tracks.forEach(track => {
                         track.style.animationPlayState = 'running';
                     });

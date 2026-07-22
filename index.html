@@ -4,327 +4,343 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>扬州·绒花｜缠花</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: "SimSun", "宋体", serif;
         }
         
         body {
             background-color: #8B4513; /* 褐色背景 */
-            color: #3E2723;
-            font-family: 'Noto Serif SC', '宋体', STSong, serif;
+            color: #333;
             line-height: 1.6;
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
             padding: 20px;
         }
         
-        /* 页眉样式 */
-        header {
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
-            border-bottom: 1px solid #D7CCC8;
-            margin-bottom: 40px;
+            padding: 15px 0;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
-        .logo {
-            font-size: 28px;
-            font-weight: 700;
-            color: #F5F5F5;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        .site-title {
+            font-size: 24px;
+            color: #fff;
+            font-weight: bold;
         }
         
         .contact {
-            color: #F5F5F5;
-            font-size: 18px;
-            font-weight: 500;
+            color: #fff;
+            font-size: 16px;
         }
         
-        /* 副标题样式 */
+        .main {
+            max-width: 1200px;
+            margin: 30px auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
         .subtitle {
             text-align: center;
-            font-size: 24px;
-            color: #F5F5F5;
-            margin: 30px 0 40px;
-            padding: 15px;
-            background-color: rgba(139, 69, 19, 0.3);
-            border-radius: 8px;
-            max-width: 800px;
-            margin: 30px auto 50px;
+            font-size: 28px;
+            color: #8B4513;
+            margin: 20px 0 40px;
+            font-weight: bold;
         }
         
-        /* 产品展示区域 */
-        .gallery-section {
-            margin-bottom: 50px;
+        .section {
+            margin-bottom: 40px;
         }
         
         .section-title {
+            font-size: 22px;
+            color: #8B4513;
             text-align: center;
-            font-size: 28px;
-            color: #F5F5F5;
-            margin-bottom: 25px;
-            position: relative;
+            margin-bottom: 20px;
+            font-weight: bold;
         }
         
-        .section-title:after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 3px;
-            background: #D7CCC8;
-            margin: 10px auto;
-        }
-        
-        .gallery-container {
+        .products-container {
             overflow: hidden;
             position: relative;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            cursor: pointer;
-        }
-        
-        .gallery {
-            display: flex;
-            animation: scroll 30s linear infinite;
             padding: 10px 0;
         }
         
-        .gallery-item {
-            flex: 0 0 280px;
-            margin: 0 15px;
-            border-radius: 6px;
+        .products {
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            gap: 15px;
+            padding: 10px;
+            scrollbar-width: none; /* 隐藏滚动条（Firefox） */
+        }
+        
+        .products::-webkit-scrollbar {
+            display: none; /* 隐藏滚动条（Chrome等） */
+        }
+        
+        .product-item {
+            min-width: 200px;
+            height: 250px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-            background: #fff;
+            cursor: pointer;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .product-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             transition: transform 0.3s;
         }
         
-        .gallery-item:hover {
-            transform: translateY(-5px);
+        .product-item:hover {
+            transform: scale(1.03);
         }
         
-        .gallery img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            display: block;
-        }
-        
-        .gallery-title {
-            padding: 12px;
-            text-align: center;
-            font-weight: 500;
-        }
-        
-        /* 查看全部链接 */
         .view-all {
             text-align: center;
-            margin: 30px 0 50px;
+            margin: 30px 0;
         }
         
         .view-all a {
-            color: #F5F5F5;
-            font-size: 18px;
+            color: #8B4513;
             text-decoration: none;
-            padding: 10px 25px;
-            border: 2px solid #D7CCC8;
+            font-size: 18px;
+            padding: 10px 20px;
+            border: 2px solid #8B4513;
             border-radius: 30px;
             transition: all 0.3s;
-            display: inline-block;
         }
         
         .view-all a:hover {
-            background: #D7CCC8;
-            color: #5D4037;
+            background-color: #8B4513;
+            color: white;
         }
         
-        /* 页脚样式 */
-        footer {
+        .footer {
             text-align: center;
-            padding: 30px 0;
-            margin-top: 20px;
-            border-top: 1px solid #D7CCC8;
+            color: #fff;
+            margin-top: 40px;
+            padding: 20px 0;
         }
         
         .email {
-            color: #F5F5F5;
             font-size: 18px;
         }
         
-        /* 滚动动画 */
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+        .product-item.expanded {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            min-width: auto;
+            z-index: 1000;
+            border-radius: 0;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .product-item.expanded img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         
         /* 响应式设计 */
         @media (max-width: 768px) {
-            .logo {
-                font-size: 18px;
-            }
-            
-            .contact {
-                font-size: 16px;
+            .main {
+                padding: 15px;
             }
             
             .subtitle {
                 font-size: 16px;
-                padding: 10px;
+                margin: 15px 0 30px;
             }
             
             .section-title {
                 font-size: 16px;
+                margin-bottom: 15px;
             }
             
-            .gallery {
-                animation: scroll-mobile 20s linear infinite;
+            .product-item {
+                min-width: 160px;
+                height: 200px;
             }
             
-            .gallery-item {
-                flex: 0 0 220px;
-                margin: 0 10px;
+            .site-title {
+                font-size: 16px;
             }
             
-            .gallery img {
-                height: 180px;
+            .contact {
+                font-size: 14px;
             }
         }
         
         @media (max-width: 480px) {
-            .gallery {
-                animation: scroll-mobile 25s linear infinite;
+            .product-item {
+                min-width: 140px;
+                height: 180px;
             }
             
-            .gallery-item {
-                flex: 0 0 160px;
-                margin: 0 8px;
+            .site-title {
+                font-size: 16px;
             }
-            
-            .gallery img {
-                height: 140px;
-            }
-        }
-        
-        @keyframes scroll-mobile {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">扬州·绒花｜缠花</div>
-            <div class="contact">电话：18361301686</div>
-        </header>
+    <div class="header">
+        <div class="site-title">扬州·绒花｜缠花</div>
+        <div class="contact">电话：18361301686</div>
+    </div>
+    
+    <div class="main">
+        <h1 class="subtitle">扬古韵今风，琢时光入软</h1>
         
-        <h2 class="subtitle">扬古韵今风，琢时光入软</h2>
-        
-        <section class="gallery-section">
-            <h3 class="section-title">绒花馆</h3>
-            <div class="gallery-container" id="ronghuaGallery">
-                <div class="gallery">
-                    <div class="gallery-item">
-                        <img src="R1.JPG" alt="绒花作品一">
-                        <div class="gallery-title">牡丹绒花</div>
+        <div class="section">
+            <h2 class="section-title">绒花馆</h2>
+            <div class="products-container" id="ronghua-container">
+                <div class="products" id="ronghua-products">
+                    <div class="product-item" data-img="ronghua1.jpg">
+                        <img src="R1.JPG" alt="绒花作品">
                     </div>
-                    <div class="gallery-item">
-                        <img src="R2.JPG" alt="绒花作品二">
-                        <div class="gallery-title">梅花绒花</div>
+                    <div class="product-item" data-img="ronghua2.jpg">
+                        <img src="R2.JPG" alt="绒花作品">
                     </div>
-                    <div class="gallery-item">
-                        <img src="R3.JPG" alt="绒花作品三">
-                        <div class="gallery-title">菊花绒花</div>
+                    <div class="product-item" data-img="ronghua3.jpg">
+                        < img src="https://fakeimg.pl/300x400/8B4513/FFFFFF/?text=绒花3&font=noto&font_size=80" alt="绒花作品">
                     </div>
-                    <div class="gallery-item">
-                        <img src="R4.JPG" alt="绒花作品四">
-                        <div class="gallery-title">兰花绒花</div>
+                    <div class="product-item" data-img="ronghua4.jpg">
+                        < img src="https://fakeimg.pl/300x400/D2B48C/8B4513/?text=绒花4&font=noto&font_size=80" alt="绒花作品">
                     </div>
-                    <div class="gallery-item">
-                        <img src="R5.JPG" alt="绒花作品五">
-                        <div class="gallery-title">牡丹绒花</div>
+                    <div class="product-item" data-img="ronghua5.jpg">
+                        < img src="https://fakeimg.pl/300x400/8B4513/FFFFFF/?text=绒花5&font=noto&font_size=80" alt="绒花作品">
                     </div>
-                    <div class="gallery-item">
-                        <img src="R1.JPG" alt="绒花作品六">
-                        <div class="gallery-title">梅花绒花</div>
+                    <div class="product-item" data-img="ronghua6.jpg">
+                        < img src="https://fakeimg.pl/300x400/D2B48C/8B4513/?text=绒花6&font=noto&font_size=80" alt="绒花作品">
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
         
-        <section class="gallery-section">
-            <h3 class="section-title">缠花馆</h3>
-            <div class="gallery-container" id="chanhuaGallery">
-                <div class="gallery">
-                    <div class="gallery-item">
-                        < img src="https://images.unsplash.com/photo-1619072016232-33c0c0d02e18?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="缠花作品一">
-                        <div class="gallery-title">蝴蝶缠花</div>
+        <div class="section">
+            <h2 class="section-title">缠花馆</h2>
+            <div class="products-container" id="chanhua-container">
+                <div class="products" id="chanhua-products">
+                    <div class="product-item" data-img="chanhua1.jpg">
+                        < img src="https://fakeimg.pl/300x400/8B4513/FFFFFF/?text=缠花1&font=noto&font_size=80" alt="缠花作品">
                     </div>
-                    <div class="gallery-item">
-                        < img src="https://images.unsplash.com/photo-1598755255555-4f8b7d8b9c3c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="缠花作品二">
-                        <div class="gallery-title">凤凰缠花</div>
+                    <div class="product-item" data-img="chanhua2.jpg">
+                        < img src="https://fakeimg.pl/300x400/D2B48C/8B4513/?text=缠花2&font=noto&font_size=80" alt="缠花作品">
                     </div>
-                    <div class="gallery-item">
-                        < img src="https://images.unsplash.com/photo-1619072016232-33c0c0d02e18?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="缠花作品三">
-                        <div class="gallery-title">蝴蝶缠花</div>
+                    <div class="product-item" data-img="chanhua3.jpg">
+                        < img src="https://fakeimg.pl/300x400/8B4513/FFFFFF/?text=缠花3&font=noto&font_size=80" alt="缠花作品">
                     </div>
-                    <div class="gallery-item">
-                        < img src="https://images.unsplash.com/photo-1598755255555-4f8b7d8b9c3c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="缠花作品四">
-                        <div class="gallery-title">凤凰缠花</div>
+                    <div class="product-item" data-img="chanhua4.jpg">
+                        < img src="https://fakeimg.pl/300x400/D2B48C/8B4513/?text=缠花4&font=noto&font_size=80" alt="缠花作品">
                     </div>
-                    <div class="gallery-item">
-                        < img src="https://images.unsplash.com/photo-1619072016232-33c0c0d02e18?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="缠花作品五">
-                        <div class="gallery-title">蝴蝶缠花</div>
+                    <div class="product-item" data-img="chanhua5.jpg">
+                        < img src="https://fakeimg.pl/300x400/8B4513/FFFFFF/?text=缠花5&font=noto&font_size=80" alt="缠花作品">
                     </div>
-                    <div class="gallery-item">
-                        < img src="https://images.unsplash.com/photo-1598755255555-4f8b7d8b9c3c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="缠花作品六">
-                        <div class="gallery-title">凤凰缠花</div>
+                    <div class="product-item" data-img="chanhua6.jpg">
+                        < img src="https://fakeimg.pl/300x400/D2B48C/8B4513/?text=缠花6&font=noto&font_size=80" alt="缠花作品">
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
         
         <div class="view-all">
             <a href=" ">查看全部</a >
         </div>
-        
-        <footer>
-            <div class="email">邮箱：yangzhou_ronghua@example.com</div>
-        </footer>
+    </div>
+    
+    <div class="footer">
+        <div class="email">邮箱：yangzhou_ronghua@example.com</div>
     </div>
 
     <script>
-        // 鼠标悬停暂停滚动功能
-        function setupGalleryPause(galleryId) {
-            const galleryContainer = document.getElementById(galleryId);
-            const gallery = galleryContainer.querySelector('.gallery');
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为每个产品容器设置自动滚动
+            const containers = [
+                { id: 'ronghua-products', speed: 1 },
+                { id: 'chanhua-products', speed: 1.2 }
+            ];
             
-            // 克隆内容以实现无缝滚动
-            const originalContent = gallery.innerHTML;
-            gallery.innerHTML = originalContent + originalContent;
+            let intervals = {};
             
-            galleryContainer.addEventListener('mouseenter', () => {
-                gallery.style.animationPlayState = 'paused';
+            function startAutoScroll(containerId, speed) {
+                const container = document.getElementById(containerId);
+                intervals[containerId] = setInterval(() => {
+                    container.scrollLeft += speed;
+                    // 到达末尾时回到起点
+                    if (container.scrollLeft >= container.scrollWidth - container.clientWidth) {
+                        container.scrollLeft = 0;
+                    }
+                }, 30);
+            }
+            
+            // 初始化自动滚动
+            containers.forEach(container => {
+                startAutoScroll(container.id, container.speed);
+                
+                // 鼠标悬停时停止滚动
+                const containerElement = document.getElementById(container.id);
+                const containerParent = document.getElementById(container.id.replace('-products', '-container'));
+                
+                containerParent.addEventListener('mouseenter', () => {
+                    clearInterval(intervals[container.id]);
+                });
+                
+                containerParent.addEventListener('mouseleave', () => {
+                    startAutoScroll(container.id, container.speed);
+                });
             });
             
-            galleryContainer.addEventListener('mouseleave', () => {
-                gallery.style.animationPlayState = 'running';
+            // 图片点击放大功能
+            const productItems = document.querySelectorAll('.product-item');
+            let isExpanded = false;
+            
+            productItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (isExpanded && this.classList.contains('expanded')) {
+                        // 如果已经是放大状态，再次点击则缩小
+                        this.classList.remove('expanded');
+                        isExpanded = false;
+                        document.body.style.overflow = 'auto';
+                    } else {
+                        // 其他图片缩小
+                        productItems.forEach(i => i.classList.remove('expanded'));
+                        
+                        // 当前图片放大
+                        this.classList.add('expanded');
+                        isExpanded = true;
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
             });
-        }
-        
-        // 初始化两个画廊
-        document.addEventListener('DOMContentLoaded', () => {
-            setupGalleryPause('ronghuaGallery');
-            setupGalleryPause('chanhuaGallery');
+            
+            // 点击页面其他地方缩小图片
+            document.addEventListener('click', function(e) {
+                if (isExpanded && !e.target.closest('.product-item') && !e.target.closest('.expanded')) {
+                    productItems.forEach(item => {
+                        item.classList.remove('expanded');
+                    });
+                    isExpanded = false;
+                    document.body.style.overflow = 'auto';
+                }
+            });
         });
     </script>
 </body>

@@ -31,19 +31,13 @@
     align-items: center;
     padding: 10px 20px;
     margin-bottom: 30px;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* 允许内部元素在小屏幕上换行 */
   }
 
-  .site-title {
-    font-size: 1.8em;
-    font-weight: bold;
-    margin: 10px 0;
+  /* 名称和电话各自占据一行（在小屏幕上），在宽屏幕上并排 */
+  .site-title, .contact-phone {
+    flex: 0 0 100%; /* 默认占据整行 */
     text-align: center;
-    flex-basis: 100%;
-  }
-
-  .contact-phone {
-    font-size: 1.2em;
     margin: 10px 0;
   }
 
@@ -60,10 +54,27 @@
     margin: 40px 0;
   }
 
+  /* 通用标题卡片样式 (用于首页标题和产品区标题) */
   .section-title {
     text-align: center;
     font-size: 2em;
     margin-bottom: 20px;
+    background-color: #F5F5DC; /* 米黄色背景，体现段落感 */
+    color: #8B4513; /* 深褐色文字，与背景形成对比 */
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: "Microsoft YaHei", sans-serif;
+  }
+
+  /* 首页主标题和副标题也应用卡片样式 */
+  .site-title, .subtitle {
+    background-color: #F5F5DC;
+    color: #8B4513;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-family: "Microsoft YaHei", sans-serif;
   }
 
   /* 通用图片滚动容器样式 */
@@ -71,22 +82,23 @@
     display: flex;
     overflow: hidden;
     padding: 10px 0;
-    margin: 0 -10px;
   }
 
   /* 无缝滚动核心样式 */
   .scroll-list {
     display: flex;
-    animation: scrollImages 20s linear infinite;
-    white-space: nowrap;
-    will-change: transform;
+    animation: scroll linear infinite;
+    flex: 0 0 auto; /* 关键：防止图片被压缩 */
+  }
+
+  .scroll-list:hover {
+    animation-play-state: paused;
   }
 
   .scroll-item {
-    flex: 0 0 auto;
     width: 200px;
     height: 200px;
-    margin: 0 10px;
+    margin-right: 10px;
     border: 2px solid transparent;
     transition: border-color 0.3s;
     cursor: pointer;
@@ -104,24 +116,9 @@
   }
 
   /* 无缝滚动动画定义 */
-  @keyframes scrollImages {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-
-  /* 查看全部链接样式 */
-  .view-all {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-    font-size: 1.2em;
-    color: #fff;
-    text-decoration: none;
-    font-weight: bold;
-  }
-
-  .view-all:hover {
-    text-decoration: underline;
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
   }
 
   /* 页脚样式 */
@@ -146,19 +143,19 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
     opacity: 0;
-    pointer-events: none; /* 默认不响应事件 */
+    pointer-events: none;
     transition: opacity 0.3s;
   }
 
   .fullscreen-overlay.active {
     opacity: 1;
-    pointer-events: auto; /* 激活时响应事件 */
+    pointer-events: auto;
   }
 
   .fullscreen-image {
@@ -168,45 +165,12 @@
   }
 
   /* 响应式布局调整 */
-  @media (max-width: 768px) {
-    body {
-      padding: 10px;
-    }
-
-    .container {
-      padding: 0 10px;
-    }
-
-    .section-title {
-      font-size: 1.5em;
-    }
-
-    .scroll-item {
-      width: 150px;
-      height: 150px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .site-title {
-      font-size: 1.5em;
-    }
-
-    .subtitle {
-      font-size: 1.2em;
-    }
-
-    .section-title {
-      font-size: 1.3em;
-    }
-
-    .scroll-item {
-      width: 120px;
-      height: 120px;
-    }
-
-    .contact-phone, .contact-email {
-      font-size: 1em;
+  @media (min-width: 769px) {
+    /* 在宽屏幕上，让名称和电话并排显示 */
+    .site-title, .contact-phone {
+      flex: 0 0 auto;
+      text-align: left;
+      margin: 0;
     }
   }
 </style>
@@ -215,51 +179,45 @@
 <div class="container">
   <!-- 1. 顶部导航栏 -->
   <header class="header">
-    <h1 class="site-title">扬州·绒花 | 缠花</h1>
-    <div class="contact-phone">电话：183-6130-1686</div>
+    <h1 class="site-title">扬州·绒花</h1>
+    <div class="contact-phone">联系电话：0514-88888888</div>
   </header>
 
-  <!-- 2. 居中副标题 -->
+  <!-- 2. 副标题 -->
   <h2 class="subtitle">扬古韵今风，琢时光入软</h2>
 
   <!-- 3. 绒花馆区域 -->
   <section class="product-section">
-    <h3 class="section-title">绒花馆</h3>
+    <h2 class="section-title">绒花馆</h2>
     <div class="scroll-container">
       <div class="scroll-list" id="scrollList1">
         <!-- 原始图片列表 -->
-        <div class="scroll-item"><img src="R1.JPG" alt="绒花1"></div>
-        <div class="scroll-item"><img src="R2.JPG" alt="绒花2"></div>
-        <div class="scroll-item"><img src="R3.JPG" alt="绒花3"></div>
-        <div class="scroll-item"><img src="R4.JPG" alt="绒花4"></div>
-        <!-- 重复的图片副本 (用于无缝循环) -->
-        <div class="scroll-item"><img src="R1.JPG" alt="绒花1"></div>
-        <div class="scroll-item"><img src="R2.JPG" alt="绒花2"></div>
-        <div class="scroll-item"><img src="R3.JPG" alt="绒花3"></div>
-        <div class="scroll-item"><img src="R4.JPG" alt="绒花4"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花1" alt="绒花1"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花2" alt="绒花2"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花3" alt="绒花3"></div>
+        <!-- 重复一次列表以实现无缝循环 -->
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花1" alt="绒花1"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花2" alt="绒花2"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花3" alt="绒花3"></div>
       </div>
     </div>
-    <a href="#" class="view-all">查看全部绒花</a>
   </section>
 
   <!-- 4. 缠花馆区域 -->
   <section class="product-section">
-    <h3 class="section-title">缠花馆</h3>
+    <h2 class="section-title">缠花馆</h2>
     <div class="scroll-container">
       <div class="scroll-list" id="scrollList2">
         <!-- 原始图片列表 -->
         <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花1" alt="缠花1"></div>
         <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花2" alt="缠花2"></div>
         <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花3" alt="缠花3"></div>
-        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花4" alt="缠花4"></div>
-        <!-- 重复的图片副本 (用于无缝循环) -->
+        <!-- 重复一次列表以实现无缝循环 -->
         <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花1" alt="缠花1"></div>
         <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花2" alt="缠花2"></div>
         <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花3" alt="缠花3"></div>
-        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花4" alt="缠花4"></div>
       </div>
     </div>
-    <a href="#" class="view-all">查看全部缠花</a>
   </section>
 
   <!-- 5. 页脚信息 -->
@@ -275,13 +233,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  const scrollItems = document.querySelectorAll('.scroll-item');
   const fullscreenOverlay = document.getElementById('fullscreenOverlay');
   const fullscreenImage = document.getElementById('fullscreenImage');
+  const scrollLists = document.querySelectorAll('.scroll-list');
 
-  // 1. 无缝滚动功能 (使用CSS动画，无需JS)
-  // 2. 点击图片全屏放大功能
-  const scrollItems = document.querySelectorAll('.scroll-item');
-
+  // 1. 图片点击放大功能
   scrollItems.forEach(item => {
     item.addEventListener('click', function() {
       const imgSrc = this.querySelector('img').src;
@@ -290,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // 关闭全屏图片
+  // 2. 关闭全屏图片
   fullscreenOverlay.addEventListener('click', function(event) {
     if (event.target === this) {
       this.classList.remove('active');
@@ -299,8 +256,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 3. 移动端优化：点击任意位置暂停/恢复滚动
   let isPaused = false;
-  const scrollLists = document.querySelectorAll('.scroll-list');
-
   document.body.addEventListener('click', function() {
     if (isPaused) {
       scrollLists.forEach(list => {

@@ -1,293 +1,251 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>扬州·绒花｜缠花</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "SimSun", "宋体", serif;
-        }
-        
-        body {
-            background-color: #8B4513; /* 褐色背景 */
-            color: #333;
-            line-height: 1.6;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 5%;
-            background-color: rgba(139, 69, 19, 0.9);
-        }
-        
-        .site-title {
-            font-size: 24px;
-            color: #fff;
-            font-weight: bold;
-        }
-        
-        .contact {
-            color: #fff;
-            font-size: 18px;
-        }
-        
-        .main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-        
-        .subtitle {
-            text-align: center;
-            font-size: 28px;
-            color: #fff;
-            margin: 30px 0;
-            padding: 15px;
-            background-color: rgba(139, 69, 19, 0.7);
-        }
-        
-        .section {
-            margin: 40px 0;
-        }
-        
-        .section-title {
-            text-align: center;
-            font-size: 24px;
-            color: #fff;
-            margin-bottom: 20px;
-        }
-        
-        .gallery-container {
-            overflow: hidden;
-            position: relative;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        
-        .gallery {
-            display: flex;
-            animation: scroll 30s linear infinite;
-            padding: 10px 0;
-        }
-        
-        .gallery img {
-            width: 250px;
-            height: 200px;
-            object-fit: cover;
-            margin: 0 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-        
-        .gallery img:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
-        }
-        
-        .gallery img.expanded {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 70%;
-            height: auto;
-            max-width: 90%;
-            max-height: 80%;
-            z-index: 1000;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-            border: 3px solid #fff;
-        }
-        
-        .view-all {
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        .view-all a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 18px;
-            padding: 10px 25px;
-            border: 2px solid #fff;
-            border-radius: 25px;
-            transition: all 0.3s;
-        }
-        
-        .view-all a:hover {
-            background-color: #fff;
-            color: #8B4513;
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 25px 0;
-            color: #fff;
-            font-size: 18px;
-            background-color: rgba(139, 69, 19, 0.8);
-            margin-top: 20px;
-        }
-        
-        /* 滚动暂停效果 */
-        .gallery-container:hover .gallery {
-            animation-play-state: paused;
-        }
-        
-        /* 动画关键帧 */
-        @keyframes scroll {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(-50%);
-            }
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-            
-            .contact {
-                order: 1;
-            }
-            
-            .gallery img {
-                width: 180px;
-                height: 150px;
-                margin: 0 10px;
-            }
-            
-            .subtitle {
-                font-size: 16px;
-            }
-            
-            .section-title {
-                font-size: 16px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .gallery img {
-                width: 140px;
-                height: 120px;
-            }
-            
-            .site-title {
-                font-size: 16px;
-            }
-            
-            .contact {
-                font-size: 16px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>扬州·绒花｜缠花</title>
+<style>
+  /* 全局样式重置与设置 */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    background-color: #8B4513; /* 背景为褐色 */
+    color: #333;
+    font-family: "宋体", SimSun, "Microsoft YaHei", sans-serif; /* 字体为宋体 */
+    line-height: 1.6;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* 头部样式 */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 40px;
+  }
+  .logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+  }
+  .contact {
+    font-size: 18px;
+    color: white;
+  }
+
+  /* 主标题和副标题样式 */
+  .main-title {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: white;
+  }
+  .sub-title {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 40px;
+    color: white;
+  }
+
+  /* 滚动画廊容器样式 */
+  .gallery-container {
+    margin: 40px 0;
+  }
+  .gallery-title {
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: white;
+  }
+  .scroll-container {
+    overflow: hidden;
+    position: relative;
+    padding: 10px 0;
+  }
+  .scroll-content {
+    display: flex;
+    animation: scroll 20s linear infinite; /* 调整时间控制速度 */
+  }
+  .scroll-item {
+    flex: 0 0 auto;
+    margin-right: 20px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border: 2px solid white;
+  }
+  .scroll-item:hover {
+    transform: scale(1.05);
+    border-color: #ccc;
+  }
+  .scroll-container:hover .scroll-content {
+    animation-play-state: paused;
+  }
+  .scroll-item img {
+    width: 400px;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* 查看全部链接 */
+  .view-all {
+    text-align: center;
+    margin: 30px 0;
+  }
+  .view-all a {
+    font-size: 20px;
+    color: white;
+    text-decoration: none;
+    border-bottom: 1px solid white;
+  }
+
+  /* 页脚样式 */
+  footer {
+    text-align: center;
+    margin-top: 50px;
+    padding: 20px 0;
+    border-top: 1px solid #ccc;
+  }
+  footer p {
+    color: white;
+    font-size: 18px;
+  }
+
+  /* 全屏图片样式 */
+  #fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    cursor: pointer;
+    display: none;
+  }
+  #fullscreen-image {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .scroll-item img {
+      width: 250px;
+      height: 200px;
+    }
+    .logo, .contact {
+      font-size: 16px;
+    }
+    .main-title {
+      font-size: 28px;
+    }
+    .sub-title {
+      font-size: 20px;
+    }
+    .gallery-title {
+      font-size: 24px;
+    }
+  }
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="site-title">扬州·绒花｜缠花</div>
-        <div class="contact">电话：18361301686</div>
-    </div>
-    
-    <div class="main">
-        <h2 class="subtitle">扬古韵今风，琢时光入软</h2>
-        
-        <div class="section">
-            <h3 class="section-title">绒花馆</h3>
-            <div class="gallery-container">
-                <div class="gallery" id="gallery1">
-                    <img src="R1.JPG" alt="绒花作品1">
-                    <img src="R2.JPG" alt="绒花作品2">
-                    <img src="R3.JPG" alt="绒花作品3">
-                    <img src="R4.JPG" alt="绒花作品4">
-                    <img src="R5.JPG" alt="绒花作品5">
-                    <img src="R1.JPG" alt="绒花作品1">
-                    <img src="R2.JPG" alt="绒花作品2">
-                    <img src="R3.JPG" alt="绒花作品3">
-                    <img src="R4.JPG" alt="绒花作品4">
-                </div>
-            </div>
-        </div>
-        
-        <div class="section">
-            <h3 class="section-title">缠花馆</h3>
-            <div class="gallery-container">
-                <div class="gallery" id="gallery2">
-                    <img src="R1.JPG" alt="绒花作品1">
-                    <img src="R2.JPG" alt="绒花作品2">
-                    <img src="R3.JPG" alt="绒花作品3">
-                    <img src="R4.JPG" alt="绒花作品4">
-                    <img src="R5.JPG" alt="绒花作品5">
-                    <img src="R1.JPG" alt="绒花作品1">
-                    <img src="R2.JPG" alt="绒花作品2">
-                    <img src="R3.JPG" alt="绒花作品3">
-                    <img src="R4.JPG" alt="绒花作品4">
-                </div>
-            </div>
-        </div>
-        
-        <div class="view-all">
-            <a href=" ">查看全部</a >
-        </div>
-    </div>
-    
-    <div class="footer">
-        <p>邮箱：yangzhou_ronghua@163.com</p >
-    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // 为所有图片添加点击放大功能
-            const images = document.querySelectorAll('.gallery img');
-            let expandedImage = null;
-            
-            images.forEach(img => {
-                img.addEventListener('click', function() {
-                    // 如果点击的是已展开的图片，则恢复原状
-                    if (expandedImage === this) {
-                        this.classList.remove('expanded');
-                        expandedImage = null;
-                        return;
-                    }
-                    
-                    // 如果已有展开的图片，先恢复
-                    if (expandedImage) {
-                        expandedImage.classList.remove('expanded');
-                    }
-                    
-                    // 展开当前图片
-                    this.classList.add('expanded');
-                    expandedImage = this;
-                });
-            });
-            
-            // 点击页面其他区域恢复图片
-            document.addEventListener('click', function(e) {
-                if (expandedImage && !expandedImage.contains(e.target) && !e.target.closest('.gallery')) {
-                    expandedImage.classList.remove('expanded');
-                    expandedImage = null;
-                }
-            });
-            
-            // 阻止点击图片时触发页面点击事件
-            document.querySelectorAll('.gallery').forEach(gallery => {
-                gallery.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            });
-        });
-    </script>
+<!-- 头部 -->
+<header>
+  <div class="logo">扬州·绒花｜缠花</div>
+  <div class="contact">联系电话: 138-1234-5678</div>
+</header>
+
+<!-- 主标题和副标题 -->
+<h1 class="main-title">扬州·绒花｜缠花</h1>
+<p class="sub-title">扬古韵今风，琢时光入软</p>
+
+<!-- 绒花馆滚动画廊 -->
+<div class="gallery-container">
+  <h2 class="gallery-title">绒花馆</h2>
+  <div class="scroll-container">
+    <div class="scroll-content" id="ronghua-scroll">
+      <div class="scroll-item"><img src="R1.JPG" alt="绒花1"></div>
+      <div class="scroll-item"><img src="R2.JPG" alt="绒花2"></div>
+      <div class="scroll-item"><img src="R3.JPG" alt="绒花3"></div>
+      <div class="scroll-item"><img src="R4.JPG" alt="绒花4"></div>
+      <div class="scroll-item"><img src="R5.JPG" alt="绒花5"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 缠花馆滚动画廊 -->
+<div class="gallery-container">
+  <h2 class="gallery-title">缠花馆</h2>
+  <div class="scroll-container">
+    <div class="scroll-content" id="chanhua-scroll">
+      <div class="scroll-item"><img src="R1.JPG" alt="缠花1"></div>
+      <div class="scroll-item"><img src="R2.JPG" alt="缠花2"></div>
+      <div class="scroll-item"><img src="R3.JPG" alt="缠花3"></div>
+      <div class="scroll-item"><img src="R4.JPG" alt="缠花4"></div>
+      <div class="scroll-item"><img src="R5.JPG" alt="缠花5"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 查看全部链接 -->
+<div class="view-all">
+  <a href="https://qr61.cn/opfHx6/qj3M323">查看全部</a>
+</div>
+
+<!-- 页脚 -->
+<footer>
+  <p>邮箱: rongyan@yangruan.cn</p>
+</footer>
+
+<!-- 全屏图片遮罩层 -->
+<div id="fullscreen-overlay">
+  <img id="fullscreen-image" src="" alt="全屏预览">
+</div>
+
+<script>
+// JavaScript 交互逻辑
+document.addEventListener('DOMContentLoaded', function() {
+  const scrollContents = document.querySelectorAll('.scroll-content');
+  const fullscreenOverlay = document.getElementById('fullscreen-overlay');
+  const fullscreenImage = document.getElementById('fullscreen-image');
+
+  // 为每个滚动区域设置无缝循环
+  scrollContents.forEach(scrollContent => {
+    const items = scrollContent.querySelectorAll('.scroll-item');
+    const firstItemClone = items[0].cloneNode(true);
+    scrollContent.appendChild(firstItemClone);
+  });
+
+  // 点击图片全屏放大
+  const scrollItems = document.querySelectorAll('.scroll-item');
+  scrollItems.forEach(item => {
+    item.addEventListener('click', function() {
+      const imgSrc = this.querySelector('img').src;
+      fullscreenImage.src = imgSrc;
+      fullscreenOverlay.style.display = 'flex';
+    });
+  });
+
+  // 点击遮罩层关闭全屏
+  fullscreenOverlay.addEventListener('click', function() {
+    this.style.display = 'none';
+    fullscreenImage.src = '';
+  });
+});
+</script>
+
 </body>
 </html>

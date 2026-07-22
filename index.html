@@ -3,281 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>扬软</title>
+    <title>扬州·绒花｜缠花</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* 全局样式 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "SimSun", "宋体", serif;
         }
         
         body {
-            background-color: #8B4513; /* 棕色背景 */
-            color: #333;
+            background-color: #8B4513; /* 褐色背景 */
+            color: #3E2723;
+            font-family: 'Noto Serif SC', '宋体', STSong, serif;
             line-height: 1.6;
-            padding: 20px;
+            min-height: 100vh;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 15px;
+            padding: 20px;
         }
         
-        /* 顶部栏 */
+        /* 页眉样式 */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            border-bottom: 2px solid #5D4037;
+            padding: 20px 0;
+            border-bottom: 1px solid #D7CCC8;
             margin-bottom: 40px;
         }
         
         .logo {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #F5F5DC; /* 米白色文字 */
+            font-size: 28px;
+            font-weight: 700;
+            color: #F5F5F5;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
         
         .contact {
-            font-size: 1.1rem;
-            color: #F5F5DC;
-            background: #5D4037;
-            padding: 5px 15px;
-            border-radius: 20px;
+            color: #F5F5F5;
+            font-size: 18px;
+            font-weight: 500;
         }
         
-        /* 副标题 */
+        /* 副标题样式 */
         .subtitle {
             text-align: center;
-            font-size: 1.8rem;
-            color: #F5F5DC;
-            margin: 30px 0 50px;
-            line-height: 1.4;
+            font-size: 24px;
+            color: #F5F5F5;
+            margin: 30px 0 40px;
+            padding: 15px;
+            background-color: rgba(139, 69, 19, 0.3);
+            border-radius: 8px;
+            max-width: 800px;
+            margin: 30px auto 50px;
         }
         
-        /* 产品区域通用样式 */
+        /* 产品展示区域 */
         .gallery-section {
-            margin: 50px 0;
+            margin-bottom: 50px;
         }
         
-        .gallery-title {
+        .section-title {
             text-align: center;
-            font-size: 1.6rem;
-            color: #F5F5DC;
+            font-size: 28px;
+            color: #F5F5F5;
             margin-bottom: 25px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #A52A2A;
+            position: relative;
         }
         
-        /* 滚动容器 */
-        .scroll-container {
+        .section-title:after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: #D7CCC8;
+            margin: 10px auto;
+        }
+        
+        .gallery-container {
             overflow: hidden;
             position: relative;
-            border: 3px solid #5D4037;
             border-radius: 8px;
-            background: #F5F5DC;
-            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             cursor: pointer;
         }
         
-        .scroll-content {
+        .gallery {
             display: flex;
             animation: scroll 30s linear infinite;
-            gap: 20px;
+            padding: 10px 0;
         }
         
-        .scroll-content img {
-            min-width: 220px;
-            height: 180px;
+        .gallery-item {
+            flex: 0 0 280px;
+            margin: 0 15px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            background: #fff;
+            transition: transform 0.3s;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .gallery img {
+            width: 100%;
+            height: 220px;
             object-fit: cover;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: block;
         }
         
-        /* 悬停暂停滚动 */
-        .scroll-container:hover .scroll-content {
-            animation-play-state: paused;
-        }
-        
-        /* 无缝滚动关键帧 */
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); } /* 滚动距离为内容总宽的一半 */
+        .gallery-title {
+            padding: 12px;
+            text-align: center;
+            font-weight: 500;
         }
         
         /* 查看全部链接 */
         .view-all {
             text-align: center;
-            margin: 40px 0;
+            margin: 30px 0 50px;
         }
         
         .view-all a {
-            display: inline-block;
-            color: #F5F5DC;
-            font-size: 1.2rem;
+            color: #F5F5F5;
+            font-size: 18px;
             text-decoration: none;
             padding: 10px 25px;
-            border: 2px solid #F5F5DC;
+            border: 2px solid #D7CCC8;
             border-radius: 30px;
             transition: all 0.3s;
+            display: inline-block;
         }
         
         .view-all a:hover {
-            background: #5D4037;
-            transform: scale(1.05);
+            background: #D7CCC8;
+            color: #5D4037;
         }
         
-        /* 页脚 */
+        /* 页脚样式 */
         footer {
             text-align: center;
             padding: 30px 0;
             margin-top: 20px;
-            border-top: 2px solid #5D4037;
-            color: #F5F5DC;
+            border-top: 1px solid #D7CCC8;
         }
         
-        footer a {
-            color: #FFECB3;
-            text-decoration: none;
+        .email {
+            color: #F5F5F5;
+            font-size: 18px;
         }
         
-        footer a:hover {
-            text-decoration: underline;
+        /* 滚动动画 */
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
         
         /* 响应式设计 */
         @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
+            .logo {
+                font-size: 22px;
+            }
+            
+            .contact {
+                font-size: 16px;
             }
             
             .subtitle {
-                font-size: 1.4rem;
-                margin: 20px 0 30px;
+                font-size: 20px;
+                padding: 10px;
             }
             
-            .scroll-content img {
-                min-width: 160px;
-                height: 130px;
+            .section-title {
+                font-size: 24px;
             }
             
-            .gallery-title {
-                font-size: 1.3rem;
+            .gallery {
+                animation: scroll-mobile 20s linear infinite;
+            }
+            
+            .gallery-item {
+                flex: 0 0 220px;
+                margin: 0 10px;
+            }
+            
+            .gallery img {
+                height: 180px;
             }
         }
         
         @media (max-width: 480px) {
-            .scroll-content img {
-                min-width: 130px;
-                height: 110px;
+            .gallery {
+                animation: scroll-mobile 25s linear infinite;
             }
             
-            .logo {
-                font-size: 1.8rem;
+            .gallery-item {
+                flex: 0 0 160px;
+                margin: 0 8px;
             }
             
-            .contact {
-                font-size: 1rem;
+            .gallery img {
+                height: 140px;
             }
+        }
+        
+        @keyframes scroll-mobile {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 顶部栏 -->
         <header>
-            <div class="logo">扬软</div>
-            <div class="contact">TEL: 18361301686</div>
+            <div class="logo">扬州·绒花｜缠花</div>
+            <div class="contact">联系电话：0514-88889999</div>
         </header>
         
-        <!-- 副标题 -->
-        <h1 class="subtitle">扬古韵今风，琢时光入软</h1>
+        <h2 class="subtitle">扬古韵今风，琢时光入软</h2>
         
-        <!-- 绒花馆 -->
         <section class="gallery-section">
-            <h2 class="gallery-title">绒花馆</h2>
-            <div class="scroll-container">
-                <div class="scroll-content">
-                    <!-- 图片列表（实际使用时替换为真实图片URL） -->
-                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=绒花1" alt="绒花产品">
-                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=绒花2" alt="绒花产品">
-                    < img src="https://via.placeholder.com/220x180/A52A2A/FFFFFF?text=绒花3" alt="绒花产品">
-                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=绒花4" alt="绒花产品">
-                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=绒花5" alt="绒花产品">
-                    <!-- 无缝滚动关键：复制一份相同内容 -->
-                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=绒花1" alt="绒花产品">
-                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=绒花2" alt="绒花产品">
-                    < img src="https://via.placeholder.com/220x180/A52A2A/FFFFFF?text=绒花3" alt="绒花产品">
-                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=绒花4" alt="绒花产品">
-                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=绒花5" alt="绒花产品">
+            <h3 class="section-title">绒花馆</h3>
+            <div class="gallery-container" id="ronghuaGallery">
+                <div class="gallery">
+                    <div class="gallery-item">
+                        < img src="https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="绒花作品一">
+                        <div class="gallery-title">牡丹绒花</div>
+                    </div>
+                    <div class="gallery-item">
+                        < img src="https://images.unsplash.com/photo-1595433707835-19a7b7d69a2f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="绒花作品二">
+                        <div class="gallery-title">梅花绒花</div>
+                    </div>
+                    <div class="gallery-item">
+                        < img src="https://images.unsplash.com/photo-1606761568490-6de781fb62cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="绒花作品三">
+                        <div class="gallery-title">菊花绒花</div>
+                    </div>
+                    <div class="gallery-item">
+                        < img src="https://images.unsplash.com/photo-1589990532412-06f63b2bb206?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="绒花作品四">
+                        <div class="gallery-title">兰花绒花</div>
+                    </div>
+                    <div class="gallery-item">
+                        < img src="https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="绒花作品五">
+                        <div class="gallery-title">牡丹绒花</div>
+                    </div>
+                    <div class="gallery-item">
+                        < img src="https://images.unsplash.com/photo-1595433707835-19a7b7d69a2f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="绒花作品六">
+                        <div class="gallery-title">梅花绒花</div>
+                    </div>
                 </div>
             </div>
         </section>
         
-        <!-- 缠花馆 -->
         <section class="gallery-section">
-            <h2 class="gallery-title">缠花馆</h2>
-            <div class="scroll-container">
-                <div class="scroll-content">
-                    < img src="https://via.placeholder.com/220x180/D2691E/FFFFFF?text=缠花1" alt="缠花产品">
-                    < img src="https://via.placeholder.com/220x180/CD853F/FFFFFF?text=缠花2" alt="缠花产品">
-                    < img src="https://via.placeholder.com/220x180/A0522D/FFFFFF?text=缠花3" alt="缠花产品">
-                    < img src="https://via.placeholder.com/220x180/D2691E/FFFFFF?text=缠花4" alt="缠花产品">
-                    < img src="https://via.placeholder.com/220x180/CD853F/FFFFFF?text=缠花5" alt="缠花产品">
-                    <!-- 无缝滚动副本 -->
-                    < img src="https://via.placeholder.com/220x180/D2691E/FFFFFF?text=缠花1" alt="缠花产品">
-                    < img src="https://via.placeholder.com/220x180/CD853F/FFFFFF?text=缠花2" alt="缠花产品">
-                    < img src="https://via.placeholder.com/220x180/A0522D/FFFFFF?text=缠花3" alt="缠花产品">
-                    < img src="https://via.placeholder.com/220x180/D2691E/FFFFFF?text=缠花4" alt="缠花产品">
-                    < img src="https://via.placeholder.com/220x180/CD853F/FFFFFF?text=缠花5" alt="缠花产品">
+            <h3 class="section-title">缠花馆</h3>
+            <div class="gallery-container" id="chanhuaGallery">
+                <div class="gallery">
+                    <div class="gallery-item">
+                        < img src="https://images.unsplash.com/photo-1619072016232-33c0c0d02e18?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="缠花作品一">
+                        <div class="gallery-title">蝴蝶缠花</div>
+                    </div>
+                    <div class="gallery-item">
+                        < img src="https://images.unsplash.com/photo-1598755255555-4f8b7d8b9c3c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="缠花作品二">
+                        <div class="gallery-title">凤凰缠花</div>
+                    </div>
+                    <div class="gallery-item">
+                        < img src="https://images.unsplash.com/photo-1619072016232-33c0c0d02e18?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="缠花作品三">
+                        <div class="gallery-title">蝴蝶缠花</div>
+                    </div>
+                    <div class="gallery-item">
+                        < img src="https://images.unsplash.com/photo-1598755255555-4f8b7d8b9c3c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="缠花作品四">
+                        <div class="gallery-title">凤凰缠花</div>
+                    </div>
+                    <div class="gallery-item">
+                        < img src="https://images.unsplash.com/photo-1619072016232-33c0c0d02e18?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="缠花作品五">
+                        <div class="gallery-title">蝴蝶缠花</div>
+                    </div>
+                    <div class="gallery-item">
+                        < img src="https://images.unsplash.com/photo-1598755255555-4f8b7d8b9c3c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=220&q=80" alt="缠花作品六">
+                        <div class="gallery-title">凤凰缠花</div>
+                    </div>
                 </div>
             </div>
         </section>
         
-        <!-- 饰品馆 -->
-        <section class="gallery-section">
-            <h2 class="gallery-title">饰品馆</h2>
-            <div class="scroll-container">
-                <div class="scroll-content">
-                    < img src="R1.JPG" alt="饰品产品">
-                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=饰品2" alt="饰品产品">
-                    < img src="https://via.placeholder.com/220x180/A52A2A/FFFFFF?text=饰品3" alt="饰品产品">
-                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=饰品4" alt="饰品产品">
-                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=饰品5" alt="饰品产品">
-                    <!-- 无缝滚动副本 -->
-                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=饰品1" alt="饰品产品">
-                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=饰品2" alt="饰品产品">
-                    < img src="https://via.placeholder.com/220x180/A52A2A/FFFFFF?text=饰品3" alt="饰品产品">
-                    < img src="https://via.placeholder.com/220x180/8B4513/FFFFFF?text=饰品4" alt="饰品产品">
-                    < img src="https://via.placeholder.com/220x180/5D4037/FFFFFF?text=饰品5" alt="饰品产品">
-                </div>
-            </div>
-        </section>
-        
-        <!-- 查看全部链接 -->
         <div class="view-all">
-            <a href="https://qr61.cn/opfHx6/qj3M323">查看全部</a >
+            <a href=" ">查看全部</a >
         </div>
         
-        <!-- 页脚 -->
         <footer>
-            <p>
-                <a href="https://surl.amap.com/bNjNbjg1p8lQ" target="_blank">地图链接</a > | 
-                邮箱: <a href="mailto:18361301686@163.com">18361301686@163.com</a >
-            </p >
+            <div class="email">邮箱：yangzhou_ronghua@example.com</div>
         </footer>
     </div>
 
     <script>
-        // 移动端优化：防止长按图片保存时触发默认行为
-        document.querySelectorAll('.scroll-content img').forEach(img => {
-            img.addEventListener('touchstart', e => e.preventDefault());
+        // 鼠标悬停暂停滚动功能
+        function setupGalleryPause(galleryId) {
+            const galleryContainer = document.getElementById(galleryId);
+            const gallery = galleryContainer.querySelector('.gallery');
+            
+            // 克隆内容以实现无缝滚动
+            const originalContent = gallery.innerHTML;
+            gallery.innerHTML = originalContent + originalContent;
+            
+            galleryContainer.addEventListener('mouseenter', () => {
+                gallery.style.animationPlayState = 'paused';
+            });
+            
+            galleryContainer.addEventListener('mouseleave', () => {
+                gallery.style.animationPlayState = 'running';
+            });
+        }
+        
+        // 初始化两个画廊
+        document.addEventListener('DOMContentLoaded', () => {
+            setupGalleryPause('ronghuaGallery');
+            setupGalleryPause('chanhuaGallery');
         });
     </script>
 </body>

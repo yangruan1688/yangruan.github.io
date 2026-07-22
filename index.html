@@ -6,11 +6,7 @@
     <title>扬州绒花|缠花</title>
     <style>
         /* 重置样式与基础设置 */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --brown-bg: #f5e9dc;
@@ -40,15 +36,10 @@
             flex-wrap: wrap;
         }
 
-        .brand-area {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-        }
+        .brand-area { display: flex; align-items: center; gap: 1.2rem; }
 
         .logo-img {
-            width: 65px;
-            height: 65px;
+            width: 65px; height: 65px;
             object-fit: contain;
             border-radius: 50%;
             border: 2px solid var(--golden);
@@ -56,294 +47,99 @@
             padding: 4px;
         }
 
-        .company-name {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--golden);
-            letter-spacing: 2px;
-        }
-
-        .business-type {
-            font-size: 1.1rem;
-            color: var(--light-golden);
-            margin-top: 0.3rem;
-        }
+        .company-name { font-size: 1.8rem; font-weight: 700; color: var(--golden); letter-spacing: 2px; }
+        .business-type { font-size: 1.1rem; color: var(--light-golden); margin-top: 0.3rem; }
 
         /* 公司介绍 */
         .intro {
-            text-align: center;
-            padding: 2.5rem 5%;
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-bottom: 2px solid var(--golden);
+            text-align: center; padding: 2.5rem 5%; max-width: 1200px; margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.8); border-bottom: 2px solid var(--golden);
         }
-
-        .intro h2 {
-            color: var(--dark-brown);
-            font-size: 1.6rem;
-            margin-bottom: 1rem;
-            position: relative;
-            display: inline-block;
-        }
-
-        .intro h2::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background-color: var(--golden);
-        }
-
-        .intro p {
-            font-size: 1.1rem;
-            color: var(--text-light);
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        .intro h2 { color: var(--dark-brown); font-size: 1.6rem; margin-bottom: 1rem; position: relative; display: inline-block; }
+        .intro h2::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 60px; height: 3px; background-color: var(--golden); }
+        .intro p { font-size: 1.1rem; color: var(--text-light); max-width: 800px; margin: 0 auto; }
 
         /* 馆别展示区 */
-        .gallery-section {
-            padding: 3rem 5%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .gallery-title {
-            text-align: center;
-            color: var(--dark-brown);
-            font-size: 1.8rem;
-            margin-bottom: 2rem;
-            position: relative;
-        }
-
-        .gallery-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 4px;
-            background-color: var(--golden);
-        }
+        .gallery-section { padding: 3rem 5%; max-width: 1200px; margin: 0 auto; }
+        .gallery-title { text-align: center; color: var(--dark-brown); font-size: 1.8rem; margin-bottom: 2rem; position: relative; }
+        .gallery-title::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background-color: var(--golden); }
 
         .gallery-container {
-            overflow: hidden;
-            margin: 1.5rem 0 2.5rem;
-            position: relative;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden; margin: 1.5rem 0 2.5rem; position: relative;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: #eaddcf; /* 容器占位背景色 */
         }
 
-        .gallery-track {
-            display: flex;
-            /* 动画由JS在图片克隆完成后动态添加 */
-        }
+        .gallery-track { display: flex; /* 动画由JS控制 */ }
 
-        /* 动画关键帧 */
         @keyframes scroll {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
 
         .gallery-item {
-            flex: 0 0 auto;
-            width: 280px;
-            margin: 0 15px;
-            cursor: pointer;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            flex: 0 0 auto; width: 280px; margin: 0 15px; cursor: pointer;
+            border-radius: 6px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s;
         }
-
-        .gallery-item:hover {
-            transform: scale(1.03);
-        }
+        .gallery-item:hover { transform: scale(1.03); }
 
         .gallery-item img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            display: block;
-            /* 新增：图片占位背景色 & 淡入效果 */
-            background-color: #d9c4a9; /* 图片加载前显示的占位色 */
-            opacity: 0;
-            transition: opacity 0.5s ease-in;
+            width: 100%; height: 220px; object-fit: cover; display: block;
+            background-color: #d9c4a9; 
+            opacity: 0; transition: opacity 0.6s ease-in;
         }
-
-        /* 图片加载完成后的样式 */
-        .gallery-item img.loaded {
-            opacity: 1;
-        }
+        .gallery-item img.loaded { opacity: 1; }
 
         .view-all {
-            display: block;
-            text-align: center;
-            color: var(--dark-brown);
-            font-weight: 500;
-            font-size: 1.1rem;
-            text-decoration: none;
-            padding: 0.8rem 0;
-            background-color: rgba(212, 175, 55, 0.1);
-            border-radius: 6px;
-            transition: all 0.3s;
-            margin-top: 1rem;
+            display: block; text-align: center; color: var(--dark-brown); font-weight: 500;
+            font-size: 1.1rem; text-decoration: none; padding: 0.8rem 0;
+            background-color: rgba(212, 175, 55, 0.1); border-radius: 6px;
+            transition: all 0.3s; margin-top: 1rem;
         }
-
-        .view-all:hover {
-            background-color: rgba(212, 175, 55, 0.2);
-            color: var(--golden);
-        }
+        .view-all:hover { background-color: rgba(212, 175, 55, 0.2); color: var(--golden); }
 
         /* 图片模态框 */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.9); z-index: 1000;
+            justify-content: center; align-items: center; padding: 20px;
         }
-
-        .modal-content {
-            max-width: 90%;
-            max-height: 90%;
-        }
-
-        .modal-content img {
-            max-width: 100%;
-            max-height: 90vh;
-            object-fit: contain;
-            border: 3px solid var(--golden);
-            border-radius: 4px;
-        }
-
-        .close {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: white;
-            font-size: 2.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .close:hover {
-            color: var(--golden);
-        }
+        .modal-content { max-width: 90%; max-height: 90%; }
+        .modal-content img { max-width: 100%; max-height: 90vh; object-fit: contain; border: 3px solid var(--golden); border-radius: 4px; }
+        .close { position: absolute; top: 20px; right: 30px; color: white; font-size: 2.5rem; font-weight: bold; cursor: pointer; transition: color 0.3s; }
+        .close:hover { color: var(--golden); }
 
         /* 页脚 */
-        .footer {
-            background-color: var(--dark-brown);
-            color: white;
-            padding: 2.5rem 5%;
-            text-align: center;
-        }
-
-        .contact-info {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .contact-title {
-            color: var(--golden);
-            font-size: 1.4rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .contact-details {
-            font-size: 1.1rem;
-            line-height: 1.8;
-        }
-
-        .contact-details p {
-            margin: 0.5rem 0;
-        }
-
-        .copyright {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
+        .footer { background-color: var(--dark-brown); color: white; padding: 2.5rem 5%; text-align: center; }
+        .contact-info { max-width: 600px; margin: 0 auto; }
+        .contact-title { color: var(--golden); font-size: 1.4rem; margin-bottom: 1.2rem; }
+        .contact-details { font-size: 1.1rem; line-height: 1.8; }
+        .contact-details p { margin: 0.5rem 0; }
+        .copyright { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); }
 
         /* 响应式设计 */
         @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
-                gap: 0.5rem;
-            }
-            
-            .logo-img {
-                width: 50px;
-                height: 50px;
-            }
-            
-            .brand-area {
-                gap: 0.8rem;
-            }
-
-            .company-name {
-                font-size: 1.5rem;
-            }
-            
-            .business-type {
-                font-size: 1rem;
-            }
-            
-            .gallery-item {
-                width: 220px;
-                margin: 0 10px;
-            }
-            
-            .gallery-item img {
-                height: 180px;
-            }
-            
-            .gallery-title {
-                font-size: 1.5rem;
-            }
+            .header { flex-direction: column; text-align: center; gap: 0.5rem; }
+            .logo-img { width: 50px; height: 50px; }
+            .brand-area { gap: 0.8rem; }
+            .company-name { font-size: 1.5rem; }
+            .business-type { font-size: 1rem; }
+            .gallery-item { width: 220px; margin: 0 10px; }
+            .gallery-item img { height: 180px; }
+            .gallery-title { font-size: 1.5rem; }
         }
 
         @media (max-width: 480px) {
-            .gallery-item {
-                width: 180px;
-                margin: 0 8px;
-            }
-            
-            .gallery-item img {
-                height: 150px;
-            }
-            
-            .gallery-title {
-                font-size: 1.3rem;
-            }
-            
-            .intro h2 {
-                font-size: 1.3rem;
-            }
-            
-            .intro p {
-                font-size: 1rem;
-            }
+            .gallery-item { width: 180px; margin: 0 8px; }
+            .gallery-item img { height: 150px; }
+            .gallery-title { font-size: 1.3rem; }
+            .intro h2 { font-size: 1.3rem; }
+            .intro p { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
-    <!-- 顶部导航 -->
     <header class="header">
         <div class="brand-area">
             <img src="logo.png" alt="扬州绒花缠花商标" class="logo-img">
@@ -354,7 +150,6 @@
         </div>
     </header>
 
-    <!-- 公司介绍 -->
     <section class="intro">
         <h2>绒颜•让绒花开在鬓边</h2>
         <h2>绒花｜缠花｜饰品高级定制</h2>       
@@ -363,12 +158,13 @@
         <p>●作为手工爱好，绒颜将以现代审美与传统技法结合，创作这些绒花/缠花作品，将古典之美融入日常。</p>
     </section>
 
-    <!-- 绒花馆（优化：去掉了HTML中重复的第二组图片） -->
+    <!-- 绒花馆 -->
     <section class="gallery-section">
         <h2 class="gallery-title">绒花馆</h2>
         <div class="gallery-container">
             <div class="gallery-track">
-                <div class="gallery-item"><img src="r1.jpg" alt="绒花作品" fetchpriority="high"></div>
+                <!-- 首图使用 eager 和 fetchpriority="high" 提升 LCP 性能 -->
+                <div class="gallery-item"><img src="r1.jpg" alt="绒花作品" loading="eager" fetchpriority="high"></div>
                 <div class="gallery-item"><img src="r2.jpg" alt="绒花作品" loading="lazy"></div>
                 <div class="gallery-item"><img src="r3.jpg" alt="绒花作品" loading="lazy"></div>
                 <div class="gallery-item"><img src="r4.jpg" alt="绒花作品" loading="lazy"></div>
@@ -379,7 +175,7 @@
         <a href="javascript:void(0)" class="view-all">查看全部绒花作品</a>
     </section>
 
-    <!-- 缠花馆（优化：去掉了HTML中重复的第二组图片） -->
+    <!-- 缠花馆 -->
     <section class="gallery-section">
         <h2 class="gallery-title">缠花馆</h2>
         <div class="gallery-container">
@@ -395,7 +191,7 @@
         <a href="javascript:void(0)" class="view-all">查看全部缠花作品</a>
     </section>
 
-    <!-- 饰品馆（优化：去掉了HTML中重复的第二组图片） -->
+    <!-- 饰品馆 -->
     <section class="gallery-section">
         <h2 class="gallery-title">饰品馆</h2>
         <div class="gallery-container">
@@ -411,7 +207,6 @@
         <a href="javascript:void(0)" class="view-all">查看全部饰品作品</a>
     </section>
 
-    <!-- 页脚 -->
     <footer class="footer">
         <div class="contact-info">
             <h3 class="contact-title">联系我们</h3>
@@ -425,7 +220,6 @@
         </div>
     </footer>
 
-    <!-- 图片模态框 -->
     <div id="imageModal" class="modal">
         <span class="close">&times;</span>
         <div class="modal-content">
@@ -439,14 +233,17 @@
             const modalImg = document.getElementById('modalImage');
             const closeBtn = document.querySelector('.close');
             const tracks = document.querySelectorAll('.gallery-track');
+            const containers = document.querySelectorAll('.gallery-container');
             
             // ==========================================
-            // 优化1：用JS克隆图片实现无缝滚动（避免HTML中重复写两遍图片，减少首屏HTTP请求数量）
+            // 优化1：使用 cloneNode 安全克隆图片，避免 innerHTML 导致的懒加载重置问题
             // ==========================================
             tracks.forEach(track => {
-                // 克隆所有子元素并追加到后面，实现无缝滚动效果
-                const items = track.innerHTML;
-                track.innerHTML = items + items;
+                const children = Array.from(track.children);
+                // 克隆并追加到末尾
+                children.forEach(child => {
+                    track.appendChild(child.cloneNode(true));
+                });
                 
                 // 克隆完成后再添加动画，防止克隆前就触发滚动
                 track.style.width = '200%';
@@ -454,65 +251,52 @@
             });
 
             // ==========================================
-            // 优化2：图片加载完成后淡入显示（配合CSS的 opacity: 0）
+            // 优化2：图片淡入效果（处理缓存与异步加载）
             // ==========================================
             const allImages = document.querySelectorAll('.gallery-item img');
-            
             allImages.forEach(img => {
-                // 如果图片已经加载完成（从缓存读取）
                 if (img.complete) {
                     img.classList.add('loaded');
                 } else {
-                    img.addEventListener('load', function() {
-                        this.classList.add('loaded');
-                    });
-                    // 图片加载失败时的处理
-                    img.addEventListener('error', function() {
-                        this.classList.add('loaded');
-                        this.alt = '图片加载失败';
+                    img.addEventListener('load', function() { this.classList.add('loaded'); });
+                    img.addEventListener('error', function() { 
+                        this.classList.add('loaded'); 
+                        this.style.backgroundColor = '#ccc'; // 加载失败显示灰色
                     });
                 }
             });
             
             // ==========================================
-            // 图片点击放大功能
+            // 优化3：使用“事件委托”处理点击放大（完美兼容 JS 克隆出来的图片）
             // ==========================================
-            const galleryItems = document.querySelectorAll('.gallery-item');
-            
-            galleryItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const imgSrc = this.querySelector('img').src;
-                    modalImg.src = imgSrc;
+            containers.forEach(container => {
+                container.addEventListener('click', function(e) {
+                    // 查找被点击的 gallery-item
+                    const item = e.target.closest('.gallery-item');
+                    if (!item) return; // 如果点击的不是图片项，则退出
+                    
+                    const img = item.querySelector('img');
+                    if (!img) return;
+
+                    modalImg.src = img.src;
                     modal.style.display = 'flex';
                     document.body.style.overflow = 'hidden';
                     
-                    // 暂停背景轮播动画
-                    tracks.forEach(track => {
-                        track.style.animationPlayState = 'paused';
-                    });
+                    // 暂停所有轮播动画
+                    tracks.forEach(track => { track.style.animationPlayState = 'paused'; });
                 });
             });
             
-            // 关闭模态框
-            closeBtn.addEventListener('click', function() {
+            // 关闭模态框逻辑
+            const closeModal = () => {
                 modal.style.display = 'none';
                 document.body.style.overflow = 'auto';
-                
-                tracks.forEach(track => {
-                    track.style.animationPlayState = 'running';
-                });
-            });
-            
-            // 点击模态框外部关闭
+                tracks.forEach(track => { track.style.animationPlayState = 'running'; });
+            };
+
+            closeBtn.addEventListener('click', closeModal);
             modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                    
-                    tracks.forEach(track => {
-                        track.style.animationPlayState = 'running';
-                    });
-                }
+                if (e.target === modal) closeModal();
             });
         });
     </script>

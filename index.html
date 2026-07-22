@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>扬州·绒花 | 缠花</title>
 <style>
   * {
@@ -14,7 +14,7 @@
   body {
     background-color: #8B4513; /* 背景为褐色 */
     color: #fff;
-    font-family: "SimSun", "宋体", "Microsoft YaHei", sans-serif; /* 字体为宋体 */
+    font-family: "SimSun", "宋体", "Microsoft YaHei", sans-serif;
     line-height: 1.6;
     padding: 20px;
   }
@@ -31,15 +31,20 @@
     align-items: center;
     padding: 10px 20px;
     margin-bottom: 30px;
+    flex-wrap: wrap;
   }
 
   .site-title {
     font-size: 1.8em;
     font-weight: bold;
+    margin: 10px 0;
+    text-align: center;
+    flex-basis: 100%;
   }
 
   .contact-phone {
     font-size: 1.2em;
+    margin: 10px 0;
   }
 
   /* 副标题样式 */
@@ -47,6 +52,7 @@
     text-align: center;
     font-size: 1.5em;
     margin: 20px 0;
+    word-wrap: break-word;
   }
 
   /* 通用产品区域样式 */
@@ -63,41 +69,55 @@
   /* 通用图片滚动容器样式 */
   .scroll-container {
     display: flex;
-    overflow-x: hidden; /* 隐藏横向滚动条 */
+    overflow: hidden;
     padding: 10px 0;
-    background-color: rgba(0, 0, 0, 0.2);
+    margin: 0 -10px;
   }
 
-  /* 通用图片列表样式 (横向排列) */
+  /* 无缝滚动核心样式 */
   .scroll-list {
     display: flex;
-    transition: transform 0.5s ease-in-out;
+    animation: scrollImages 60s linear infinite;
+    white-space: nowrap;
+    will-change: transform;
   }
 
-  /* 图片样式 */
-  .scroll-item img {
+  .scroll-item {
+    flex: 0 0 auto;
     width: 200px;
     height: 200px;
-    object-fit: cover;
-    border-radius: 8px;
     margin: 0 10px;
-    cursor: pointer;
     border: 2px solid transparent;
     transition: border-color 0.3s;
+    cursor: pointer;
   }
 
-  .scroll-item img:hover {
+  .scroll-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .scroll-item:hover {
     border-color: #fff;
+  }
+
+  /* 无缝滚动动画定义 */
+  @keyframes scrollImages {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
   }
 
   /* 查看全部链接样式 */
   .view-all {
     display: block;
     text-align: center;
-    margin: 30px 0;
+    margin-top: 20px;
     font-size: 1.2em;
     color: #fff;
     text-decoration: none;
+    font-weight: bold;
   }
 
   .view-all:hover {
@@ -110,10 +130,13 @@
     margin-top: 50px;
     padding: 20px 0;
     border-top: 1px solid rgba(255, 255, 255, 0.3);
+    width: 100%;
+    left: 0;
   }
 
   .contact-email {
     font-size: 1.2em;
+    margin-top: 10px;
   }
 
   /* 全屏图片放大样式 */
@@ -123,19 +146,19 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
     opacity: 0;
-    pointer-events: none;
+    pointer-events: none; /* 默认不响应事件 */
     transition: opacity 0.3s;
   }
 
   .fullscreen-overlay.active {
     opacity: 1;
-    pointer-events: auto;
+    pointer-events: auto; /* 激活时响应事件 */
   }
 
   .fullscreen-image {
@@ -143,15 +166,57 @@
     max-height: 90%;
     object-fit: contain;
   }
+
+  /* 响应式布局调整 */
+  @media (max-width: 768px) {
+    body {
+      padding: 10px;
+    }
+
+    .container {
+      padding: 0 10px;
+    }
+
+    .section-title {
+      font-size: 1.5em;
+    }
+
+    .scroll-item {
+      width: 150px;
+      height: 150px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .site-title {
+      font-size: 1.5em;
+    }
+
+    .subtitle {
+      font-size: 1.2em;
+    }
+
+    .section-title {
+      font-size: 1.3em;
+    }
+
+    .scroll-item {
+      width: 120px;
+      height: 120px;
+    }
+
+    .contact-phone, .contact-email {
+      font-size: 1em;
+    }
+  }
 </style>
 </head>
 <body>
-
 <div class="container">
-  <!-- 1. 顶部区域 (左上角名称, 右上角电话) -->
+  <!-- 1. 顶部导航栏 -->
   <header class="header">
-    <div class="site-title">扬州·绒花 | 缠花</div>
-    <div class="contact-phone">联系电话: 138-8888-8888</div>
+    <h1 class="site-title">扬州·绒花</h1>
+    <div class="contact-phone">联系电话：138-1234-5678</div>
   </header>
 
   <!-- 2. 居中副标题 -->
@@ -160,105 +225,93 @@
   <!-- 3. 绒花馆区域 -->
   <section class="product-section">
     <h3 class="section-title">绒花馆</h3>
-    <div class="scroll-container" id="scrollContainer1">
+    <div class="scroll-container">
       <div class="scroll-list" id="scrollList1">
-        <div class="scroll-item"><img src="R1.JPG" alt="绒花1"></div>
-        <div class="scroll-item"><img src="R2.JPG" alt="绒花2"></div>
-        <div class="scroll-item"><img src="R3.JPG" alt="绒花3"></div>
-        <div class="scroll-item"><img src="R4.JPG" alt="绒花4"></div>
-        <div class="scroll-item"><img src="R5.JPG" alt="绒花5"></div>
+        <!-- 原始图片列表 -->
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花1" alt="绒花1"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花2" alt="绒花2"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花3" alt="绒花3"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花4" alt="绒花4"></div>
+        <!-- 重复的图片副本 (用于无缝循环) -->
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花1" alt="绒花1"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花2" alt="绒花2"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花3" alt="绒花3"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=绒花4" alt="绒花4"></div>
       </div>
     </div>
+    <a href="#" class="view-all">查看全部绒花</a>
   </section>
 
   <!-- 4. 缠花馆区域 -->
   <section class="product-section">
     <h3 class="section-title">缠花馆</h3>
-    <div class="scroll-container" id="scrollContainer2">
+    <div class="scroll-container">
       <div class="scroll-list" id="scrollList2">
+        <!-- 原始图片列表 -->
         <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花1" alt="缠花1"></div>
         <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花2" alt="缠花2"></div>
         <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花3" alt="缠花3"></div>
         <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花4" alt="缠花4"></div>
-        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花5" alt="缠花5"></div>
+        <!-- 重复的图片副本 (用于无缝循环) -->
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花1" alt="缠花1"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花2" alt="缠花2"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花3" alt="缠花3"></div>
+        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花4" alt="缠花4"></div>
       </div>
     </div>
+    <a href="#" class="view-all">查看全部缠花</a>
   </section>
 
-  <!-- 5. 查看全部链接 -->
-  <a href="#" class="view-all">查看全部</a>
-
-  <!-- 6. 底部邮箱 -->
+  <!-- 5. 页脚信息 -->
   <footer class="footer">
-    <div class="contact-email">邮箱: yangzhou_ronghua@example.com</div>
+    <div class="contact-email">联系邮箱：contact@example.com</div>
   </footer>
 </div>
 
-<!-- 7. 全屏放大图片的遮罩层 -->
+<!-- 6. 全屏放大图片的遮罩层 -->
 <div class="fullscreen-overlay" id="fullscreenOverlay">
   <img src="" alt="全屏预览" class="fullscreen-image" id="fullscreenImage">
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const scrollContainers = document.querySelectorAll('.scroll-container');
-  let scrollIntervals = {};
+  const fullscreenOverlay = document.getElementById('fullscreenOverlay');
+  const fullscreenImage = document.getElementById('fullscreenImage');
 
-  // 为每个滚动区域设置独立的自动滚动、悬停暂停和点击放大功能
-  scrollContainers.forEach(container => {
-    const list = container.querySelector('.scroll-list');
-    const items = container.querySelectorAll('.scroll-item');
-    let scrollAmount = 0;
-    let totalVisibleWidth = 0;
+  // 1. 无缝滚动功能 (使用CSS动画，无需JS)
+  // 2. 点击图片全屏放大功能
+  const scrollItems = document.querySelectorAll('.scroll-item');
 
-    // 计算所有可见项的总宽度
-    items.forEach(item => {
-      totalVisibleWidth += item.offsetWidth + parseInt(window.getComputedStyle(item).marginRight);
+  scrollItems.forEach(item => {
+    item.addEventListener('click', function() {
+      const imgSrc = this.querySelector('img').src;
+      fullscreenImage.src = imgSrc;
+      fullscreenOverlay.classList.add('active');
     });
-
-    function startScroll() {
-      clearInterval(scrollIntervals[container.id]);
-      scrollIntervals[container.id] = setInterval(() => {
-        scrollAmount += 1; // 每次滚动1px
-        if (scrollAmount >= totalVisibleWidth) {
-          list.style.transform = 'translateX(0)';
-          scrollAmount = 0;
-        } else {
-          list.style.transform = `translateX(-${scrollAmount}px)`;
-        }
-      }, 20);
-    }
-
-    container.addEventListener('mouseenter', () => {
-      clearInterval(scrollIntervals[container.id]);
-    });
-
-    container.addEventListener('mouseleave', () => {
-      startScroll();
-    });
-
-    // 3. 点击图片全屏放大
-    items.forEach(item => {
-      item.addEventListener('click', function() {
-        const imgSrc = this.querySelector('img').src;
-        const fullscreenOverlay = document.getElementById('fullscreenOverlay');
-        const fullscreenImage = document.getElementById('fullscreenImage');
-        
-        fullscreenImage.src = imgSrc;
-        fullscreenOverlay.classList.add('active');
-      });
-    });
-
-    // 初始化自动滚动
-    startScroll();
   });
 
   // 关闭全屏图片
-  const fullscreenOverlay = document.getElementById('fullscreenOverlay');
   fullscreenOverlay.addEventListener('click', function(event) {
     if (event.target === this) {
       this.classList.remove('active');
     }
+  });
+
+  // 3. 移动端优化：点击任意位置暂停/恢复滚动
+  let isPaused = false;
+  const scrollLists = document.querySelectorAll('.scroll-list');
+
+  document.body.addEventListener('click', function() {
+    if (isPaused) {
+      scrollLists.forEach(list => {
+        list.style.animationPlayState = 'running';
+      });
+    } else {
+      scrollLists.forEach(list => {
+        list.style.animationPlayState = 'paused';
+      });
+    }
+    isPaused = !isPaused;
   });
 });
 </script>

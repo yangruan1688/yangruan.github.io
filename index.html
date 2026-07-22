@@ -2,273 +2,299 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>扬州·绒花 | 缠花</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>扬州·绒花｜缠花</title>
 <style>
+  /* 全局样式重置与设置 */
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
-
   body {
-    background-color: #8B4513; /* 背景为褐色 */
-    color: #fff;
-    font-family: "SimSun", "宋体", "Microsoft YaHei", sans-serif;
-    line-height: 1.6;
+    font-family: "Noto Serif SC", "宋体", SimSun, serif;
+    background-color: #F8F4E9;
+    color: #5A4A42;
+    line-height: 1.8;
     padding: 20px;
-  }
-
-  .container {
     max-width: 1200px;
     margin: 0 auto;
+    position: relative;
   }
-
-  /* 顶部导航栏样式 */
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    margin-bottom: 30px;
-    flex-wrap: wrap; /* 允许内部元素在小屏幕上换行 */
-  }
-
-  /* 名称和电话各自占据一行（在小屏幕上），在宽屏幕上并排 */
-  .site-title, .contact-phone {
-    flex: 0 0 100%; /* 默认占据整行 */
-    text-align: center;
-    margin: 10px 0;
-  }
-
-  /* 副标题样式 */
-  .subtitle {
-    text-align: center;
-    font-size: 1.5em;
-    margin: 20px 0;
-    word-wrap: break-word;
-  }
-
-  /* 通用产品区域样式 */
-  .product-section {
-    margin: 40px 0;
-  }
-
-  /* 通用标题卡片样式 (用于首页标题和产品区标题) */
-  .section-title {
-    text-align: center;
-    font-size: 2em;
-    margin-bottom: 20px;
-    background-color: #F5F5DC; /* 米黄色背景，体现段落感 */
-    color: #8B4513; /* 深褐色文字，与背景形成对比 */
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    font-family: "Microsoft YaHei", sans-serif;
-  }
-
-  /* 首页主标题和副标题也应用卡片样式 */
-  .site-title, .subtitle {
-    background-color: #F5F5DC;
-    color: #8B4513;
-    padding: 10px;
-    border-radius: 8px;
-    margin: 10px 0;
-    font-family: "Microsoft YaHei", sans-serif;
-  }
-
-  /* 通用图片滚动容器样式 */
-  .scroll-container {
-    display: flex;
-    overflow: hidden;
-    padding: 10px 0;
-  }
-
-  /* 无缝滚动核心样式 */
-  .scroll-list {
-    display: flex;
-    animation: scroll linear infinite;
-    flex: 0 0 auto; /* 关键：防止图片被压缩 */
-  }
-
-  .scroll-list:hover {
-    animation-play-state: paused;
-  }
-
-  .scroll-item {
-    width: 200px;
-    height: 200px;
-    margin-right: 10px;
-    border: 2px solid transparent;
-    transition: border-color 0.3s;
-    cursor: pointer;
-  }
-
-  .scroll-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-
-  .scroll-item:hover {
-    border-color: #fff;
-  }
-
-  /* 无缝滚动动画定义 */
-  @keyframes scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-  }
-
-  /* 页脚样式 */
-  .footer {
-    text-align: center;
-    margin-top: 50px;
-    padding: 20px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-    width: 100%;
-    left: 0;
-  }
-
-  .contact-email {
-    font-size: 1.2em;
-    margin-top: 10px;
-  }
-
-  /* 全屏图片放大样式 */
-  .fullscreen-overlay {
+  body::before {
+    content: "";
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background: linear-gradient(135deg, rgba(240, 230, 210, 0.2) 0%, rgba(255, 253, 245, 0.2) 100%);
+    z-index: -1;
+  }
+
+  /* 标题和链接样式 */
+  h1, h2, h3 {
+    font-family: "Ma Shan Zheng", cursive;
+    color: #8B4513;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  }
+  a {
+    color: #D4AF37;
+    text-decoration: none;
+    font-weight: bold;
+    border-bottom: 1px dashed #D4AF37;
+    padding-bottom: 2px;
+  }
+  a:hover {
+    text-decoration: none;
+    border-bottom: 1px solid #D4AF37;
+  }
+
+  /* 头部样式 */
+  header {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 2px solid #E6DCC8;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+  .header-title {
+    font-size: 1.8em;
+    font-weight: bold;
+    flex: 1 0 auto;
+    text-align: left;
+  }
+  .header-contact {
+    font-size: 1.2em;
+    margin-left: 20px;
+    flex: 0 0 auto;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* 副标题样式 */
+  .subtitle {
+    font-size: 1.8em;
+    margin: 40px 0 20px 0;
+    font-weight: bold;
+    position: relative;
+    padding-left: 20px;
+  }
+  .subtitle::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    background-color: #D4AF37;
+    border-radius: 50%;
+  }
+
+  /* 引言样式 */
+  .introduction {
+    background-color: #FFF9F0;
+    border-left: 4px solid #D4AF37;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 产品展示区通用样式 */
+  .gallery-section {
+    margin: 40px 0;
+  }
+  .gallery-title {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+    border: 2px solid #8B4513;
+    padding: 10px;
+    position: relative;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0 20px;
+    background-color: #F8F4E9;
+  }
+  .gallery-container {
+    overflow: hidden;
+    width: 100%;
+    padding: 10px 0;
+  }
+  .gallery-track {
+    display: flex;
+    width: fit-content;
+    animation: scroll 20s linear infinite;
+  }
+  .gallery-item {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    margin: 0 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .gallery-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  /* 全屏查看器样式 */
+  .fullscreen-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: none;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
   }
-
-  .fullscreen-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
   .fullscreen-image {
     max-width: 90%;
     max-height: 90%;
     object-fit: contain;
   }
 
-  /* 响应式布局调整 */
-  @media (min-width: 769px) {
-    /* 在宽屏幕上，让名称和电话并排显示 */
-    .site-title, .contact-phone {
-      flex: 0 0 auto;
-      text-align: left;
-      margin: 0;
+  /* 页脚样式 */
+  footer {
+    margin-top: 60px;
+    padding: 20px;
+    text-align: center;
+    color: #5A4A42;
+    font-size: 0.9em;
+    border-top: 1px solid #E6DCC8;
+  }
+
+  /* 响应式布局 */
+  @media (max-width: 768px) {
+    header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .header-title, .header-contact {
+      text-align: center;
+      margin-left: 0;
+      margin-right: 0;
+      width: 100%;
+    }
+    .header-contact {
+      margin-top: 10px;
+    }
+    .gallery-item {
+      width: 200px;
+      height: 200px;
     }
   }
 </style>
 </head>
 <body>
-<div class="container">
-  <!-- 1. 顶部导航栏 -->
-  <header class="header">
-    <h1 class="site-title">扬州·绒花 | 缠花</h1>
-    <div class="contact-phone">联系电话：0514-88888888</div>
-  </header>
 
-  <!-- 2. 副标题 -->
-  <h2 class="subtitle">扬古韵今风，琢时光入软</h2>
+<header>
+  <div class="header-title">扬州·绒花｜缠花</div>
+  <div class="header-contact">
+    联系电话: 138-1234-5678<br>
+    联系邮箱: yangzhou_ronghua@example.com
+  </div>
+</header>
 
-  <!-- 3. 绒花馆区域 -->
-  <section class="product-section">
-    <h2 class="section-title">绒花馆</h2>
-    <div class="scroll-container">
-      <div class="scroll-list" id="scrollList1">
-        <!-- 原始图片列表 -->
-        <div class="scroll-item"><img src="R1.JPG" alt="绒花1"></div>
-        <div class="scroll-item"><img src="R2.JPG" alt="绒花2"></div>
-        <div class="scroll-item"><img src="R3.JPG" alt="绒花3"></div>
-        <!-- 重复一次列表以实现无缝循环 -->
-        <div class="scroll-item"><img src="R1.JPG" alt="绒花1"></div>
-        <div class="scroll-item"><img src="R2.JPG" alt="绒花2"></div>
-        <div class="scroll-item"><img src="R3.JPG" alt="绒花3"></div>
+<main>
+  <h2 class="subtitle">非遗之美，指尖传承</h2>
+  <div class="introduction">
+    <p>欢迎来到我们的绒花与缠花世界。这里展示了我们精心制作的绒花与缠花作品，每一件都凝聚了匠人的心血与对传统工艺的热爱。我们致力于将这份珍贵的非物质文化遗产传承下去，并赋予其新的生命力。</p>
+  </div>
+
+  <section class="gallery-section">
+    <h3 class="gallery-title">绒花馆</h3>
+    <div class="gallery-container">
+      <div class="gallery-track" id="ronghua-track">
+        <img src="https://via.placeholder.com/250/FF5733/FFFFFF?text=绒花1" alt="绒花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/33A1FF/FFFFFF?text=绒花2" alt="绒花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/F0FF33/000000?text=绒花3" alt="绒花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/FF33A1/FFFFFF?text=绒花4" alt="绒花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/33FF57/000000?text=绒花5" alt="绒花样品" class="gallery-item">
+        <!-- 为了实现无缝循环，将图片列表复制一份 -->
+        <img src="https://via.placeholder.com/250/FF5733/FFFFFF?text=绒花1" alt="绒花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/33A1FF/FFFFFF?text=绒花2" alt="绒花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/F0FF33/000000?text=绒花3" alt="绒花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/FF33A1/FFFFFF?text=绒花4" alt="绒花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/33FF57/000000?text=绒花5" alt="绒花样品" class="gallery-item">
       </div>
     </div>
   </section>
 
-  <!-- 4. 缠花馆区域 -->
-  <section class="product-section">
-    <h2 class="section-title">缠花馆</h2>
-    <div class="scroll-container">
-      <div class="scroll-list" id="scrollList2">
-        <!-- 原始图片列表 -->
-        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花1" alt="缠花1"></div>
-        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花2" alt="缠花2"></div>
-        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花3" alt="缠花3"></div>
-        <!-- 重复一次列表以实现无缝循环 -->
-        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花1" alt="缠花1"></div>
-        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花2" alt="缠花2"></div>
-        <div class="scroll-item"><img src="https://via.placeholder.com/200/8B4513/FFFFFF?text=缠花3" alt="缠花3"></div>
+  <section class="gallery-section">
+    <h3 class="gallery-title">缠花馆</h3>
+    <div class="gallery-container">
+      <div class="gallery-track" id="chanhua-track">
+        <img src="https://via.placeholder.com/250/FF5733/FFFFFF?text=缠花1" alt="缠花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/33FF57/000000?text=缠花2" alt="缠花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/33A1FF/FFFFFF?text=缠花3" alt="缠花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/F0FF33/000000?text=缠花4" alt="缠花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/FF33A1/FFFFFF?text=缠花5" alt="缠花样品" class="gallery-item">
+        <!-- 为了实现无缝循环，将图片列表复制一份 -->
+        <img src="https://via.placeholder.com/250/FF5733/FFFFFF?text=缠花1" alt="缠花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/33FF57/000000?text=缠花2" alt="缠花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/33A1FF/FFFFFF?text=缠花3" alt="缠花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/F0FF33/000000?text=缠花4" alt="缠花样品" class="gallery-item">
+        <img src="https://via.placeholder.com/250/FF33A1/FFFFFF?text=缠花5" alt="缠花样品" class="gallery-item">
       </div>
     </div>
   </section>
+</main>
 
-  <!-- 5. 页脚信息 -->
-  <footer class="footer">
-    <div class="contact-email">联系邮箱：contact@example.com</div>
-  </footer>
+<div class="fullscreen-viewer" id="fullscreen-viewer">
+  <img src="" alt="全屏预览" class="fullscreen-image" id="fullscreen-image">
 </div>
 
-<!-- 6. 全屏放大图片的遮罩层 -->
-<div class="fullscreen-overlay" id="fullscreenOverlay">
-  <img src="" alt="全屏预览" class="fullscreen-image" id="fullscreenImage">
-</div>
+<footer>
+  &copy; 2026 扬州绒花坊. 保留所有权利。
+</footer>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const scrollItems = document.querySelectorAll('.scroll-item');
-  const fullscreenOverlay = document.getElementById('fullscreenOverlay');
-  const fullscreenImage = document.getElementById('fullscreenImage');
-  const scrollLists = document.querySelectorAll('.scroll-list');
+  // JavaScript 逻辑
+  document.addEventListener('DOMContentLoaded', function() {
+    const fullscreenViewer = document.getElementById('fullscreen-viewer');
+    const fullscreenImage = document.getElementById('fullscreen-image');
+    const galleryItems = document.querySelectorAll('.gallery-item');
 
-  // 1. 图片点击放大功能
-  scrollItems.forEach(item => {
-    item.addEventListener('click', function() {
-      const imgSrc = this.querySelector('img').src;
-      fullscreenImage.src = imgSrc;
-      fullscreenOverlay.classList.add('active');
+    galleryItems.forEach(item => {
+      item.addEventListener('click', function() {
+        fullscreenImage.src = this.src;
+        fullscreenViewer.style.display = 'flex';
+      });
+    });
+
+    // 点击查看器本身（非图片）时关闭
+    fullscreenViewer.addEventListener('click', function(e) {
+      if (e.target === fullscreenViewer) {
+        fullscreenViewer.style.display = 'none';
+      }
+    });
+
+    // 获取所有滚动轨道
+    const tracks = document.querySelectorAll('.gallery-track');
+
+    // 为每个轨道添加鼠标悬停暂停效果
+    tracks.forEach(track => {
+      track.addEventListener('mouseenter', function() {
+        this.style.animationPlayState = 'paused';
+      });
+
+      track.addEventListener('mouseleave', function() {
+        this.style.animationPlayState = 'running';
+      });
     });
   });
-
-  // 2. 关闭全屏图片
-  fullscreenOverlay.addEventListener('click', function(event) {
-    if (event.target === this) {
-      this.classList.remove('active');
-    }
-  });
-
-  // 3. 移动端优化：点击任意位置暂停/恢复滚动
-  let isPaused = false;
-  document.body.addEventListener('click', function() {
-    if (isPaused) {
-      scrollLists.forEach(list => {
-        list.style.animationPlayState = 'running';
-      });
-    } else {
-      scrollLists.forEach(list => {
-        list.style.animationPlayState = 'paused';
-      });
-    }
-    isPaused = !isPaused;
-  });
-});
 </script>
 
 </body>

@@ -229,10 +229,11 @@
 </div>
 
 <script>
-// JavaScript for image fullscreen preview
-document.addEventListener('DOMContentLoaded', function() {
-  const overlay = document.getElementById('fullscreen-overlay');
-  const fullscreenImage = document.getElementById('fullscreen-image');
+// --- 以下是生产环境的真实代码，请替换上面的alert语句 ---
+const fullImagePath = 'images/' + imgSrc; // 拼接完整路径
+fullscreenImage.src = fullImagePath;
+overlay.style.display = 'flex';
+// --- 替换结束 ---
   
   // 使用事件委托，只为.container添加一个事件监听器
   document.querySelector('.container').addEventListener('click', function(event) {

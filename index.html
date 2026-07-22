@@ -16,16 +16,16 @@
             background-color: #8B4513; /* 褐色背景 */
             color: #333;
             line-height: 1.6;
-            padding: 20px;
+            padding: 0;
+            margin: 0;
         }
         
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            max-width: 1200px;
-            margin: 0 auto;
+            padding: 20px 5%;
+            background-color: rgba(139, 69, 19, 0.9);
         }
         
         .site-title {
@@ -36,70 +36,76 @@
         
         .contact {
             color: #fff;
-            font-size: 16px;
+            font-size: 18px;
         }
         
         .main {
             max-width: 1200px;
-            margin: 30px auto;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin: 0 auto;
+            padding: 40px 20px;
         }
         
         .subtitle {
             text-align: center;
             font-size: 28px;
-            color: #8B4513;
-            margin: 20px 0 40px;
-            font-weight: bold;
+            color: #fff;
+            margin: 30px 0;
+            padding: 15px;
+            background-color: rgba(139, 69, 19, 0.7);
         }
         
         .section {
-            margin-bottom: 40px;
+            margin: 40px 0;
         }
         
         .section-title {
-            font-size: 22px;
-            color: #8B4513;
             text-align: center;
+            font-size: 24px;
+            color: #fff;
             margin-bottom: 20px;
-            font-weight: bold;
         }
         
-        .products-container {
+        .gallery-container {
             overflow: hidden;
             position: relative;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .gallery {
+            display: flex;
+            animation: scroll 30s linear infinite;
             padding: 10px 0;
         }
         
-        .products {
-            display: flex;
-            position: relative;
-            transition: transform 0.3s ease-out;
-        }
-        
-        .product-item {
-            min-width: 200px;
-            height: 250px;
-            border-radius: 8px;
-            overflow: hidden;
+        .gallery img {
+            width: 250px;
+            height: 200px;
+            object-fit: cover;
+            margin: 0 15px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: transform 0.3s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
             flex-shrink: 0;
         }
         
-        .product-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
+        .gallery img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
         }
         
-        .product-item:hover {
-            transform: scale(1.03);
+        .gallery img.expanded {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: auto;
+            max-width: 90%;
+            max-height: 80%;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            border: 3px solid #fff;
         }
         
         .view-all {
@@ -108,69 +114,75 @@
         }
         
         .view-all a {
-            color: #8B4513;
+            color: #fff;
             text-decoration: none;
             font-size: 18px;
-            padding: 10px 20px;
-            border: 2px solid #8B4513;
-            border-radius: 30px;
+            padding: 10px 25px;
+            border: 2px solid #fff;
+            border-radius: 25px;
             transition: all 0.3s;
         }
         
         .view-all a:hover {
-            background-color: #8B4513;
-            color: white;
+            background-color: #fff;
+            color: #8B4513;
         }
         
         .footer {
             text-align: center;
+            padding: 25px 0;
             color: #fff;
-            margin-top: 40px;
-            padding: 20px 0;
-        }
-        
-        .email {
             font-size: 18px;
+            background-color: rgba(139, 69, 19, 0.8);
+            margin-top: 20px;
         }
         
-        .product-item.expanded {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            height: 80%;
-            min-width: auto;
-            z-index: 1000;
-            border-radius: 0;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        /* 滚动暂停效果 */
+        .gallery-container:hover .gallery {
+            animation-play-state: paused;
         }
         
-        .product-item.expanded img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+        /* 动画关键帧 */
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
         }
         
         /* 响应式设计 */
         @media (max-width: 768px) {
-            .main {
-                padding: 15px;
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .contact {
+                order: 1;
+            }
+            
+            .gallery img {
+                width: 180px;
+                height: 150px;
+                margin: 0 10px;
             }
             
             .subtitle {
                 font-size: 16px;
-                margin: 15px 0 30px;
             }
             
             .section-title {
                 font-size: 16px;
-                margin-bottom: 15px;
             }
-            
-            .product-item {
-                min-width: 160px;
-                height: 200px;
+        }
+        
+        @media (max-width: 480px) {
+            .gallery img {
+                width: 140px;
+                height: 120px;
             }
             
             .site-title {
@@ -178,17 +190,6 @@
             }
             
             .contact {
-                font-size: 14px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .product-item {
-                min-width: 140px;
-                height: 180px;
-            }
-            
-            .site-title {
                 font-size: 16px;
             }
         }
@@ -201,19 +202,39 @@
     </div>
     
     <div class="main">
-        <h1 class="subtitle">扬古韵今风，琢时光入软</h1>
+        <h2 class="subtitle">扬古韵今风，琢时光入软</h2>
         
         <div class="section">
-            <h2 class="section-title">绒花馆</h2>
-            <div class="products-container" id="ronghua-container">
-                <div class="products" id="ronghua-products"></div>
+            <h3 class="section-title">绒花馆</h3>
+            <div class="gallery-container">
+                <div class="gallery" id="gallery1">
+                    <img src="R1.JPG" alt="绒花作品1">
+                    <img src="R2.JPG" alt="绒花作品2">
+                    <img src="R3.JPG" alt="绒花作品3">
+                    <img src="R4.JPG" alt="绒花作品4">
+                    <img src="R5.JPG" alt="绒花作品5">
+                    <img src="R1.JPG" alt="绒花作品1">
+                    <img src="R2.JPG" alt="绒花作品2">
+                    <img src="R3.JPG" alt="绒花作品3">
+                    <img src="R4.JPG" alt="绒花作品4">
+                </div>
             </div>
         </div>
         
         <div class="section">
-            <h2 class="section-title">缠花馆</h2>
-            <div class="products-container" id="chanhua-container">
-                <div class="products" id="chanhua-products"></div>
+            <h3 class="section-title">缠花馆</h3>
+            <div class="gallery-container">
+                <div class="gallery" id="gallery2">
+                    <img src="R1.JPG" alt="绒花作品1">
+                    <img src="R2.JPG" alt="绒花作品2">
+                    <img src="R3.JPG" alt="绒花作品3">
+                    <img src="R4.JPG" alt="绒花作品4">
+                    <img src="R5.JPG" alt="绒花作品5">
+                    <img src="R1.JPG" alt="绒花作品1">
+                    <img src="R2.JPG" alt="绒花作品2">
+                    <img src="R3.JPG" alt="绒花作品3">
+                    <img src="R4.JPG" alt="绒花作品4">
+                </div>
             </div>
         </div>
         
@@ -223,137 +244,48 @@
     </div>
     
     <div class="footer">
-        <div class="email">邮箱：yangzhou_ronghua@example.com</div>
+        <p>邮箱：yangzhou_ronghua@163.com</p >
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 产品数据（实际使用时替换为真实图片URL）
-            const productData = {
-                ronghua: [
-                    { src: 'https://fakeimg.pl/300x400/8B4513/FFFFFF/?text=绒花1&font=noto&font_size=80', alt: '绒花作品1' },
-                    { src: 'https://fakeimg.pl/300x400/D2B48C/8B4513/?text=绒花2&font=noto&font_size=80', alt: '绒花作品2' },
-                    { src: 'https://fakeimg.pl/300x400/8B4513/FFFFFF/?text=绒花3&font=noto&font_size=80', alt: '绒花作品3' },
-                    { src: 'https://fakeimg.pl/300x400/D2B48C/8B4513/?text=绒花4&font=noto&font_size=80', alt: '绒花作品4' },
-                    { src: 'https://fakeimg.pl/300x400/8B4513/FFFFFF/?text=绒花5&font=noto&font_size=80', alt: '绒花作品5' },
-                    { src: 'https://fakeimg.pl/300x400/D2B48C/8B4513/?text=绒花6&font=noto&font_size=80', alt: '绒花作品6' }
-                ],
-                chanhua: [
-                    { src: 'https://fakeimg.pl/300x400/8B4513/FFFFFF/?text=缠花1&font=noto&font_size=80', alt: '缠花作品1' },
-                    { src: 'https://fakeimg.pl/300x400/D2B48C/8B4513/?text=缠花2&font=noto&font_size=80', alt: '缠花作品2' },
-                    { src: 'https://fakeimg.pl/300x400/8B4513/FFFFFF/?text=缠花3&font=noto&font_size=80', alt: '缠花作品3' },
-                    { src: 'https://fakeimg.pl/300x400/D2B48C/8B4513/?text=缠花4&font=noto&font_size=80', alt: '缠花作品4' },
-                    { src: 'https://fakeimg.pl/300x400/8B4513/FFFFFF/?text=缠花5&font=noto&font_size=80', alt: '缠花作品5' },
-                    { src: 'https://fakeimg.pl/300x400/D2B48C/8B4513/?text=缠花6&font=noto&font_size=80', alt: '缠花作品6' }
-                ]
-            };
+            // 为所有图片添加点击放大功能
+            const images = document.querySelectorAll('.gallery img');
+            let expandedImage = null;
             
-            // 初始化产品展示区
-            function initProductSection(sectionId, products, speed) {
-                const container = document.getElementById(sectionId);
-                const itemsPerCopy = products.length;
-                
-                // 创建两份产品列表（实现无缝循环的关键）
-                for (let i = 0; i < 2; i++) {
-                    products.forEach(product => {
-                        const item = document.createElement('div');
-                        item.className = 'product-item';
-                        item.innerHTML = `< img src="${product.src}" alt="${product.alt}">`;
-                        container.appendChild(item);
-                    });
-                }
-                
-                // 计算单个产品宽度（包含间距）
-                const itemWidth = container.firstElementChild.offsetWidth + 15; // 15px是gap值
-                
-                // 滚动控制
-                let scrollPosition = 0;
-                let isPaused = false;
-                let animationFrame;
-                
-                function autoScroll() {
-                    if (isPaused) return;
-                    
-                    scrollPosition += speed;
-                    const maxScroll = itemsPerCopy * itemWidth;
-                    
-                    // 当滚动超过一份完整列表时，瞬间重置位置（用户看不到跳跃）
-                    if (scrollPosition >= maxScroll) {
-                        container.style.transition = 'none';
-                        scrollPosition = 0;
-                        container.style.transform = `translateX(-${scrollPosition}px)`;
-                        
-                        // 确保下一帧恢复过渡效果
-                        requestAnimationFrame(() => {
-                            container.style.transition = 'transform 0.3s ease-out';
-                        });
-                    } else {
-                        container.style.transform = `translateX(-${scrollPosition}px)`;
+            images.forEach(img => {
+                img.addEventListener('click', function() {
+                    // 如果点击的是已展开的图片，则恢复原状
+                    if (expandedImage === this) {
+                        this.classList.remove('expanded');
+                        expandedImage = null;
+                        return;
                     }
                     
-                    animationFrame = requestAnimationFrame(autoScroll);
-                }
-                
-                // 鼠标悬停暂停
-                const containerParent = document.getElementById(sectionId + '-container');
-                containerParent.addEventListener('mouseenter', () => {
-                    isPaused = true;
-                });
-                
-                containerParent.addEventListener('mouseleave', () => {
-                    isPaused = false;
-                });
-                
-                // 启动自动滚动
-                autoScroll();
-                
-                // 清理函数（如果需要）
-                return {
-                    pause: () => { isPaused = true; },
-                    resume: () => { isPaused = false; },
-                    destroy: () => { 
-                        isPaused = true;
-                        cancelAnimationFrame(animationFrame);
+                    // 如果已有展开的图片，先恢复
+                    if (expandedImage) {
+                        expandedImage.classList.remove('expanded');
                     }
-                };
-            }
+                    
+                    // 展开当前图片
+                    this.classList.add('expanded');
+                    expandedImage = this;
+                });
+            });
             
-            // 初始化两个产品区
-            const ronghuaScroll = initProductSection('ronghua-products', productData.ronghua, 0.8);
-            const chanhuaScroll = initProductSection('chanhua-products', productData.chanhua, 1.0);
-            
-            // 图片点击放大功能
+            // 点击页面其他区域恢复图片
             document.addEventListener('click', function(e) {
-                const productItem = e.target.closest('.product-item');
-                if (!productItem) return;
-                
-                // 阻止事件冒泡到body
-                e.stopPropagation();
-                
-                // 如果是放大状态，再次点击则缩小
-                if (productItem.classList.contains('expanded')) {
-                    productItem.classList.remove('expanded');
-                    document.body.style.overflow = 'auto';
-                } else {
-                    // 先缩小所有已放大的项目
-                    document.querySelectorAll('.product-item.expanded').forEach(item => {
-                        item.classList.remove('expanded');
-                    });
-                    
-                    // 放大当前项目
-                    productItem.classList.add('expanded');
-                    document.body.style.overflow = 'hidden';
+                if (expandedImage && !expandedImage.contains(e.target) && !e.target.closest('.gallery')) {
+                    expandedImage.classList.remove('expanded');
+                    expandedImage = null;
                 }
             });
             
-            // 点击页面其他地方缩小图片
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.product-item') && document.querySelector('.product-item.expanded')) {
-                    document.querySelectorAll('.product-item.expanded').forEach(item => {
-                        item.classList.remove('expanded');
-                    });
-                    document.body.style.overflow = 'auto';
-                }
+            // 阻止点击图片时触发页面点击事件
+            document.querySelectorAll('.gallery').forEach(gallery => {
+                gallery.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
             });
         });
     </script>

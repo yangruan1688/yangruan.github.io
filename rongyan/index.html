@@ -1,35 +1,31 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>绒颜</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>我的饰品店</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body id="home">
+  <header>
+    <h1>我的饰品店</h1>
+    <nav>
+      <ul id="categoryFilter">
+        <li><button class="filter-btn active" data-filter="all">全部</button></li>
+        <li><button class="filter-btn" data-filter="hair">发饰</button></li>
+        <li><button class="filter-btn" data-filter="ear">耳饰</button></li>
+        <li><button class="filter-btn" data-filter="brooch">胸针</button></li>
+        <li><button class="filter-btn" data-filter="other">其他</button></li>
+      </ul> <!-- 修正：添加了缺失的 closing </ul> tag -->
+    </nav>
+  </header>
 
-    <div class="container">
-        <!-- 顶部导航 -->
-        <nav class="top-nav">
-            <button class="nav-btn active" data-category="全部">全部</button>
-            <button class="nav-btn" data-category="发饰">发饰</button>
-            <button class="nav-btn" data-category="耳饰">耳饰</button>
-            <button class="nav-btn" data-category="胸针">胸针</button>
-            <button class="nav-btn" data-category="其他">其他</button>
-        </nav>
-
-        <!-- 筛选栏 -->
-
-
-        <!-- 产品列表容器 -->
-        <div id="product-grid" class="product-grid">
-            <!-- 初始状态：加载中提示 -->
-            <div id="loading-state" style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #888;">
-                <p>✨ 正在加载精美饰品...</p>
-            </div>
-        </div>
+  <main>
+    <div class="products-grid" id="productsGrid">
+      <!-- 产品卡片将通过 JavaScript 动态生成 -->
     </div>
+  </main>
 
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

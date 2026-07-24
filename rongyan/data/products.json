@@ -3,7 +3,7 @@
     "id": 1,
     "name": "珍珠流苏发簪",
     "category": "发饰",
-    "coverImage": "images/hair1.jpg",
+    "coverImage": "../../images/c1.webp",
     "images": [
       "../../images/c1.webp",
       "../../images/c2.webp",
@@ -15,7 +15,7 @@
     "id": 2,
     "name": "星月耳骨夹",
     "category": "耳饰",
-    "coverImage": "images/ear1.jpg",
+    "coverImage": "../../images/r1.webp",
     "images": [
       "../../images/r1.webp",
       "../../images/r2.webp",
@@ -27,7 +27,7 @@
     "id": 3,
     "name": "复古玫瑰胸针",
     "category": "胸针",
-    "coverImage": "images/brooch1.jpg",
+    "coverImage": "../../images/s1.webp",
     "images": [
       "../../images/s1.webp",
       "../../images/s2.webp",
@@ -39,7 +39,7 @@
     "id": 4,
     "name": "手工编织发带",
     "category": "发饰",
-    "coverImage": "images/hair2.jpg",
+    "coverImage": "../../images/c1.webp",
     "images": [
       "../../images/c1.webp",
       "../../images/c2.webp",
@@ -51,7 +51,7 @@
     "id": 5,
     "name": "极简几何耳钉",
     "category": "耳饰",
-    "coverImage": "images/ear2.jpg",
+    "coverImage": "../../images/c1.webp",
     "images": [
       "../../images/r1.webp",
       "../../images/r2.webp",

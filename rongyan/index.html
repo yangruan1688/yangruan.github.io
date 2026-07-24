@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#faf8f5">
-<title>扬软</title>
+<title>拾光饰品 · 精品商铺</title>
 <style>
   /* ============ 基础重置 ============ */
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -19,7 +19,6 @@
     --shadow: 0 2px 16px rgba(0,0,0,0.06);
     --shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
     --radius: 12px;
-    --nav-h: 72px;
   }
 
   html {
@@ -34,9 +33,9 @@
     color: var(--text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    padding-top: var(--nav-h);
     min-height: 100vh;
     overflow-x: hidden;
+    /* padding-top 会在下面根据屏幕宽度设置 */
   }
 
   /* ============ 固定导航栏 ============ */
@@ -44,7 +43,6 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 1000;
-    height: var(--nav-h);
     background: rgba(255,255,255,0.88);
     backdrop-filter: saturate(180%) blur(20px);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -52,35 +50,44 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 0 16px;
-    /* 适配刘海屏 */
-    padding-top: env(safe-area-inset-top, 0px);
+    padding: 10px 16px;
+    padding-top: calc(10px + env(safe-area-inset-top, 0px));
   }
 
   .brand {
     text-align: center;
-    font-size: 13px;
+    font-size: 14px;
     letter-spacing: 6px;
     color: var(--primary);
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     user-select: none;
   }
 
+  /* 导航分类容器 - 支持横向滑动 */
   .categories {
     display: flex;
-    justify-content: center;
-    gap: 6px;
+    justify-content: flex-start;
+    gap: 8px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     padding: 0 4px;
+    scroll-snap-type: x proximity;
   }
   .categories::-webkit-scrollbar { display: none; }
 
+  /* 两端留白呼吸感 */
+  .categories::before,
+  .categories::after {
+    content: '';
+    flex-shrink: 0;
+    width: 4px;
+  }
+
   .nav-btn {
     flex-shrink: 0;
-    padding: 6px 18px;
+    padding: 7px 18px;
     border: 1.5px solid transparent;
     background: transparent;
     color: var(--text);
@@ -93,6 +100,7 @@
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    scroll-snap-align: center;
   }
   .nav-btn:hover {
     color: var(--primary);
@@ -105,6 +113,13 @@
     box-shadow: 0 2px 12px rgba(184,134,11,0.3);
   }
   .nav-btn .icon { margin-right: 3px; font-size: 14px; }
+
+  /* 小屏手机优化 */
+  @media (max-width: 420px) {
+    .navbar { padding: 8px 12px; padding-top: calc(8px + env(safe-area-inset-top, 0px)); }
+    .brand { font-size: 12px; letter-spacing: 4px; margin-bottom: 6px; }
+    .nav-btn { padding: 5px 14px; font-size: 13px; }
+  }
 
   /* ============ 主内容 ============ */
   .main {
@@ -186,7 +201,6 @@
     transform: scale(1.05);
   }
 
-  /* 图片加载失败占位 */
   .card-img-wrap .img-fallback {
     position: absolute;
     top: 0; left: 0;
@@ -220,9 +234,7 @@
     pointer-events: none;
   }
 
-  .card-info {
-    padding: 12px 12px 14px;
-  }
+  .card-info { padding: 12px 12px 14px; }
   .card-name {
     font-size: 13px;
     font-weight: 600;
@@ -233,9 +245,7 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  @media (min-width: 768px) {
-    .card-name { font-size: 14px; }
-  }
+  @media (min-width: 768px) { .card-name { font-size: 14px; } }
   .card-price {
     font-size: 17px;
     font-weight: 700;
@@ -247,22 +257,14 @@
     margin-right: 1px;
   }
 
-  /* ============ 空状态 ============ */
-  .empty {
+  /* ============ 空状态/加载 ============ */
+  .empty, .loading {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 80px 20px;
+    padding: 60px 20px;
     color: var(--text-light);
   }
   .empty-icon { font-size: 48px; margin-bottom: 16px; }
-
-  /* ============ 加载中 ============ */
-  .loading {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px;
-    color: var(--text-light);
-  }
   .spinner {
     width: 30px; height: 30px;
     border: 3px solid #eee;
@@ -284,7 +286,6 @@
     margin-top: 20px;
   }
 
-  /* ============ 滚动条 ============ */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #d0c8b8; border-radius: 3px; }
@@ -293,7 +294,7 @@
 <body>
 
 <!-- 固定导航栏 -->
-<nav class="navbar">
+<nav class="navbar" id="navbar">
   <div class="brand">✦ 拾光饰品 ✦</div>
   <div class="categories" id="cats">
     <button class="nav-btn active" data-cat="全部"><span class="icon">🏠</span>全部</button>
@@ -322,6 +323,15 @@
   var grid = document.getElementById('grid');
   var cats = document.getElementById('cats');
   var titleEl = document.getElementById('title');
+  var navbar = document.getElementById('navbar');
+
+  // ====== 动态设置 body padding-top 以适配导航栏高度 ======
+  function adjustBodyPadding() {
+    var navHeight = navbar.offsetHeight;
+    document.body.style.paddingTop = navHeight + 'px';
+  }
+  adjustBodyPadding();
+  window.addEventListener('resize', adjustBodyPadding);
 
   // ====== 加载数据 ======
   fetch('products.json')
@@ -338,7 +348,7 @@
         '<div class="empty">' +
           '<div class="empty-icon">😢</div>' +
           '<p>产品加载失败</p>' +
-          '<p style="font-size:12px;margin-top:8px;color:#bbb">请确认 products.json 文件存在且通过 HTTP 服务器访问</p>' +
+          '<p style="font-size:12px;margin-top:8px;color:#bbb">请确认 products.json 存在且通过 HTTP 服务器访问</p>' +
         '</div>';
     });
 
@@ -351,6 +361,12 @@
     for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
     btn.classList.add('active');
 
+    // 自动滚动导航栏，让当前按钮居中显示
+    var catsRect = cats.getBoundingClientRect();
+    var btnRect = btn.getBoundingClientRect();
+    var scrollTarget = cats.scrollLeft + (btnRect.left - catsRect.left) - (catsRect.width / 2) + (btnRect.width / 2);
+    cats.scrollTo({ left: scrollTarget, behavior: 'smooth' });
+
     var cat = btn.getAttribute('data-cat');
     titleEl.innerHTML = '—— 为你精选 <span>' + cat + '</span> 饰品 ——';
 
@@ -359,7 +375,6 @@
     });
     render(list);
 
-    // 滚到顶部
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 

@@ -1,247 +1,54 @@
 /* =========================================
-   1. 全局基础设置 
+   ✨ PC端画廊交互增强样式 (追加到 style.css 底部)
    ========================================= */
-*, *::before, *::after {
-    box-sizing: border-box; 
-}
 
-body {
-    margin: 0;
-    padding: 0;
-    background-color: #F7F5F0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: #333;
-    overflow-x: hidden; 
-    -webkit-text-size-adjust: 100%; 
-}
-
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 15px; 
-    padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
-}
-
-/* =========================================
-   2. 导航栏与筛选 (保持不变)
-   ========================================= */
-.top-nav {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 12px;
-    margin-bottom: 5px;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch; 
-}
-.top-nav::-webkit-scrollbar { display: none; }
-.top-nav { -ms-overflow-style: none; scrollbar-width: none; }
-
-.nav-btn {
-    background: #fff;
-    border: 1px solid #E0DCD3;
-    border-radius: 20px;
-    padding: 8px 18px;
-    font-size: 14px;
-    cursor: pointer;
-    color: #666;
-    transition: all 0.3s;
-    flex-shrink: 0; 
-}
-
-.nav-btn.active, .nav-btn:hover {
-    background: #FFFDF5;
-    border-color: #CFAA68;
-    color: #CFAA68;
-    font-weight: bold;
-}
-
-.filter-bar {
-    margin: 10px 0 15px 0;
-    font-size: 14px;
-    color: #888;
-    border-bottom: 1px solid #EAEAEA;
-    padding-bottom: 10px;
-}
-
-/* =========================================
-   3. 首页产品网格 (保持不变)
-   ========================================= */
-.product-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); 
-    gap: 12px;
-}
-
-.card {
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    cursor: pointer;
-    transition: transform 0.2s;
-    display: flex;
-    flex-direction: column;
-}
-.card:active { transform: scale(0.98); }
-
-.card img {
-    width: 100%;
-    aspect-ratio: 1 / 1; 
-    object-fit: cover;
-    display: block;
-    background-color: #eee; 
-}
-
-.card-info {
-    padding: 10px 12px 12px 12px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.card-title {
-    font-size: 14px;
-    margin: 0 0 8px 0;
-    color: #333;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    word-break: break-all; 
-}
-
-.card-price {
-    font-size: 16px;
-    color: #B8860B;
-    font-weight: bold;
-    margin-top: auto; 
-}
-
-/* =========================================
-   4. 详情页：多图滑动画廊 (✨ 新增核心样式)
-   ========================================= */
-.gallery-container {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    border-radius: 12px;
-    background: #fff;
-    margin-bottom: 20px;
-}
-
-/* 滑动轨道：让图片横向排列 */
-.gallery-track {
-    display: flex;
-    overflow-x: auto;
-    /* 核心：开启横向滚动吸附，滑动后自动对齐到某张图片，手感极佳 */
-    scroll-snap-type: x mandatory; 
-    -webkit-overflow-scrolling: touch;
-}
-
-/* 隐藏画廊的滚动条 */
-.gallery-track::-webkit-scrollbar { display: none; }
-.gallery-track { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* 画廊里的每一张图片 */
-.gallery-track img {
-    flex: 0 0 100%; /* 每张图片强制占据 100% 的宽度 */
-    width: 100%;
-    aspect-ratio: 4 / 5; /* 详情页图片通常比首页列表图更高一点，适合展示全身/细节 */
-    object-fit: cover;
-    /* 核心：滑动吸附的对齐点 */
-    scroll-snap-align: start; 
-    display: block;
-}
-
-/* 底部小圆点指示器容器 */
-.gallery-indicators {
+/* 左右箭头基础样式 */
+.gallery-arrow {
     position: absolute;
-    bottom: 12px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    /* 给小圆点加个半透明黑底，确保在浅色图片上也能看清 */
-    background: rgba(0,0,0,0.2);
-    padding: 5px 0;
-    border-radius: 20px;
-    width: fit-content;
-    margin: 0 auto;
-}
-
-/* 默认小圆点 */
-.gallery-indicators .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    transition: all 0.3s;
-}
-
-/* 当前激活的小圆点 */
-.gallery-indicators .dot.active {
-    background: #fff;
-    width: 16px; /* 激活时变成椭圆形，更符合现代 UI 设计 */
-    border-radius: 3px;
-}
-
-/* =========================================
-   5. 详情页其他信息 (保持不变)
-   ========================================= */
-.back-link {
-    display: inline-block;
-    margin-bottom: 15px;
-    text-decoration: none;
-    color: #666;
-    font-size: 14px;
-}
-
-.detail-content {
-    background: #fff;
-    border-radius: 12px;
-    padding: 0 15px 15px 15px; /* 顶部去掉 padding，让画廊图片贴边 */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.detail-info {
-    padding: 0 5px;
-}
-
-.detail-info h1 {
-    font-size: 20px;
-    line-height: 1.4;
-    margin: 15px 0 10px 0;
-}
-
-.detail-price {
-    font-size: 24px;
-    color: #B8860B;
-    font-weight: bold;
-    margin: 10px 0 20px 0;
-}
-
-.detail-desc {
-    margin-top: 20px;
-    line-height: 1.6;
-    color: #555;
-    font-size: 15px;
-    word-wrap: break-word;
-    white-space: pre-wrap; /* 支持 JSON 里的换行符 \n 显示 */
-}
-
-.buy-btn {
-    width: 100%;
-    background: #333;
-    color: #fff;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.8);
     border: none;
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 16px;
-    margin-top: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 18px;
+    color: #333;
     cursor: pointer;
-    margin-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.2s;
+    opacity: 0; /* 默认隐藏，鼠标悬浮时显示 */
+}
+
+.gallery-arrow:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.left-arrow { left: 10px; }
+.right-arrow { right: 10px; }
+
+/* 鼠标悬浮在画廊上时，显示箭头 */
+.gallery-container:hover .gallery-arrow {
+    opacity: 1;
+}
+
+/* 鼠标拖拽时的手势变化 */
+.gallery-track.dragging {
+    cursor: grabbing !important; /* 拖拽时变成“抓手” */
+    scroll-snap-type: none !important; /* 拖拽时暂时关闭吸附，防止卡顿 */
+}
+
+.gallery-track {
+    cursor: grab; /* 默认显示“张开的手”，提示用户可以拖拽 */
+}
+
+/* 📱 移动端适配：手机上不需要箭头，且禁止拖拽手势 */
+@media (max-width: 768px) {
+    .gallery-arrow { display: none !important; }
+    .gallery-track { cursor: default; }
 }

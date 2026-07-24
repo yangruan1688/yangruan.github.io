@@ -5,9 +5,9 @@
     "price": 428,
     "category": "发饰",
     "images": [
-      "main/img/c1.webp",
-      "main/img/c2.webp",
-      "main/img/c3.webp"
+      "../img/c1.webp",
+      "../img/c2.webp",
+      "../img/c3.webp"
     ],
     "description": "纯手工制作的红色彼岸花发饰，寓意优美，细节精致。采用优质蚕丝线，光泽度极佳。"
   },
@@ -17,9 +17,9 @@
     "price": 488,
     "category": "发饰",
     "images": [
-      "img/r1.webp",
-      "img/r2.webp",
-      "img/r3.webp"
+      "../img/r1.webp",
+      "../img/r2.webp",
+      "../img/r3.webp"
     ],
     "description": "淡紫色丁香花，清新淡雅，适合搭配汉服或日常装扮。"
   },
@@ -29,9 +29,9 @@
     "price": 299,
     "category": "胸针",
     "images": [
-      "img/r1.webp",
-      "img/r2.webp",
-      "img/r3.webp"
+      "../img/r1.webp",
+      "../img/r2.webp",
+      "../img/r3.webp"
     ],
     "description": "深蓝色丝绒质感胸针，点缀珍珠，高贵典雅。"
   },
@@ -41,9 +41,9 @@
     "price": 168,
     "category": "耳饰",
     "images": [
-      "img/s1.webp",
-      "img/s2.webp",
-      "img/s3.webp"
+      "../img/s1.webp",
+      "../img/s2.webp",
+      "../img/s3.webp"
     ],
     "description": "温润珍珠搭配金色流苏，修饰脸型，步步生姿。"
   }

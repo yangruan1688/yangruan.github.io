@@ -1,1 +1,60 @@
-
+[
+  {
+    "id": 1,
+    "name": "珍珠流苏发簪",
+    "category": "发饰",
+    "coverImage": "images/hair1.jpg",
+    "images": [
+      "images/hair1.jpg",
+      "images/hair1-2.jpg",
+      "images/hair1-3.jpg"
+    ],
+    "description": "925银镀金工艺，天然淡水珍珠，手工镶嵌"
+  },
+  {
+    "id": 2,
+    "name": "星月耳骨夹",
+    "category": "耳饰",
+    "coverImage": "images/ear1.jpg",
+    "images": [
+      "images/ear1.jpg",
+      "images/ear1-2.jpg"
+    ],
+    "description": "钛钢防过敏材质，可调节耳骨夹设计"
+  },
+  {
+    "id": 3,
+    "name": "复古玫瑰胸针",
+    "category": "胸针",
+    "coverImage": "images/brooch1.jpg",
+    "images": [
+      "images/brooch1.jpg",
+      "images/brooch1-2.jpg",
+      "images/brooch1-3.jpg",
+      "images/brooch1-4.jpg"
+    ],
+    "description": "合金镀金+珐琅工艺，复古宫廷风"
+  },
+  {
+    "id": 4,
+    "name": "手工编织发带",
+    "category": "发饰",
+    "coverImage": "images/hair2.jpg",
+    "images": [
+      "images/hair2.jpg",
+      "images/hair2-2.jpg"
+    ],
+    "description": "真丝材质，手工刺绣花朵"
+  },
+  {
+    "id": 5,
+    "name": "极简几何耳钉",
+    "category": "耳饰",
+    "coverImage": "images/ear2.jpg",
+    "images": [
+      "images/ear2.jpg",
+      "images/ear2-2.jpg"
+    ],
+    "description": "纯银材质，多边形几何设计"
+  }
+]

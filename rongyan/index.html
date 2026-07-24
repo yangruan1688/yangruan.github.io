@@ -4,19 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>绒颜</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <nav class="navbar">
-    <div class="nav-items">
-      <!-- 导航栏将由JavaScript动态生成 -->
+  <!-- 悬浮导航栏 -->
+  <nav class="sticky-nav">
+    <div class="nav-container">
+      <button class="nav-item active" data-category="all">全部</button>
+      <button class="nav-item" data-category="发饰">发饰</button>
+      <button class="nav-item" data-category="耳饰">耳饰</button>
+      <button class="nav-item" data-category="胸针">胸针</button>
+      <button class="nav-item" data-category="其他">其他</button>
     </div>
   </nav>
-  
-  <div class="products-grid">
-    <!-- 产品列表将由JavaScript动态生成 -->
-  </div>
-  
-  <script src="script.js"></script>
+
+  <!-- 产品网格容器 -->
+  <main class="products-grid">
+    <!-- 通过JS动态生成产品卡片 -->
+  </main>
+
+  <script src="js/script.js"></script>
 </body>
 </html>

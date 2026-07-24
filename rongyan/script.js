@@ -1,70 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const path = window.location.pathname;
-    
-    if (path.endsWith('index.html') || path.endsWith('/')) {
-        initHomePage();
-    } else if (path.includes('detail.html')) {
-        initDetailPage();
-    }
-
-    // --- 首页逻辑 ---
-    async function initHomePage() {
-        const grid = document.getElementById('product-grid');
-        const loadingState = document.getElementById('loading-state');
-        const navBtns = document.querySelectorAll('.nav-btn');
-        
-        try {
-            const response = await fetch('products.json');
-            const products = await response.json();
-
-            function renderProducts(filterCategory) {
-                grid.innerHTML = ''; 
-                
-                const filtered = filterCategory === '全部' 
-                    ? products 
-                    : products.filter(p => p.category === filterCategory);
-
-                if (filtered.length === 0) {
-                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#888; padding:20px;">该分类下暂无产品</p>';
-                    return;
-                }
-
-                filtered.forEach(product => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.onclick = () => window.location.href = `detail.html?id=${product.id}`;
-                    
-                    // 核心修改：取 images 数组的第一张图作为封面图
-                    const coverImage = product.images && product.images.length > 0 ? product.images[0] : '';
-                    
-                    card.innerHTML = `
-                        <img src="${coverImage}" alt="${product.name}">
-                        <div class="card-info">
-                            <h3 class="card-title">${product.name}</h3>
-                            <div class="card-price">¥${product.price}</div>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
-            }
-
-            renderProducts('全部');
-
-            navBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    navBtns.forEach(b => b.classList.remove('active'));
-                    e.target.classList.add('active');
-                    renderProducts(e.target.dataset.category);
-                });
-            });
-
-        } catch (error) {
-            console.error('无法加载产品数据:', error);
-            if(loadingState) loadingState.innerHTML = '<p style="color:red;">加载失败，请检查网络或 products.json 文件。</p>';
-        }
-    }
-
-    // --- 详情页逻辑 (支持多图) ---
+    // --- 详情页逻辑 (支持多图 + PC端交互增强) ---
     async function initDetailPage() {
         const params = new URLSearchParams(window.location.search);
         const productId = parseInt(params.get('id'));
@@ -82,39 +16,104 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('detail-price').innerText = `¥${product.price}`;
                 document.getElementById('detail-description').innerText = product.description || '暂无详细描述';
 
-                // === 核心：渲染多图画廊 ===
                 const track = document.getElementById('gallery-track');
                 const indicators = document.getElementById('gallery-indicators');
-                
-                // 兼容旧数据：如果没有 images 数组，则降级使用单张 image
                 const images = product.images || (product.image ? [product.image] : []);
 
+                // 1. 渲染图片和小圆点
                 images.forEach((imgUrl, index) => {
-                    // 1. 插入图片
                     const img = document.createElement('img');
                     img.src = imgUrl;
                     img.alt = `${product.name} 图片 ${index + 1}`;
+                    // 防止拖拽图片时出现“幽灵”图标
+                    img.draggable = false; 
                     track.appendChild(img);
 
-                    // 2. 插入底部小圆点
                     const dot = document.createElement('span');
                     dot.className = 'dot' + (index === 0 ? ' active' : '');
                     indicators.appendChild(dot);
                 });
 
-                // 3. 监听滑动事件，让小圆点跟着动
-                track.addEventListener('scroll', () => {
+                // 更新小圆点状态的通用函数
+                function updateDots() {
                     const scrollLeft = track.scrollLeft;
                     const trackWidth = track.offsetWidth;
-                    // 计算当前滑到了第几张图 (四舍五入)
                     const currentIndex = Math.round(scrollLeft / trackWidth);
-                    
-                    // 更新小圆点状态
                     const dots = indicators.querySelectorAll('.dot');
                     dots.forEach((dot, i) => {
                         dot.classList.toggle('active', i === currentIndex);
                     });
+                }
+                
+                track.addEventListener('scroll', updateDots);
+
+                // ==========================================
+                // ✨ 核心新增：PC 端专属交互逻辑
+                // ==========================================
+
+                // A. 左右箭头点击切换
+                const prevBtn = document.getElementById('prev-btn');
+                const nextBtn = document.getElementById('next-btn');
+                
+                if (prevBtn && nextBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        track.scrollBy({ left: -track.offsetWidth, behavior: 'smooth' });
+                    });
+                    nextBtn.addEventListener('click', () => {
+                        track.scrollBy({ left: track.offsetWidth, behavior: 'smooth' });
+                    });
+                }
+
+                // B. 鼠标滚轮横向滚动 (在图片上滚动鼠标，变成左右翻页)
+                track.addEventListener('wheel', (e) => {
+                    // 如果用户是垂直滚动（上下滚），拦截它，变成横向滚动
+                    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                        e.preventDefault(); // 阻止页面上下跳动
+                        track.scrollBy({
+                            left: e.deltaY > 0 ? track.offsetWidth : -track.offsetWidth,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, { passive: false });
+
+                // C. 鼠标按住拖拽滑动 (像手机触屏一样)
+                let isDown = false;
+                let startX;
+                let scrollLeftStart;
+
+                track.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    track.classList.add('dragging');
+                    startX = e.pageX - track.offsetLeft;
+                    scrollLeftStart = track.scrollLeft;
                 });
+
+                track.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    track.classList.remove('dragging');
+                });
+
+                track.addEventListener('mouseup', () => {
+                    isDown = false;
+                    track.classList.remove('dragging');
+                    // 拖拽结束后，重新触发一次 scroll 事件，让 scroll-snap 自动吸附对齐
+                    track.dispatchEvent(new Event('scroll'));
+                });
+
+                track.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - track.offsetLeft;
+                    const walk = (x - startX) * 1.5; // 1.5 是拖拽速度倍率
+                    track.scrollLeft = scrollLeftStart - walk;
+                });
+
+                // 如果只有一张图，隐藏箭头和圆点
+                if (images.length <= 1) {
+                    if(prevBtn) prevBtn.style.display = 'none';
+                    if(nextBtn) nextBtn.style.display = 'none';
+                    indicators.style.display = 'none';
+                }
 
             } else {
                 document.body.innerHTML = '<div class="container" style="text-align:center; padding:50px;"><h1>未找到该产品</h1><a href="index.html">返回首页</a></div>';
@@ -123,4 +122,3 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('加载详情失败:', error);
         }
     }
-});

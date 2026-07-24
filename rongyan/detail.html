@@ -1,822 +1,513 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="theme-color" content="#faf8f5">
-<title>扬软</title>
-<style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-  :root {
-    --primary: #b8860b;
-    --primary-light: #d4a843;
-    --bg: #faf8f5;
-    --text: #2c2c2c;
-    --text-light: #999;
-    --radius: 12px;
-    --top-h: 52px;
-  }
-
-  html {
-    -webkit-text-size-adjust: 100%;
-    scroll-behavior: smooth;
-  }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
-                 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ============ 顶部栏 ============ */
-  .topbar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 900;
-    height: var(--top-h);
-    padding-top: env(safe-area-inset-top, 0px);
-    background: rgba(255,255,255,0.9);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-bottom: 1px solid rgba(0,0,0,0.06);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-left: 8px;
-    padding-right: 16px;
-  }
-
-  .back-btn {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    font-size: 15px;
-    color: var(--text);
-    cursor: pointer;
-    padding: 10px 12px 10px 8px;
-    border-radius: 8px;
-    text-decoration: none;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    transition: background 0.2s;
-  }
-  .back-btn:hover { background: rgba(0,0,0,0.04); }
-  .back-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
-
-  .topbar-title {
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    color: var(--primary);
-    user-select: none;
-  }
-
-  .topbar-right { width: 60px; }
-
-  /* ============ 加载/错误 ============ */
-  .page-status {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 70vh;
-    padding-top: var(--top-h);
-    color: var(--text-light);
-    gap: 12px;
-  }
-  .spinner {
-    width: 32px; height: 32px;
-    border: 3px solid #eee;
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ============ 轮播区 ============ */
-  .gallery {
-    margin-top: calc(var(--top-h) + env(safe-area-inset-top, 0px));
-    position: relative;
-    background: #f0ece6;
-    touch-action: pan-y;
-    overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-
-  .track {
-    display: flex;
-    will-change: transform;
-  }
-  .track.animating {
-    transition: transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-
-  .slide {
-    flex: 0 0 100%;
-    width: 100%;
-    min-width: 0;
-    position: relative;
-  }
-  .slide img {
-    display: block;
-    width: 100%;
-    height: auto;
-    cursor: zoom-in;
-    -webkit-user-drag: none;
-    user-select: none;
-    pointer-events: auto;
-  }
-
-  /* 移动端正方形 */
-  @media (max-width: 767px) {
-    .slide { padding-top: 100%; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="theme-color" content="#faf8f5">
+  <title>产品详情 · 拾光饰品</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --primary: #b8860b;
+      --primary-light: #d4a843;
+      --bg: #faf8f5;
+      --text: #2c2c2c;
+      --text-light: #999;
+      --radius: 12px;
+      --top-h: 52px;
+    }
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    /* ============ 顶部栏 ============ */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 900;
+      height: var(--top-h);
+      padding-top: env(safe-area-inset-top, 0px);
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-left: 8px;
+      padding-right: 16px;
+    }
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      font-size: 15px;
+      color: var(--text);
+      cursor: pointer;
+      padding: 10px 12px 10px 8px;
+      border-radius: 8px;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: background 0.2s;
+    }
+    .back-btn:hover {
+      background: rgba(0,0,0,0.04);
+    }
+    .back-btn svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .topbar-title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--primary);
+      user-select: none;
+    }
+    .topbar-right {
+      width: 60px;
+    }
+    /* ============ 加载/错误 ============ */
+    .page-status {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 70vh;
+      padding-top: var(--top-h);
+      color: var(--text-light);
+      gap: 12px;
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #eee;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    /* ============ 轮播区 ============ */
+    .gallery {
+      margin-top: calc(var(--top-h) + env(safe-area-inset-top, 0px));
+      position: relative;
+      background: #f0ece6;
+      touch-action: pan-y;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .track {
+      display: flex;
+      will-change: transform;
+    }
+    .track.animating {
+      transition: transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .slide {
+      flex: 0 0 100%;
+      width: 100%;
+      min-width: 0;
+      position: relative;
+    }
     .slide img {
+      display: block;
+      width: 100%;
+      height: auto;
+      cursor: zoom-in;
+      -webkit-user-drag: none;
+      user-select: none;
+      pointer-events: auto;
+    }
+    /* 移动端正方形 */
+    @media (max-width: 767px) {
+      .slide { padding-top: 100%; }
+      .slide img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    /* 桌面端居中限宽 */
+    @media (min-width: 768px) {
+      .gallery {
+        max-width: 680px;
+        margin-left: auto;
+        margin-right: auto;
+        border-radius: 0 0 var(--radius) var(--radius);
+      }
+    }
+    .counter {
       position: absolute;
-      top: 0; left: 0;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: none;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.25s, background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .arrow:hover {
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .arrow svg {
+      width: 18px;
+      height: 18px;
+      color: var(--text);
+    }
+    .arrow-left { left: 12px; }
+    .arrow-right { right: 12px; }
+    @media (min-width: 768px) {
+      .arrow { display: flex; }
+      .gallery:hover .arrow { opacity: 1; }
+    }
+    .thumbs {
+      display: flex;
+      gap: 8px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      background: #fff;
+    }
+    .thumbs::-webkit-scrollbar { display: none; }
+    .thumb {
+      flex-shrink: 0;
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      opacity: 0.5;
+      transition: all 0.25s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .thumb:hover { opacity: 0.8; }
+    .thumb.active {
+      border-color: var(--primary);
+      opacity: 1;
+      box-shadow: 0 2px 8px rgba(184,134,11,0.2);
+    }
+    .thumb img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
+      -webkit-user-drag: none;
+      pointer-events: none;
     }
-  }
-
-  /* 桌面端居中限宽 */
-  @media (min-width: 768px) {
-    .gallery {
+    /* ============ 产品信息 ============ */
+    .info {
       max-width: 680px;
-      margin-left: auto;
-      margin-right: auto;
-      border-radius: 0 0 var(--radius) var(--radius);
+      margin: 0 auto;
+      padding: 28px 20px 80px;
     }
-  }
-
-  .counter {
-    position: absolute;
-    bottom: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: #fff;
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    pointer-events: none;
-    z-index: 5;
-  }
-
-  .arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    border: none;
-    cursor: pointer;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-    z-index: 10;
-    opacity: 0;
-    transition: opacity 0.25s, background 0.2s;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-  .arrow:hover { background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
-  .arrow svg { width: 18px; height: 18px; color: var(--text); }
-  .arrow-left { left: 12px; }
-  .arrow-right { right: 12px; }
-
-  @media (min-width: 768px) {
-    .arrow { display: flex; }
-    .gallery:hover .arrow { opacity: 1; }
-  }
-
-  .thumbs {
-    display: flex;
-    gap: 8px;
-    padding: 14px 16px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    background: #fff;
-  }
-  .thumbs::-webkit-scrollbar { display: none; }
-
-  .thumb {
-    flex-shrink: 0;
-    width: 56px; height: 56px;
-    border-radius: 8px;
-    overflow: hidden;
-    cursor: pointer;
-    border: 2px solid transparent;
-    opacity: 0.5;
-    transition: all 0.25s;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-  .thumb:hover { opacity: 0.8; }
-  .thumb.active {
-    border-color: var(--primary);
-    opacity: 1;
-    box-shadow: 0 2px 8px rgba(184,134,11,0.2);
-  }
-  .thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    -webkit-user-drag: none;
-    pointer-events: none; /* 关键修复：防止内部img拦截点击事件 */
-  }
-
-  /* ============ 产品信息 ============ */
-  .info {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 28px 20px 80px;
-  }
-  .info-cat {
-    display: inline-block;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: #fff;
-    padding: 3px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    margin-bottom: 14px;
-  }
-  .info-name {
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1.4;
-    margin-bottom: 12px;
-  }
-  .info-price {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--primary);
-    margin-bottom: 20px;
-  }
-  .info-price::before {
-    content: '¥';
-    font-size: 16px;
-    margin-right: 2px;
-  }
-  .info-divider {
-    width: 40px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    border-radius: 2px;
-    margin-bottom: 20px;
-  }
-  .info-desc {
-    font-size: 15px;
-    line-height: 1.85;
-    color: #555;
-  }
-
-  /* ============ 灯箱 ============ */
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 2000;
-    background: rgba(0,0,0,0.95);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    touch-action: pan-y;
-    -webkit-user-select: none;
-    user-select: none;
-  }
-  .lightbox.open {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .lb-img {
-    max-width: 94vw;
-    max-height: 90vh;
-    object-fit: contain;
-    border-radius: 4px;
-    transform: scale(0.9);
-    transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
-    cursor: zoom-out;
-    -webkit-user-drag: none;
-    user-select: none;
-    pointer-events: auto;
-  }
-  .lightbox.open .lb-img { transform: scale(1); }
-
-  .lb-close {
-    position: absolute;
-    top: 16px; right: 16px;
-    width: 42px; height: 42px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.12);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-    z-index: 10;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-  .lb-close:hover { background: rgba(255,255,255,0.25); }
-  .lb-close svg { width: 20px; height: 20px; color: #fff; }
-
-  .lb-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-    z-index: 10;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-  .lb-arrow:hover { background: rgba(255,255,255,0.22); }
-  .lb-arrow svg { width: 20px; height: 20px; color: #fff; }
-  .lb-prev { left: 12px; }
-  .lb-next { right: 12px; }
-
-  @media (max-width: 767px) { .lb-arrow { display: none; } }
-
-  .lb-counter {
-    position: absolute;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255,255,255,0.65);
-    font-size: 13px;
-    letter-spacing: 3px;
-    pointer-events: none;
-    z-index: 10;
-  }
-
-  .safe-bottom { height: env(safe-area-inset-bottom, 0px); }
-
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #d0c8b8; border-radius: 3px; }
-</style>
+    .info-cat {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      padding: 3px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+    }
+    .info-name {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+    .info-price {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+    .info-price::before {
+      content: '¥';
+      font-size: 16px;
+      margin-right: 2px;
+    }
+    .info-divider {
+      width: 40px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      border-radius: 2px;
+      margin-bottom: 20px;
+    }
+    .info-desc {
+      font-size: 15px;
+      line-height: 1.85;
+      color: #555;
+    }
+    /* ============ 灯箱 ============ */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(0,0,0,0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      touch-action: pan-y;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .lightbox.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .lb-img {
+      max-width: 94vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 4px;
+      transform: scale(0.9);
+      transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+      cursor: zoom-out;
+      -webkit-user-drag: none;
+      user-select: none;
+      pointer-events: auto;
+    }
+    .lightbox.open .lb-img {
+      transform: scale(1);
+    }
+    .lb-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      z-index: 10;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .lb-close:hover {
+      background: rgba(255,255,255,0.25);
+    }
+    .lb-close svg {
+      width: 20px;
+      height: 20px;
+      color: #fff;
+    }
+    .lb-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      z-index: 10;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .lb-arrow:hover {
+      background: rgba(255,255,255,0.22);
+    }
+    .lb-arrow svg {
+      width: 20px;
+      height: 20px;
+      color: #fff;
+    }
+    .lb-prev { left: 12px; }
+    .lb-next { right: 12px; }
+    @media (max-width: 767px) {
+      .lb-arrow { display: none; }
+    }
+    .lb-counter {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.65);
+      font-size: 13px;
+      letter-spacing: 3px;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .safe-bottom {
+      height: env(safe-area-inset-bottom, 0px);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #d0c8b8;
+      border-radius: 3px;
+    }
+  </style>
 </head>
 <body>
+  <header class="topbar">
+    <a class="back-btn" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      返回
+    </a>
+    <span class="topbar-title">产品详情</span>
+    <div class="topbar-right"></div>
+  </header>
 
-<header class="topbar">
-  <a class="back-btn" href="index.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-    返回
-  </a>
-  <span class="topbar-title">产品详情</span>
-  <div class="topbar-right"></div>
-</header>
+  <div class="page-status" id="status">
+    <div class="spinner"></div>
+    <p>加载中...</p>
+  </div>
 
-<div class="page-status" id="status">
-  <div class="spinner"></div>
-  <p>加载中...</p>
-</div>
+  <div id="content" style="display:none">
+    <div class="gallery" id="gallery">
+      <div class="track" id="track"></div>
+      <button class="arrow arrow-left" id="aLeft" aria-label="上一张">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="arrow arrow-right" id="aRight" aria-label="下一张">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+      </button>
+      <div class="counter" id="counter">1 / 1</div>
+    </div>
+    <div class="thumbs" id="thumbs"></div>
+    <div class="info">
+      <span class="info-cat" id="iCat"></span>
+      <h1 class="info-name" id="iName"></h1>
+      <div class="info-price" id="iPrice"></div>
+      <div class="info-divider"></div>
+      <p class="info-desc" id="iDesc"></p>
+    </div>
+    <div class="safe-bottom"></div>
+  </div>
 
-<div id="content" style="display:none">
-  <div class="gallery" id="gallery">
-    <div class="track" id="track"></div>
-    <button class="arrow arrow-left" id="aLeft" aria-label="上一张">
+  <!-- 灯箱 -->
+  <div class="lightbox" id="lb">
+    <button class="lb-close" id="lbClose" aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <button class="lb-arrow lb-prev" id="lbPrev" aria-label="上一张">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
-    <button class="arrow arrow-right" id="aRight" aria-label="下一张">
+    <img class="lb-img" id="lbImg" src="" alt="" draggable="false">
+    <button class="lb-arrow lb-next" id="lbNext" aria-label="下一张">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
     </button>
-    <div class="counter" id="counter">1 / 1</div>
+    <div class="lb-counter" id="lbCounter"></div>
   </div>
 
-  <div class="thumbs" id="thumbs"></div>
+  <script>
+    ;(function() {
+      'use strict';
 
-  <div class="info">
-    <span class="info-cat" id="iCat"></span>
-    <h1 class="info-name" id="iName"></h1>
-    <div class="info-price" id="iPrice"></div>
-    <div class="info-divider"></div>
-    <p class="info-desc" id="iDesc"></p>
-  </div>
-  <div class="safe-bottom"></div>
-</div>
+      // --- 元素选择 ---
+      var statusEl = document.getElementById('status');
+      var contentEl = document.getElementById('content');
+      var gallery = document.getElementById('gallery');
+      var track = document.getElementById('track');
+      var thumbs = document.getElementById('thumbs');
+      var counter = document.getElementById('counter');
+      var aLeft = document.getElementById('aLeft');
+      var aRight = document.getElementById('aRight');
+      var lb = document.getElementById('lb');
+      var lbImg = document.getElementById('lbImg');
+      var lbClose = document.getElementById('lbClose');
+      var lbPrev = document.getElementById('lbPrev');
+      var lbNext = document.getElementById('lbNext');
+      var lbCounter = document.getElementById('lbCounter');
 
-<!-- 灯箱 -->
-<div class="lightbox" id="lb">
-  <button class="lb-close" id="lbClose" aria-label="关闭">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-  </button>
-  <button class="lb-arrow lb-prev" id="lbPrev" aria-label="上一张">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-  </button>
-  <img class="lb-img" id="lbImg" src="" alt="" draggable="false">
-  <button class="lb-arrow lb-next" id="lbNext" aria-label="下一张">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
-  </button>
-  <div class="lb-counter" id="lbCounter"></div>
-</div>
+      // --- 状态变量 ---
+      var images = [];
+      var current = 0;
+      var lbIndex = 0;
+      var lbOpen = false;
+      var galleryW = 0;
+      var didDrag = false;
 
-<script>
-;(function() {
-  'use strict';
+      // --- 初始化 ---
+      var params = new URLSearchParams(window.location.search);
+      var pid = parseInt(params.get('id'), 10);
 
-  var statusEl   = document.getElementById('status');
-  var contentEl  = document.getElementById('content');
-  var gallery    = document.getElementById('gallery');
-  var track      = document.getElementById('track');
-  var thumbs     = document.getElementById('thumbs');
-  var counter    = document.getElementById('counter');
-  var aLeft      = document.getElementById('aLeft');
-  var aRight     = document.getElementById('aRight');
-
-  var lb         = document.getElementById('lb');
-  var lbImg      = document.getElementById('lbImg');
-  var lbClose    = document.getElementById('lbClose');
-  var lbPrev     = document.getElementById('lbPrev');
-  var lbNext     = document.getElementById('lbNext');
-  var lbCounter  = document.getElementById('lbCounter');
-
-  var images       = [];
-  var current      = 0;
-  var lbIndex      = 0;
-  var lbOpen       = false;
-  var galleryW     = 0;
-  var didDrag      = false;
-
-  var params = new URLSearchParams(window.location.search);
-  var pid = parseInt(params.get('id'), 10);
-
-  fetch('products.json')
-    .then(function(r) {
-      if (!r.ok) throw new Error('网络错误');
-      return r.json();
-    })
-    .then(function(data) {
-      var product = null;
-      for (var i = 0; i < data.products.length; i++) {
-        if (data.products[i].id === pid) { product = data.products[i]; break; }
-      }
-      if (!product) throw new Error('产品不存在 (id=' + pid + ')');
-
-      images = product.images;
-      document.title = product.name + ' · 绒颜';
-
-      document.getElementById('iCat').textContent   = product.category;
-      document.getElementById('iName').textContent  = product.name;
-      document.getElementById('iPrice').textContent = product.price.toFixed(1);
-      document.getElementById('iDesc').textContent  = product.description;
-
-      var trackHtml = '';
-      var thumbHtml = '';
-      for (var i = 0; i < images.length; i++) {
-        trackHtml +=
-          '<div class="slide">' +
-            '<img src="' + images[i] + '" alt="图' + (i+1) + '" draggable="false"' +
-            ' onerror="this.src=\'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" fill="#f0ece6"><rect width="400" height="400"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#ccc" font-size="16">图片加载失败</text></svg>') + '\'">' +
-          '</div>';
-        thumbHtml +=
-          '<div class="thumb' + (i === 0 ? ' active' : '') + '" data-i="' + i + '">' +
-            '<img src="' + images[i] + '" alt="缩略图' + (i+1) + '" draggable="false">' +
-          '</div>';
-      }
-      track.innerHTML = trackHtml;
-      thumbs.innerHTML = thumbHtml;
-
-      counter.textContent = '1 / ' + images.length;
-      galleryW = gallery.offsetWidth;
-
-      statusEl.style.display = 'none';
-      contentEl.style.display = 'block';
-
-      initGallery();
-      initLightbox();
-      initKeyboard();
-
-      if (images.length > 1) {
-        var preImg = new Image();
-        preImg.src = images[1];
-      }
-    })
-    .catch(function(err) {
-      statusEl.innerHTML =
-        '<div style="font-size:40px;margin-bottom:8px">😢</div>' +
-        '<p>' + (err.message || '加载失败') + '</p>' +
-        '<a href="index.html" style="color:var(--primary);margin-top:12px;text-decoration:none">← 返回首页</a>';
-    });
-
-  function initGallery() {
-    // 左右箭头
-    aLeft.addEventListener('click', function(e) {
-      e.stopPropagation();
-      go(current - 1);
-    });
-    aRight.addEventListener('click', function(e) {
-      e.stopPropagation();
-      go(current + 1);
-    });
-
-    // 缩略图点击 - 修复：直接给每个缩略图绑定事件，避免事件委托被内部元素拦截
-    var thumbElements = thumbs.querySelectorAll('.thumb');
-    for (var i = 0; i < thumbElements.length; i++) {
-      (function(index) {
-        thumbElements[index].addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          go(index);
-        });
-      })(i);
-    }
-
-    // 主图点击 → 打开灯箱
-    track.addEventListener('click', function(e) {
-      if (didDrag) {
-        didDrag = false;
-        return;
-      }
-      if (e.target.tagName === 'IMG') {
-        openLB(current);
-      }
-    });
-
-    // 触摸滑动
-    var touchStartX = 0;
-    var touchStartY = 0;
-    var touchDeltaX = 0;
-    var swiping = false;
-    var directionLocked = false;
-
-    gallery.addEventListener('touchstart', function(e) {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      touchDeltaX = 0;
-      swiping = false;
-      directionLocked = false;
-      didDrag = false;
-      track.classList.remove('animating');
-    }, { passive: true });
-
-    gallery.addEventListener('touchmove', function(e) {
-      var dx = e.touches[0].clientX - touchStartX;
-      var dy = e.touches[0].clientY - touchStartY;
-
-      if (!directionLocked) {
-        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-        directionLocked = true;
-        if (Math.abs(dy) >= Math.abs(dx)) {
-          swiping = false;
-          return;
-        }
-        swiping = true;
-      }
-
-      if (!swiping) return;
-      e.preventDefault();
-
-      touchDeltaX = dx;
-      didDrag = true;
-
-      var offset = -(current * galleryW) + touchDeltaX;
-      if ((current === 0 && touchDeltaX > 0) ||
-          (current === images.length - 1 && touchDeltaX < 0)) {
-        offset = -(current * galleryW) + touchDeltaX * 0.3;
-      }
-
-      track.style.transform = 'translateX(' + offset + 'px)';
-    }, { passive: false });
-
-    gallery.addEventListener('touchend', function() {
-      if (!swiping) return;
-      track.classList.add('animating');
-
-      var threshold = galleryW * 0.2;
-      if (touchDeltaX < -threshold && current < images.length - 1) {
-        go(current + 1);
-      } else if (touchDeltaX > threshold && current > 0) {
-        go(current - 1);
-      } else {
-        go(current);
-      }
-      touchDeltaX = 0;
-      swiping = false;
-    }, { passive: true });
-
-    // 鼠标拖拽
-    var mouseStartX = 0;
-    var mouseDeltaX = 0;
-    var mouseDown = false;
-
-    gallery.addEventListener('mousedown', function(e) {
-      if (e.button !== 0) return;
-      mouseDown = true;
-      mouseStartX = e.clientX;
-      mouseDeltaX = 0;
-      didDrag = false;
-      track.classList.remove('animating');
-      e.preventDefault();
-    });
-
-    window.addEventListener('mousemove', function(e) {
-      if (!mouseDown) return;
-      mouseDeltaX = e.clientX - mouseStartX;
-      if (Math.abs(mouseDeltaX) > 4) didDrag = true;
-
-      var offset = -(current * galleryW) + mouseDeltaX;
-      if ((current === 0 && mouseDeltaX > 0) ||
-          (current === images.length - 1 && mouseDeltaX < 0)) {
-        offset = -(current * galleryW) + mouseDeltaX * 0.3;
-      }
-      track.style.transform = 'translateX(' + offset + 'px)';
-    });
-
-    window.addEventListener('mouseup', function() {
-      if (!mouseDown) return;
-      mouseDown = false;
-      track.classList.add('animating');
-
-      var threshold = galleryW * 0.15;
-      if (mouseDeltaX < -threshold && current < images.length - 1) {
-        go(current + 1);
-      } else if (mouseDeltaX > threshold && current > 0) {
-        go(current - 1);
-      } else {
-        go(current);
-      }
-      mouseDeltaX = 0;
-    });
-
-    var resizeTimer;
-    window.addEventListener('resize', function() {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(function() {
-        galleryW = gallery.offsetWidth;
-        track.classList.remove('animating');
-        track.style.transform = 'translateX(' + (-(current * galleryW)) + 'px)';
-      }, 100);
-    });
-  }
-
-  function go(index) {
-    if (index < 0) index = 0;
-    if (index >= images.length) index = images.length - 1;
-    current = index;
-
-    track.classList.add('animating');
-    track.style.transform = 'translateX(' + (-(current * galleryW)) + 'px)';
-
-    counter.textContent = (current + 1) + ' / ' + images.length;
-
-    var thumbEls = thumbs.querySelectorAll('.thumb');
-    for (var i = 0; i < thumbEls.length; i++) {
-      thumbEls[i].classList.toggle('active', i === current);
-    }
-    if (thumbEls[current]) {
-      thumbEls[current].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    }
-
-    preload(current - 1);
-    preload(current + 1);
-  }
-
-  function preload(i) {
-    if (i >= 0 && i < images.length) {
-      var img = new Image();
-      img.src = images[i];
-    }
-  }
-
-  function initLightbox() {
-    lbClose.addEventListener('click', function(e) {
-      e.stopPropagation();
-      closeLB();
-    });
-
-    lbImg.addEventListener('click', function(e) {
-      e.stopPropagation();
-      closeLB();
-    });
-
-    lb.addEventListener('click', function(e) {
-      if (e.target === lb) closeLB();
-    });
-
-    lbPrev.addEventListener('click', function(e) {
-      e.stopPropagation();
-      lbGo(lbIndex - 1);
-    });
-    lbNext.addEventListener('click', function(e) {
-      e.stopPropagation();
-      lbGo(lbIndex + 1);
-    });
-
-    var lbTouchX = 0;
-    var lbDelta = 0;
-    var lbSwiping = false;
-    var lbDirLocked = false;
-
-    lb.addEventListener('touchstart', function(e) {
-      lbTouchX = e.touches[0].clientX;
-      lbDelta = 0;
-      lbSwiping = false;
-      lbDirLocked = false;
-    }, { passive: true });
-
-    lb.addEventListener('touchmove', function(e) {
-      var dx = e.touches[0].clientX - lbTouchX;
-
-      if (!lbDirLocked) {
-        if (Math.abs(dx) < 10) return;
-        lbDirLocked = true;
-        lbSwiping = true;
-      }
-
-      if (lbSwiping) {
-        lbDelta = dx;
-        lbImg.style.transform = 'scale(1) translateX(' + (dx * 0.4) + 'px)';
-      }
-    }, { passive: true });
-
-    lb.addEventListener('touchend', function() {
-      lbImg.style.transform = '';
-      if (!lbSwiping) return;
-      lbSwiping = false;
-
-      if (Math.abs(lbDelta) > 50) {
-        if (lbDelta < 0) lbGo(lbIndex + 1);
-        else lbGo(lbIndex - 1);
-      }
-      lbDelta = 0;
-    }, { passive: true });
-  }
-
-  function openLB(index) {
-    lbIndex = index;
-    lbImg.src = images[index];
-    lbCounter.textContent = (index + 1) + ' / ' + images.length;
-    lb.classList.add('open');
-    lbOpen = true;
-    document.body.style.overflow = 'hidden';
-
-    preload(index - 1);
-    preload(index + 1);
-  }
-
-  function closeLB() {
-    lb.classList.remove('open');
-    lbOpen = false;
-    document.body.style.overflow = '';
-  }
-
-  function lbGo(index) {
-    if (index < 0) index = images.length - 1;
-    if (index >= images.length) index = 0;
-    lbIndex = index;
-    lbImg.src = images[index];
-    lbCounter.textContent = (index + 1) + ' / ' + images.length;
-
-    preload(index - 1);
-    preload(index + 1);
-  }
-
-  function initKeyboard() {
-    document.addEventListener('keydown', function(e) {
-      if (lbOpen) {
-        if (e.key === 'Escape') closeLB();
-        else if (e.key === 'ArrowLeft') lbGo(lbIndex - 1);
-        else if (e.key === 'ArrowRight') lbGo(lbIndex + 1);
-        return;
-      }
-      if (e.key === 'ArrowLeft') go(current - 1);
-      if (e.key === 'ArrowRight') go(current + 1);
-    });
-  }
-
-})();
-</script>
-</body>
-</html>
+      fetch('products.json')
+        .then(function(r) {
+          if (!r.ok) throw new Error('网络错误');
+          return r.json();
+        })
+        .then(function(data) {
+          var product = null;
+          for (var i = 0; i < data.products.length; i++) {
+            if (data.products[i].id === pid) {
+              product = data.products[i];
+              break;
+            }
+          }

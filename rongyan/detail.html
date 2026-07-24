@@ -1,336 +1,686 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <meta name="theme-color" content="#faf8f5">
-  <title>产品详情 · 绒颜</title>
-  <style>
-    *, *::before, *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    :root {
-      --primary: #b8860b;
-      --primary-light: #d4a843;
-      --bg: #faf8f5;
-      --text: #2c2c2c;
-      --text-light: #999;
-      --radius: 12px;
-      --top-h: 52px;
-    }
-    html {
-      -webkit-text-size-adjust: 100%;
-      scroll-behavior: smooth;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    /* ============ 顶部栏 ============ */
-    .topbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 900;
-      height: var(--top-h);
-      padding-top: env(safe-area-inset-top, 0px);
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: saturate(180%) blur(20px);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .topbar h1 {
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      color: var(--primary);
-    }
-    .topbar .back-btn {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 36px;
-      height: 36px;
-      border: none;
-      background: transparent;
-      font-size: 20px;
-      cursor: pointer;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .topbar .back-btn:active {
-      background: rgba(0,0,0,0.08);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>产品详情 · 拾光饰品</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --primary: #b8860b;
+    --primary-light: #d4a843;
+    --bg: #faf8f5;
+    --card-bg: #ffffff;
+    --text: #2c2c2c;
+    --text-light: #999;
+    --radius: 12px;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+                 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
 
-    /* ============ 主体内容 ============ */
-    .main {
-      padding-top: calc(var(--top-h) + env(safe-area-inset-top, 0px));
-      max-width: 600px;
-      margin: 0 auto;
-      background: #fff;
-      box-shadow: 0 0 20px rgba(0,0,0,0.05);
-    }
-    .product-gallery {
-      position: relative;
-      width: 100%;
+  /* ========== 顶部栏 ========== */
+  .top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 900;
+    height: 52px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+  }
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    font-size: 15px;
+    color: var(--text);
+    cursor: pointer;
+    padding: 8px 12px 8px 4px;
+    border-radius: 8px;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+  .back-btn:hover { background: rgba(0,0,0,0.04); }
+  .back-btn svg { width: 20px; height: 20px; }
+  .top-bar-title {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--primary);
+  }
+  .top-bar-placeholder { width: 60px; }
+
+  /* ========== 图片轮播区 ========== */
+  .gallery-section {
+    margin-top: 52px;
+    position: relative;
+    background: #f0ece6;
+  }
+
+  /* 主图容器 */
+  .gallery-main {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+  .gallery-track {
+    display: flex;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+  }
+  .gallery-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    position: relative;
+  }
+  .gallery-slide img {
+    width: 100%;
+    height: auto;
+    display: block;
+    cursor: zoom-in;
+    transition: transform 0.35s ease;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* 移动端固定正方形比例 */
+  @media (max-width: 767px) {
+    .gallery-slide {
       padding-top: 100%;
-      overflow: hidden;
-      background: #f0ece6;
+      position: relative;
     }
-    .product-gallery img {
+    .gallery-slide img {
       position: absolute;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.5s ease;
     }
-    .product-gallery img:active {
-      transform: scale(1.05);
-    }
-    .product-info {
-      padding: 20px;
-    }
-    .product-category {
-      display: inline-block;
-      padding: 4px 10px;
-      background: rgba(184, 134, 11, 0.1);
-      color: var(--primary);
-      font-size: 12px;
-      font-weight: 600;
-      border-radius: 20px;
-      margin-bottom: 12px;
-    }
-    .product-name {
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 1.4;
-      margin-bottom: 12px;
-    }
-    .product-price {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 20px;
-    }
-    .product-price::before {
-      content: '¥';
-      font-size: 14px;
-      margin-right: 2px;
-    }
-    .product-desc-title {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-    .product-desc {
-      font-size: 14px;
-      line-height: 1.7;
-      color: var(--text-light);
-      margin-bottom: 24px;
-    }
-    .thumbnails {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 10px;
-      scrollbar-width: none;
-    }
-    .thumbnails::-webkit-scrollbar {
-      display: none;
-    }
-    .thumbnail {
-      flex-shrink: 0;
-      width: 60px;
-      height: 60px;
-      border-radius: 8px;
+  }
+  @media (min-width: 768px) {
+    .gallery-section {
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 52px;
+      border-radius: 0 0 var(--radius) var(--radius);
       overflow: hidden;
-      border: 2px solid transparent;
-      cursor: pointer;
-      opacity: 0.6;
-      transition: all 0.3s ease;
     }
-    .thumbnail.active {
-      border-color: var(--primary);
+  }
+
+  /* 图片序号指示 */
+  .slide-counter {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    pointer-events: none;
+  }
+
+  /* 左右箭头（桌面端） */
+  .gallery-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(6px);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    transition: all 0.25s;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .gallery-arrow:hover {
+    background: #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .gallery-arrow svg { width: 18px; height: 18px; color: var(--text); }
+  .gallery-arrow.arrow-left { left: 12px; }
+  .gallery-arrow.arrow-right { right: 12px; }
+  @media (min-width: 768px) {
+    .gallery-section:hover .gallery-arrow {
       opacity: 1;
+      pointer-events: auto;
     }
-    .thumbnail img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .action-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 10px env(safe-area-inset-right, 16px) calc(10px + env(safe-area-inset-bottom, 0px)) env(safe-area-inset-left, 16px);
-      background: #fff;
-      border-top: 1px solid rgba(0,0,0,0.06);
-      display: flex;
-      gap: 12px;
-      z-index: 900;
-    }
-    .action-bar button {
-      flex: 1;
-      padding: 14px;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .btn-cart {
-      background: #f0ece6;
-      color: var(--text);
-    }
-    .btn-buy {
-      background: var(--primary);
-      color: #fff;
-    }
-    .btn-cart:active, .btn-buy:active {
-      opacity: 0.9;
-      transform: scale(0.98);
-    }
-    .loading, .error {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      color: var(--text-light);
-    }
-    .spinner {
-      width: 30px;
-      height: 30px;
-      border: 3px solid #eee;
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin: 0 auto 12px;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
+  }
+
+  /* 缩略图条 */
+  .thumb-strip {
+    display: flex;
+    gap: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    background: #fff;
+  }
+  .thumb-strip::-webkit-scrollbar { display: none; }
+  .thumb-item {
+    flex-shrink: 0;
+    width: 56px; height: 56px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.25s;
+    opacity: 0.55;
+  }
+  .thumb-item:hover { opacity: 0.8; }
+  .thumb-item.active {
+    border-color: var(--primary);
+    opacity: 1;
+    box-shadow: 0 2px 8px rgba(184,134,11,0.25);
+  }
+  .thumb-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* ========== 产品信息区 ========== */
+  .product-detail {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+  .detail-category {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: #fff;
+    padding: 3px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+  .detail-name {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+  .detail-price {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 20px;
+  }
+  .detail-price::before {
+    content: '¥';
+    font-size: 16px;
+    margin-right: 2px;
+  }
+  .detail-divider {
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
+  .detail-desc {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #555;
+  }
+
+  /* ========== 全屏查看（灯箱） ========== */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0,0,0,0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.35s ease;
+  }
+  .lightbox.open {
+    opacity: 1;
+    visibility: visible;
+  }
+  .lightbox-img {
+    max-width: 92vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 4px;
+    transform: scale(0.85);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: zoom-out;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .lightbox.open .lightbox-img {
+    transform: scale(1);
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .lightbox-close:hover { background: rgba(255,255,255,0.3); }
+  .lightbox-close svg { width: 20px; height: 20px; color: #fff; }
+
+  .lightbox-counter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    letter-spacing: 3px;
+  }
+
+  /* 灯箱左右箭头 */
+  .lightbox-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .lightbox-arrow:hover { background: rgba(255,255,255,0.25); }
+  .lightbox-arrow svg { width: 20px; height: 20px; color: #fff; }
+  .lightbox-arrow.lb-left { left: 16px; }
+  .lightbox-arrow.lb-right { right: 16px; }
+
+  /* ========== 加载/错误 ========== */
+  .page-loading, .page-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    color: var(--text-light);
+    gap: 12px;
+  }
+  .page-loading .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #eee;
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ========== 底部安全区 ========== */
+  .bottom-safe { height: env(safe-area-inset-bottom, 0px); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #d0c8b8; border-radius: 3px; }
+</style>
 </head>
 <body>
 
-  <div class="topbar">
-    <button class="back-btn" onclick="history.back()">←</button>
-    <h1>产品详情</h1>
-  </div>
+<!-- 顶部栏 -->
+<div class="top-bar">
+  <a class="back-btn" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    返回
+  </a>
+  <span class="top-bar-title">产品详情</span>
+  <div class="top-bar-placeholder"></div>
+</div>
 
-  <main class="main" id="product-container">
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>正在加载...</p>
+<!-- 加载中 -->
+<div class="page-loading" id="pageLoading">
+  <div class="spinner"></div>
+  <p>加载中...</p>
+</div>
+
+<!-- 主内容（默认隐藏） -->
+<div id="mainContent" style="display:none">
+  <!-- 图片轮播 -->
+  <div class="gallery-section">
+    <div class="gallery-main" id="galleryMain">
+      <div class="gallery-track" id="galleryTrack"></div>
+      <button class="gallery-arrow arrow-left" id="arrowLeft">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="gallery-arrow arrow-right" id="arrowRight">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+      </button>
+      <div class="slide-counter" id="slideCounter">1 / 1</div>
     </div>
-  </main>
-
-  <div class="action-bar">
-    <button class="btn-cart">加入购物车</button>
-    <button class="btn-buy">立即购买</button>
+    <div class="thumb-strip" id="thumbStrip"></div>
   </div>
 
-  <script>
-    ;(function() {
-      'use strict';
+  <!-- 产品信息 -->
+  <div class="product-detail">
+    <span class="detail-category" id="detailCategory"></span>
+    <h1 class="detail-name" id="detailName"></h1>
+    <div class="detail-price" id="detailPrice"></div>
+    <div class="detail-divider"></div>
+    <p class="detail-desc" id="detailDesc"></p>
+  </div>
+  <div class="bottom-safe"></div>
+</div>
 
-      const container = document.getElementById('product-container');
-      const urlParams = new URLSearchParams(window.location.search);
-      const productId = urlParams.get('id');
+<!-- 灯箱（全屏查看） -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lbClose">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <button class="lightbox-arrow lb-left" id="lbLeft">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+         stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <img class="lightbox-img" id="lbImg" src="" alt="">
+  <button class="lightbox-arrow lb-right" id="lbRight">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+         stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+  </button>
+  <div class="lightbox-counter" id="lbCounter"></div>
+</div>
 
-      if (!productId) {
-        container.innerHTML = '<div class="error"><p>❌ 未找到产品ID</p></div>';
+<script>
+(function () {
+  // ========== 获取产品ID ==========
+  const params = new URLSearchParams(window.location.search);
+  const productId = parseInt(params.get('id'));
+
+  const pageLoading = document.getElementById('pageLoading');
+  const mainContent = document.getElementById('mainContent');
+
+  // DOM引用
+  const galleryTrack = document.getElementById('galleryTrack');
+  const galleryMain = document.getElementById('galleryMain');
+  const thumbStrip = document.getElementById('thumbStrip');
+  const slideCounter = document.getElementById('slideCounter');
+  const arrowLeft = document.getElementById('arrowLeft');
+  const arrowRight = document.getElementById('arrowRight');
+
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbClose = document.getElementById('lbClose');
+  const lbLeft = document.getElementById('lbLeft');
+  const lbRight = document.getElementById('lbRight');
+  const lbCounter = document.getElementById('lbCounter');
+
+  let images = [];
+  let currentSlide = 0;
+  let lightboxIndex = 0;
+
+  // ========== 加载数据 ==========
+  fetch('products.json')
+    .then(r => r.json())
+    .then(data => {
+      const product = data.products.find(p => p.id === productId);
+      if (!product) throw new Error('产品不存在');
+
+      images = product.images;
+      document.title = product.name + ' · 拾光饰品';
+
+      // 填充产品信息
+      document.getElementById('detailCategory').textContent = product.category;
+      document.getElementById('detailName').textContent = product.name;
+      document.getElementById('detailPrice').textContent = product.price.toFixed(1);
+      document.getElementById('detailDesc').textContent = product.description;
+
+      // 生成轮播幻灯片
+      galleryTrack.innerHTML = images.map((src, i) => `
+        <div class="gallery-slide">
+          <img src="${src}" alt="${product.name} - 图${i + 1}"
+               data-index="${i}" draggable="false">
+        </div>
+      `).join('');
+
+      // 生成缩略图
+      thumbStrip.innerHTML = images.map((src, i) => `
+        <div class="thumb-item${i === 0 ? ' active' : ''}" data-index="${i}">
+          <img src="${src}" alt="缩略图${i + 1}" draggable="false">
+        </div>
+      `).join('');
+
+      slideCounter.textContent = `1 / ${images.length}`;
+
+      // 显示页面
+      pageLoading.style.display = 'none';
+      mainContent.style.display = 'block';
+
+      initGallery();
+    })
+    .catch(err => {
+      pageLoading.innerHTML = `
+        <div class="page-error">
+          <p style="font-size:36px">😢</p>
+          <p>${err.message || '加载失败'}</p>
+          <a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a>
+        </div>`;
+    });
+
+  // ========== 轮播逻辑 ==========
+  function initGallery() {
+    // 桌面端箭头
+    arrowLeft.addEventListener('click', () => goToSlide(currentSlide - 1));
+    arrowRight.addEventListener('click', () => goToSlide(currentSlide + 1));
+
+    // 缩略图点击
+    thumbStrip.addEventListener('click', (e) => {
+      const thumb = e.target.closest('.thumb-item');
+      if (thumb) goToSlide(parseInt(thumb.dataset.index));
+    });
+
+    // 点击主图 → 打开灯箱
+    galleryTrack.addEventListener('click', (e) => {
+      if (e.target.tagName === 'IMG' && !isDragging) {
+        openLightbox(parseInt(e.target.dataset.index));
+      }
+    });
+
+    // 触摸滑动
+    let startX = 0, startY = 0, moveX = 0, isDragging = false, isHorizontal = null;
+
+    galleryMain.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      isDragging = true;
+      isHorizontal = null;
+      galleryTrack.style.transition = 'none';
+    }, { passive: true });
+
+    galleryMain.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+
+      // 判断滑动方向
+      if (isHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+        isHorizontal = Math.abs(dx) > Math.abs(dy);
+      }
+      if (!isHorizontal) return;
+
+      e.preventDefault();
+      moveX = dx;
+      const offset = -(currentSlide * galleryMain.offsetWidth) + moveX;
+      galleryTrack.style.transform = `translateX(${offset}px)`;
+    }, { passive: false });
+
+    galleryMain.addEventListener('touchend', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      galleryTrack.style.transition = '';
+
+      const threshold = galleryMain.offsetWidth * 0.2;
+      if (isHorizontal) {
+        if (moveX < -threshold) goToSlide(currentSlide + 1);
+        else if (moveX > threshold) goToSlide(currentSlide - 1);
+        else goToSlide(currentSlide);
+      }
+      moveX = 0;
+    });
+
+    // 鼠标拖拽（桌面端）
+    let mouseStartX = 0, mouseMoveX = 0, mouseDown = false;
+
+    galleryMain.addEventListener('mousedown', (e) => {
+      if (e.target.tagName !== 'IMG') return;
+      mouseDown = true;
+      mouseStartX = e.clientX;
+      isDragging = false;
+      galleryTrack.style.transition = 'none';
+      e.preventDefault();
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!mouseDown) return;
+      const dx = e.clientX - mouseStartX;
+      if (Math.abs(dx) > 5) isDragging = true;
+      mouseMoveX = dx;
+      const offset = -(currentSlide * galleryMain.offsetWidth) + mouseMoveX;
+      galleryTrack.style.transform = `translateX(${offset}px)`;
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (!mouseDown) return;
+      mouseDown = false;
+      galleryTrack.style.transition = '';
+
+      const threshold = galleryMain.offsetWidth * 0.15;
+      if (mouseMoveX < -threshold) goToSlide(currentSlide + 1);
+      else if (mouseMoveX > threshold) goToSlide(currentSlide - 1);
+      else goToSlide(currentSlide);
+      mouseMoveX = 0;
+    });
+
+    // 键盘
+    document.addEventListener('keydown', (e) => {
+      if (lightbox.classList.contains('open')) {
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') lightboxNav(-1);
+        if (e.key === 'ArrowRight') lightboxNav(1);
         return;
       }
+      if (e.key === 'ArrowLeft') goToSlide(currentSlide - 1);
+      if (e.key === 'ArrowRight') goToSlide(currentSlide + 1);
+    });
+  }
 
-      // 1. 获取数据
-      fetch('products.json')
-        .then(response => {
-          if (!response.ok) throw new Error('网络错误');
-          return response.json();
-        })
-        .then(data => {
-          // 2. 查找产品 (只遍历一次)
-          const product = data.products.find(p => p.id == productId);
+  function goToSlide(index) {
+    if (index < 0) index = 0;
+    if (index >= images.length) index = images.length - 1;
+    currentSlide = index;
 
-          if (!product) {
-            container.innerHTML = '<div class="error"><p>❌ 未找到该产品</p></div>';
-            return;
-          }
+    galleryTrack.style.transition = '';
+    galleryTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+    slideCounter.textContent = `${currentSlide + 1} / ${images.length}`;
 
-          // 3. 渲染页面
-          renderProduct(product);
-        })
-        .catch(err => {
-          console.error(err);
-          container.innerHTML = '<div class="error"><p>❌ 加载失败</p><p style="font-size:12px;margin-top:8px;">请确认 products.json 存在且通过 HTTP 服务器访问</p></div>';
-        });
+    // 更新缩略图
+    thumbStrip.querySelectorAll('.thumb-item').forEach((t, i) => {
+      t.classList.toggle('active', i === currentSlide);
+    });
 
-      function renderProduct(p) {
-        // 生成缩略图HTML
-        let thumbnailsHtml = '';
-        p.images.forEach((imgSrc, index) => {
-          const activeClass = index === 0 ? 'active' : '';
-          thumbnailsHtml += `
-            <div class="thumbnail ${activeClass}" onclick="changeMainImage(this, '${imgSrc}')">
-              <img src="${imgSrc}" alt="缩略图" loading="lazy">
-            </div>
-          `;
-        });
-
-        // 设置页面标题
-        document.title = p.name + ' · 绒颜';
-
-        // 填充主内容
-        container.innerHTML = `
-          <div class="product-gallery">
-            <img id="main-image" src="${p.images[0]}" alt="${p.name}" loading="lazy">
-          </div>
-          <div class="product-info">
-            <span class="product-category">${p.category}</span>
-            <h2 class="product-name">${p.name}</h2>
-            <div class="product-price">${p.price.toFixed(1)}</div>
-            <div class="product-desc-title">商品详情</div>
-            <p class="product-desc">${p.description}</p>
-            <div class="product-desc-title">更多图片</div>
-            <div class="thumbnails">
-              ${thumbnailsHtml}
-            </div>
-          </div>
-        `;
-      }
-    })();
-
-    // 切换到主图
-    function changeMainImage(thumbnailElement, newSrc) {
-      // 1. 更新主图
-      document.getElementById('main-image').src = newSrc;
-
-      // 2. 更新缩略图样式
-      const thumbnails = document.querySelectorAll('.thumbnail');
-      thumbnails.forEach(thumb => thumb.classList.remove('active'));
-      thumbnailElement.classList.add('active');
+    // 滚动缩略图到可见
+    const activeThumb = thumbStrip.children[currentSlide];
+    if (activeThumb) {
+      activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }
-  </script>
+  }
+
+  // ========== 灯箱逻辑 ==========
+  function openLightbox(index) {
+    lightboxIndex = index;
+    lbImg.src = images[index];
+    lbCounter.textContent = `${index + 1} / ${images.length}`;
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function lightboxNav(dir) {
+    lightboxIndex += dir;
+    if (lightboxIndex < 0) lightboxIndex = images.length - 1;
+    if (lightboxIndex >= images.length) lightboxIndex = 0;
+    lbImg.src = images[lightboxIndex];
+    lbCounter.textContent = `${lightboxIndex + 1} / ${images.length}`;
+  }
+
+  lbClose.addEventListener('click', closeLightbox);
+  lbImg.addEventListener('click', closeLightbox);
+  lbLeft.addEventListener('click', () => lightboxNav(-1));
+  lbRight.addEventListener('click', () => lightboxNav(1));
+
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
+  // 灯箱触摸滑动
+  let lbStartX = 0, lbMoveX = 0, lbDragging = false;
+  lightbox.addEventListener('touchstart', (e) => {
+    lbStartX = e.touches[0].clientX;
+    lbDragging = true;
+  }, { passive: true });
+  lightbox.addEventListener('touchmove', (e) => {
+    if (!lbDragging) return;
+    lbMoveX = e.touches[0].clientX - lbStartX;
+  }, { passive: true });
+  lightbox.addEventListener('touchend', () => {
+    if (!lbDragging) return;
+    lbDragging = false;
+    if (Math.abs(lbMoveX) > 50) {
+      lightboxNav(lbMoveX < 0 ? 1 : -1);
+    }
+    lbMoveX = 0;
+  });
+})();
+</script>
 </body>
 </html>

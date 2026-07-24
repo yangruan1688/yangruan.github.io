@@ -18,12 +18,17 @@
             <button class="nav-btn" data-category="其他">其他</button>
         </nav>
 
-        <!-- 筛选栏 (模拟图片中的价格筛选) -->
-
+        <!-- 筛选栏 -->
+        <div class="filter-bar">
+            <span>🏷️ 价格</span>
+        </div>
 
         <!-- 产品列表容器 -->
         <div id="product-grid" class="product-grid">
-            <!-- JavaScript 将在这里生成产品卡片 -->
+            <!-- 初始状态：加载中提示 -->
+            <div id="loading-state" style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #888;">
+                <p>✨ 正在加载精美饰品...</p>
+            </div>
         </div>
     </div>
 

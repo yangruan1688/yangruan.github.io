@@ -24,15 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 grid.innerHTML = ''; // 清空当前列表
                 
                 // 核心筛选逻辑：
-                // 如果点击的是“全部”，则不做任何过滤，显示所有产品
-                // 如果点击的是具体分类，则只显示 category 匹配的产品
+                // 1. 如果点击的是“全部”，不做任何过滤，显示所有产品
+                // 2. 如果点击的是具体分类（如“发饰”），只显示 category 匹配的产品
                 const filtered = filterCategory === '全部' 
                     ? products 
                     : products.filter(p => p.category === filterCategory);
 
                 // 如果该分类下没有产品
                 if (filtered.length === 0) {
-                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#888;">该分类下暂无产品</p>';
+                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#888; padding:20px;">该分类下暂无产品</p>';
                     return;
                 }
 
@@ -54,14 +54,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            // 初始化显示全部 (此时会自动覆盖掉 HTML 里的 loading 提示)
+            // 初始化显示全部
             renderProducts('全部');
 
             // 绑定导航点击事件
             navBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
+                    // 移除所有激活状态
                     navBtns.forEach(b => b.classList.remove('active'));
+                    // 激活当前点击的按钮
                     e.target.classList.add('active');
+                    // 重新渲染对应分类
                     renderProducts(e.target.dataset.category);
                 });
             });

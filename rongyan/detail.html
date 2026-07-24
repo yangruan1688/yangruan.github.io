@@ -2,109 +2,146 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>产品详情 · 拾光饰品</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<meta name="theme-color" content="#faf8f5">
+<title>扬软</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
   :root {
     --primary: #b8860b;
     --primary-light: #d4a843;
     --bg: #faf8f5;
-    --card-bg: #ffffff;
     --text: #2c2c2c;
     --text-light: #999;
     --radius: 12px;
+    --top-h: 52px;
   }
-  html { scroll-behavior: smooth; }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
-                 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+                 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
     background: var(--bg);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
-  /* ========== 顶部栏 ========== */
-  .top-bar {
+  /* ============ 顶部栏 ============ */
+  .topbar {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 900;
-    height: 52px;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    height: var(--top-h);
+    padding-top: env(safe-area-inset-top, 0px);
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
     border-bottom: 1px solid rgba(0,0,0,0.06);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
+    padding-left: 8px;
+    padding-right: 16px;
   }
+
   .back-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     background: none;
     border: none;
     font-size: 15px;
     color: var(--text);
     cursor: pointer;
-    padding: 8px 12px 8px 4px;
+    padding: 10px 12px 10px 8px;
     border-radius: 8px;
-    transition: background 0.2s;
     text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: background 0.2s;
   }
   .back-btn:hover { background: rgba(0,0,0,0.04); }
-  .back-btn svg { width: 20px; height: 20px; }
-  .top-bar-title {
+  .back-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+  .topbar-title {
     font-size: 14px;
     font-weight: 600;
     letter-spacing: 2px;
     color: var(--primary);
+    user-select: none;
   }
-  .top-bar-placeholder { width: 60px; }
 
-  /* ========== 图片轮播区 ========== */
-  .gallery-section {
-    margin-top: 52px;
+  .topbar-right { width: 60px; }
+
+  /* ============ 加载/错误 ============ */
+  .page-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    padding-top: var(--top-h);
+    color: var(--text-light);
+    gap: 12px;
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid #eee;
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ============ 轮播区 ============ */
+  .gallery {
+    margin-top: var(--top-h);
     position: relative;
     background: #f0ece6;
+    /* 允许纵向滚动穿透，阻止横向 */
+    touch-action: pan-y;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
-  /* 主图容器 */
-  .gallery-main {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    touch-action: pan-y;
-  }
-  .gallery-track {
+  .track {
     display: flex;
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     will-change: transform;
   }
-  .gallery-slide {
-    flex: 0 0 100%;
-    width: 100%;
-    position: relative;
-  }
-  .gallery-slide img {
-    width: 100%;
-    height: auto;
-    display: block;
-    cursor: zoom-in;
-    transition: transform 0.35s ease;
-    user-select: none;
-    -webkit-user-drag: none;
+  .track.animating {
+    transition: transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
-  /* 移动端固定正方形比例 */
+  .slide {
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 0;
+    position: relative;
+  }
+  .slide img {
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: zoom-in;
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: auto;
+  }
+
+  /* 移动端正方形 */
   @media (max-width: 767px) {
-    .gallery-slide {
+    .slide {
       padding-top: 100%;
-      position: relative;
     }
-    .gallery-slide img {
+    .slide img {
       position: absolute;
       top: 0; left: 0;
       width: 100%;
@@ -112,35 +149,37 @@
       object-fit: cover;
     }
   }
+
+  /* 桌面端居中限宽 */
   @media (min-width: 768px) {
-    .gallery-section {
-      max-width: 700px;
+    .gallery {
+      max-width: 680px;
       margin-left: auto;
       margin-right: auto;
-      margin-top: 52px;
       border-radius: 0 0 var(--radius) var(--radius);
-      overflow: hidden;
     }
   }
 
-  /* 图片序号指示 */
-  .slide-counter {
+  /* 计数器 */
+  .counter {
     position: absolute;
     bottom: 14px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,0.45);
+    background: rgba(0,0,0,0.4);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     color: #fff;
     padding: 4px 14px;
     border-radius: 20px;
     font-size: 12px;
     letter-spacing: 2px;
     pointer-events: none;
+    z-index: 5;
   }
 
-  /* 左右箭头（桌面端） */
-  .gallery-arrow {
+  /* 左右箭头（仅桌面） */
+  .arrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -148,33 +187,31 @@
     border-radius: 50%;
     background: rgba(255,255,255,0.85);
     backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     border: none;
     cursor: pointer;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-    transition: all 0.25s;
     z-index: 10;
     opacity: 0;
-    pointer-events: none;
+    transition: opacity 0.25s, background 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
-  .gallery-arrow:hover {
-    background: #fff;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  }
-  .gallery-arrow svg { width: 18px; height: 18px; color: var(--text); }
-  .gallery-arrow.arrow-left { left: 12px; }
-  .gallery-arrow.arrow-right { right: 12px; }
+  .arrow:hover { background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+  .arrow svg { width: 18px; height: 18px; color: var(--text); }
+  .arrow-left { left: 12px; }
+  .arrow-right { right: 12px; }
+
   @media (min-width: 768px) {
-    .gallery-section:hover .gallery-arrow {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .arrow { display: flex; }
+    .gallery:hover .arrow { opacity: 1; }
   }
 
   /* 缩略图条 */
-  .thumb-strip {
+  .thumbs {
     display: flex;
     gap: 8px;
     padding: 14px 16px;
@@ -183,37 +220,41 @@
     scrollbar-width: none;
     background: #fff;
   }
-  .thumb-strip::-webkit-scrollbar { display: none; }
-  .thumb-item {
+  .thumbs::-webkit-scrollbar { display: none; }
+
+  .thumb {
     flex-shrink: 0;
     width: 56px; height: 56px;
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
     border: 2px solid transparent;
+    opacity: 0.5;
     transition: all 0.25s;
-    opacity: 0.55;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
-  .thumb-item:hover { opacity: 0.8; }
-  .thumb-item.active {
+  .thumb:hover { opacity: 0.8; }
+  .thumb.active {
     border-color: var(--primary);
     opacity: 1;
-    box-shadow: 0 2px 8px rgba(184,134,11,0.25);
+    box-shadow: 0 2px 8px rgba(184,134,11,0.2);
   }
-  .thumb-item img {
+  .thumb img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+    -webkit-user-drag: none;
   }
 
-  /* ========== 产品信息区 ========== */
-  .product-detail {
-    max-width: 700px;
+  /* ============ 产品信息 ============ */
+  .info {
+    max-width: 680px;
     margin: 0 auto;
-    padding: 28px 20px 60px;
+    padding: 28px 20px 80px;
   }
-  .detail-category {
+  .info-cat {
     display: inline-block;
     background: linear-gradient(135deg, var(--primary), var(--primary-light));
     color: #fff;
@@ -224,99 +265,77 @@
     letter-spacing: 1px;
     margin-bottom: 14px;
   }
-  .detail-name {
+  .info-name {
     font-size: 22px;
     font-weight: 700;
     line-height: 1.4;
     margin-bottom: 12px;
   }
-  .detail-price {
+  .info-price {
     font-size: 28px;
     font-weight: 800;
     color: var(--primary);
     margin-bottom: 20px;
   }
-  .detail-price::before {
+  .info-price::before {
     content: '¥';
     font-size: 16px;
     margin-right: 2px;
   }
-  .detail-divider {
+  .info-divider {
     width: 40px;
     height: 3px;
     background: linear-gradient(90deg, var(--primary), var(--primary-light));
     border-radius: 2px;
     margin-bottom: 20px;
   }
-  .detail-desc {
+  .info-desc {
     font-size: 15px;
-    line-height: 1.8;
+    line-height: 1.85;
     color: #555;
   }
 
-  /* ========== 全屏查看（灯箱） ========== */
+  /* ============ 灯箱 ============ */
   .lightbox {
     position: fixed;
     inset: 0;
     z-index: 2000;
-    background: rgba(0,0,0,0.94);
+    background: rgba(0,0,0,0.95);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.35s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
   }
   .lightbox.open {
     opacity: 1;
     visibility: visible;
   }
-  .lightbox-img {
-    max-width: 92vw;
+
+  .lb-img {
+    max-width: 94vw;
     max-height: 90vh;
     object-fit: contain;
     border-radius: 4px;
-    transform: scale(0.85);
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: scale(0.9);
+    transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
     cursor: zoom-out;
-    user-select: none;
     -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: auto;
   }
-  .lightbox.open .lightbox-img {
+  .lightbox.open .lb-img {
     transform: scale(1);
   }
-  .lightbox-close {
+
+  .lb-close {
     position: absolute;
     top: 16px; right: 16px;
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.15);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-  }
-  .lightbox-close:hover { background: rgba(255,255,255,0.3); }
-  .lightbox-close svg { width: 20px; height: 20px; color: #fff; }
-
-  .lightbox-counter {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255,255,255,0.7);
-    font-size: 13px;
-    letter-spacing: 3px;
-  }
-
-  /* 灯箱左右箭头 */
-  .lightbox-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 44px; height: 44px;
+    width: 42px; height: 42px;
     border-radius: 50%;
     background: rgba(255,255,255,0.12);
     border: none;
@@ -325,34 +344,58 @@
     align-items: center;
     justify-content: center;
     transition: background 0.2s;
+    z-index: 10;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
-  .lightbox-arrow:hover { background: rgba(255,255,255,0.25); }
-  .lightbox-arrow svg { width: 20px; height: 20px; color: #fff; }
-  .lightbox-arrow.lb-left { left: 16px; }
-  .lightbox-arrow.lb-right { right: 16px; }
+  .lb-close:hover { background: rgba(255,255,255,0.25); }
+  .lb-close svg { width: 20px; height: 20px; color: #fff; }
 
-  /* ========== 加载/错误 ========== */
-  .page-loading, .page-error {
+  .lb-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    cursor: pointer;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 80vh;
-    color: var(--text-light);
-    gap: 12px;
+    transition: background 0.2s;
+    z-index: 10;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
-  .page-loading .spinner {
-    width: 36px; height: 36px;
-    border: 3px solid #eee;
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+  .lb-arrow:hover { background: rgba(255,255,255,0.22); }
+  .lb-arrow svg { width: 20px; height: 20px; color: #fff; }
+  .lb-prev { left: 12px; }
+  .lb-next { right: 12px; }
+
+  /* 手机端隐藏灯箱箭头（用滑动代替） */
+  @media (max-width: 767px) {
+    .lb-arrow { display: none; }
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ========== 底部安全区 ========== */
-  .bottom-safe { height: env(safe-area-inset-bottom, 0px); }
+  .lb-counter {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.65);
+    font-size: 13px;
+    letter-spacing: 3px;
+    pointer-events: none;
+    z-index: 10;
+  }
 
+  /* ============ 底部安全区 ============ */
+  .safe-bottom {
+    height: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* ============ 滚动条 ============ */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #d0c8b8; border-radius: 3px; }
@@ -361,325 +404,477 @@
 <body>
 
 <!-- 顶部栏 -->
-<div class="top-bar">
+<header class="topbar">
   <a class="back-btn" href="index.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-         stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="15 18 9 12 15 6"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     返回
   </a>
-  <span class="top-bar-title">产品详情</span>
-  <div class="top-bar-placeholder"></div>
-</div>
+  <span class="topbar-title">产品详情</span>
+  <div class="topbar-right"></div>
+</header>
 
-<!-- 加载中 -->
-<div class="page-loading" id="pageLoading">
+<!-- 加载状态 -->
+<div class="page-status" id="status">
   <div class="spinner"></div>
   <p>加载中...</p>
 </div>
 
-<!-- 主内容（默认隐藏） -->
-<div id="mainContent" style="display:none">
-  <!-- 图片轮播 -->
-  <div class="gallery-section">
-    <div class="gallery-main" id="galleryMain">
-      <div class="gallery-track" id="galleryTrack"></div>
-      <button class="gallery-arrow arrow-left" id="arrowLeft">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <button class="gallery-arrow arrow-right" id="arrowRight">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
-      </button>
-      <div class="slide-counter" id="slideCounter">1 / 1</div>
-    </div>
-    <div class="thumb-strip" id="thumbStrip"></div>
+<!-- 主内容 -->
+<div id="content" style="display:none">
+  <!-- 轮播 -->
+  <div class="gallery" id="gallery">
+    <div class="track" id="track"></div>
+    <button class="arrow arrow-left" id="aLeft" aria-label="上一张">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="arrow arrow-right" id="aRight" aria-label="下一张">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+    </button>
+    <div class="counter" id="counter">1 / 1</div>
   </div>
+
+  <!-- 缩略图 -->
+  <div class="thumbs" id="thumbs"></div>
 
   <!-- 产品信息 -->
-  <div class="product-detail">
-    <span class="detail-category" id="detailCategory"></span>
-    <h1 class="detail-name" id="detailName"></h1>
-    <div class="detail-price" id="detailPrice"></div>
-    <div class="detail-divider"></div>
-    <p class="detail-desc" id="detailDesc"></p>
+  <div class="info">
+    <span class="info-cat" id="iCat"></span>
+    <h1 class="info-name" id="iName"></h1>
+    <div class="info-price" id="iPrice"></div>
+    <div class="info-divider"></div>
+    <p class="info-desc" id="iDesc"></p>
   </div>
-  <div class="bottom-safe"></div>
+  <div class="safe-bottom"></div>
 </div>
 
-<!-- 灯箱（全屏查看） -->
-<div class="lightbox" id="lightbox">
-  <button class="lightbox-close" id="lbClose">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-         stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+<!-- 灯箱 -->
+<div class="lightbox" id="lb">
+  <button class="lb-close" id="lbClose" aria-label="关闭">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
-  <button class="lightbox-arrow lb-left" id="lbLeft">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-         stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  <button class="lb-arrow lb-prev" id="lbPrev" aria-label="上一张">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
   </button>
-  <img class="lightbox-img" id="lbImg" src="" alt="">
-  <button class="lightbox-arrow lb-right" id="lbRight">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-         stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+  <img class="lb-img" id="lbImg" src="" alt="" draggable="false">
+  <button class="lb-arrow lb-next" id="lbNext" aria-label="下一张">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
   </button>
-  <div class="lightbox-counter" id="lbCounter"></div>
+  <div class="lb-counter" id="lbCounter"></div>
 </div>
 
 <script>
-(function () {
-  // ========== 获取产品ID ==========
-  const params = new URLSearchParams(window.location.search);
-  const productId = parseInt(params.get('id'));
+;(function() {
+  'use strict';
 
-  const pageLoading = document.getElementById('pageLoading');
-  const mainContent = document.getElementById('mainContent');
+  // ====== DOM ======
+  var statusEl   = document.getElementById('status');
+  var contentEl  = document.getElementById('content');
+  var gallery    = document.getElementById('gallery');
+  var track      = document.getElementById('track');
+  var thumbs     = document.getElementById('thumbs');
+  var counter    = document.getElementById('counter');
+  var aLeft      = document.getElementById('aLeft');
+  var aRight     = document.getElementById('aRight');
 
-  // DOM引用
-  const galleryTrack = document.getElementById('galleryTrack');
-  const galleryMain = document.getElementById('galleryMain');
-  const thumbStrip = document.getElementById('thumbStrip');
-  const slideCounter = document.getElementById('slideCounter');
-  const arrowLeft = document.getElementById('arrowLeft');
-  const arrowRight = document.getElementById('arrowRight');
+  var lb         = document.getElementById('lb');
+  var lbImg      = document.getElementById('lbImg');
+  var lbClose    = document.getElementById('lbClose');
+  var lbPrev     = document.getElementById('lbPrev');
+  var lbNext     = document.getElementById('lbNext');
+  var lbCounter  = document.getElementById('lbCounter');
 
-  const lightbox = document.getElementById('lightbox');
-  const lbImg = document.getElementById('lbImg');
-  const lbClose = document.getElementById('lbClose');
-  const lbLeft = document.getElementById('lbLeft');
-  const lbRight = document.getElementById('lbRight');
-  const lbCounter = document.getElementById('lbCounter');
+  // ====== 状态 ======
+  var images       = [];
+  var current      = 0;      // 当前轮播索引
+  var lbIndex      = 0;      // 灯箱当前索引
+  var lbOpen       = false;  // 灯箱是否打开
+  var galleryW     = 0;      // gallery 宽度缓存
 
-  let images = [];
-  let currentSlide = 0;
-  let lightboxIndex = 0;
+  // ====== 获取产品ID ======
+  var params = new URLSearchParams(window.location.search);
+  var pid = parseInt(params.get('id'), 10);
 
-  // ========== 加载数据 ==========
+  // ====== 加载数据 ======
   fetch('products.json')
-    .then(r => r.json())
-    .then(data => {
-      const product = data.products.find(p => p.id === productId);
-      if (!product) throw new Error('产品不存在');
+    .then(function(r) {
+      if (!r.ok) throw new Error('网络错误');
+      return r.json();
+    })
+    .then(function(data) {
+      var product = null;
+      for (var i = 0; i < data.products.length; i++) {
+        if (data.products[i].id === pid) { product = data.products[i]; break; }
+      }
+      if (!product) throw new Error('产品不存在 (id=' + pid + ')');
 
       images = product.images;
       document.title = product.name + ' · 拾光饰品';
 
-      // 填充产品信息
-      document.getElementById('detailCategory').textContent = product.category;
-      document.getElementById('detailName').textContent = product.name;
-      document.getElementById('detailPrice').textContent = product.price.toFixed(1);
-      document.getElementById('detailDesc').textContent = product.description;
+      // 填充信息
+      document.getElementById('iCat').textContent   = product.category;
+      document.getElementById('iName').textContent  = product.name;
+      document.getElementById('iPrice').textContent = product.price.toFixed(1);
+      document.getElementById('iDesc').textContent  = product.description;
 
-      // 生成轮播幻灯片
-      galleryTrack.innerHTML = images.map((src, i) => `
-        <div class="gallery-slide">
-          <img src="${src}" alt="${product.name} - 图${i + 1}"
-               data-index="${i}" draggable="false">
-        </div>
-      `).join('');
+      // 构建轮播
+      var trackHtml = '';
+      var thumbHtml = '';
+      for (var i = 0; i < images.length; i++) {
+        trackHtml +=
+          '<div class="slide">' +
+            '<img src="' + images[i] + '" alt="图' + (i+1) + '" draggable="false"' +
+            ' onerror="this.src=\'data:image/svg+xml,' + encodeURIComponent('<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'400\' fill=\'%23f0ece6\'><rect width=\'400\' height=\'400\'/><text x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23ccc\' font-size=\'16\'>图片加载失败</text></svg>') + '\'">' +
+          '</div>';
+        thumbHtml +=
+          '<div class="thumb' + (i === 0 ? ' active' : '') + '" data-i="' + i + '">' +
+            '<img src="' + images[i] + '" alt="缩略图' + (i+1) + '" draggable="false">' +
+          '</div>';
+      }
+      track.innerHTML = trackHtml;
+      thumbs.innerHTML = thumbHtml;
 
-      // 生成缩略图
-      thumbStrip.innerHTML = images.map((src, i) => `
-        <div class="thumb-item${i === 0 ? ' active' : ''}" data-index="${i}">
-          <img src="${src}" alt="缩略图${i + 1}" draggable="false">
-        </div>
-      `).join('');
+      counter.textContent = '1 / ' + images.length;
 
-      slideCounter.textContent = `1 / ${images.length}`;
+      // 计算宽度
+      galleryW = gallery.offsetWidth;
 
-      // 显示页面
-      pageLoading.style.display = 'none';
-      mainContent.style.display = 'block';
+      // 显示内容
+      statusEl.style.display = 'none';
+      contentEl.style.display = 'block';
 
+      // 初始化交互
       initGallery();
+      initLightbox();
+      initKeyboard();
+
+      // 预加载第二张图
+      if (images.length > 1) {
+        var preImg = new Image();
+        preImg.src = images[1];
+      }
     })
-    .catch(err => {
-      pageLoading.innerHTML = `
-        <div class="page-error">
-          <p style="font-size:36px">😢</p>
-          <p>${err.message || '加载失败'}</p>
-          <a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a>
-        </div>`;
+    .catch(function(err) {
+      statusEl.innerHTML =
+        '<div style="font-size:40px;margin-bottom:8px">😢</div>' +
+        '<p>' + (err.message || '加载失败') + '</p>' +
+        '<a href="index.html" style="color:var(--primary);margin-top:12px;text-decoration:none">← 返回首页</a>';
     });
 
-  // ========== 轮播逻辑 ==========
+  // ======================================================
+  //  轮播核心逻辑
+  // ======================================================
   function initGallery() {
-    // 桌面端箭头
-    arrowLeft.addEventListener('click', () => goToSlide(currentSlide - 1));
-    arrowRight.addEventListener('click', () => goToSlide(currentSlide + 1));
-
-    // 缩略图点击
-    thumbStrip.addEventListener('click', (e) => {
-      const thumb = e.target.closest('.thumb-item');
-      if (thumb) goToSlide(parseInt(thumb.dataset.index));
+    // --- 箭头 ---
+    aLeft.addEventListener('click', function(e) {
+      e.stopPropagation();
+      go(current - 1);
+    });
+    aRight.addEventListener('click', function(e) {
+      e.stopPropagation();
+      go(current + 1);
     });
 
-    // 点击主图 → 打开灯箱
-    galleryTrack.addEventListener('click', (e) => {
-      if (e.target.tagName === 'IMG' && !isDragging) {
-        openLightbox(parseInt(e.target.dataset.index));
-      }
+    // --- 缩略图点击 ---
+    thumbs.addEventListener('click', function(e) {
+      var t = e.target.closest('.thumb');
+      if (t) go(parseInt(t.getAttribute('data-i'), 10));
     });
 
-    // 触摸滑动
-    let startX = 0, startY = 0, moveX = 0, isDragging = false, isHorizontal = null;
-
-    galleryMain.addEventListener('touchstart', (e) => {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      isDragging = true;
-      isHorizontal = null;
-      galleryTrack.style.transition = 'none';
-    }, { passive: true });
-
-    galleryMain.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const dx = e.touches[0].clientX - startX;
-      const dy = e.touches[0].clientY - startY;
-
-      // 判断滑动方向
-      if (isHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
-        isHorizontal = Math.abs(dx) > Math.abs(dy);
-      }
-      if (!isHorizontal) return;
-
-      e.preventDefault();
-      moveX = dx;
-      const offset = -(currentSlide * galleryMain.offsetWidth) + moveX;
-      galleryTrack.style.transform = `translateX(${offset}px)`;
-    }, { passive: false });
-
-    galleryMain.addEventListener('touchend', () => {
-      if (!isDragging) return;
-      isDragging = false;
-      galleryTrack.style.transition = '';
-
-      const threshold = galleryMain.offsetWidth * 0.2;
-      if (isHorizontal) {
-        if (moveX < -threshold) goToSlide(currentSlide + 1);
-        else if (moveX > threshold) goToSlide(currentSlide - 1);
-        else goToSlide(currentSlide);
-      }
-      moveX = 0;
-    });
-
-    // 鼠标拖拽（桌面端）
-    let mouseStartX = 0, mouseMoveX = 0, mouseDown = false;
-
-    galleryMain.addEventListener('mousedown', (e) => {
-      if (e.target.tagName !== 'IMG') return;
-      mouseDown = true;
-      mouseStartX = e.clientX;
-      isDragging = false;
-      galleryTrack.style.transition = 'none';
-      e.preventDefault();
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!mouseDown) return;
-      const dx = e.clientX - mouseStartX;
-      if (Math.abs(dx) > 5) isDragging = true;
-      mouseMoveX = dx;
-      const offset = -(currentSlide * galleryMain.offsetWidth) + mouseMoveX;
-      galleryTrack.style.transform = `translateX(${offset}px)`;
-    });
-
-    window.addEventListener('mouseup', () => {
-      if (!mouseDown) return;
-      mouseDown = false;
-      galleryTrack.style.transition = '';
-
-      const threshold = galleryMain.offsetWidth * 0.15;
-      if (mouseMoveX < -threshold) goToSlide(currentSlide + 1);
-      else if (mouseMoveX > threshold) goToSlide(currentSlide - 1);
-      else goToSlide(currentSlide);
-      mouseMoveX = 0;
-    });
-
-    // 键盘
-    document.addEventListener('keydown', (e) => {
-      if (lightbox.classList.contains('open')) {
-        if (e.key === 'Escape') closeLightbox();
-        if (e.key === 'ArrowLeft') lightboxNav(-1);
-        if (e.key === 'ArrowRight') lightboxNav(1);
+    // --- 主图点击 → 打开灯箱 ---
+    // 用一个标记区分"拖拽"和"点击"
+    track.addEventListener('click', function(e) {
+      if (didDrag) {
+        didDrag = false;
         return;
       }
-      if (e.key === 'ArrowLeft') goToSlide(currentSlide - 1);
-      if (e.key === 'ArrowRight') goToSlide(currentSlide + 1);
+      if (e.target.tagName === 'IMG') {
+        openLB(current);
+      }
+    });
+
+    // --- 触摸滑动 ---
+    var touchStartX = 0;
+    var touchStartY = 0;
+    var touchDeltaX = 0;
+    var swiping = false;       // 是否正在横向滑动
+    var directionLocked = false; // 方向是否已锁定
+
+    gallery.addEventListener('touchstart', function(e) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchDeltaX = 0;
+      swiping = false;
+      directionLocked = false;
+      didDrag = false;
+      track.classList.remove('animating');
+    }, { passive: true });
+
+    gallery.addEventListener('touchmove', function(e) {
+      var dx = e.touches[0].clientX - touchStartX;
+      var dy = e.touches[0].clientY - touchStartY;
+
+      // 锁定方向（仅首次超过阈值时判断）
+      if (!directionLocked) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        directionLocked = true;
+        // 如果纵向大于横向 → 不拦截，让页面滚动
+        if (Math.abs(dy) >= Math.abs(dx)) {
+          swiping = false;
+          return;
+        }
+        swiping = true;
+      }
+
+      if (!swiping) return;
+
+      // 阻止纵向滚动（因为我们确认了横向滑动）
+      e.preventDefault();
+
+      touchDeltaX = dx;
+      didDrag = true;
+
+      // 边界阻尼：第一张向左 / 最后一张向右时增加阻力
+      var offset = -(current * galleryW) + touchDeltaX;
+      if ((current === 0 && touchDeltaX > 0) ||
+          (current === images.length - 1 && touchDeltaX < 0)) {
+        offset = -(current * galleryW) + touchDeltaX * 0.3;
+      }
+
+      track.style.transform = 'translateX(' + offset + 'px)';
+    }, { passive: false });
+
+    gallery.addEventListener('touchend', function() {
+      if (!swiping) return;
+      track.classList.add('animating');
+
+      var threshold = galleryW * 0.2;
+      if (touchDeltaX < -threshold && current < images.length - 1) {
+        go(current + 1);
+      } else if (touchDeltaX > threshold && current > 0) {
+        go(current - 1);
+      } else {
+        go(current); // 回弹
+      }
+      touchDeltaX = 0;
+      swiping = false;
+    }, { passive: true });
+
+    // --- 鼠标拖拽 ---
+    var mouseStartX = 0;
+    var mouseDeltaX = 0;
+    var mouseDown = false;
+
+    gallery.addEventListener('mousedown', function(e) {
+      if (e.button !== 0) return; // 仅左键
+      mouseDown = true;
+      mouseStartX = e.clientX;
+      mouseDeltaX = 0;
+      didDrag = false;
+      track.classList.remove('animating');
+      e.preventDefault();
+    });
+
+    window.addEventListener('mousemove', function(e) {
+      if (!mouseDown) return;
+      mouseDeltaX = e.clientX - mouseStartX;
+      if (Math.abs(mouseDeltaX) > 4) didDrag = true;
+
+      var offset = -(current * galleryW) + mouseDeltaX;
+      // 边界阻尼
+      if ((current === 0 && mouseDeltaX > 0) ||
+          (current === images.length - 1 && mouseDeltaX < 0)) {
+        offset = -(current * galleryW) + mouseDeltaX * 0.3;
+      }
+      track.style.transform = 'translateX(' + offset + 'px)';
+    });
+
+    window.addEventListener('mouseup', function() {
+      if (!mouseDown) return;
+      mouseDown = false;
+      track.classList.add('animating');
+
+      var threshold = galleryW * 0.15;
+      if (mouseDeltaX < -threshold && current < images.length - 1) {
+        go(current + 1);
+      } else if (mouseDeltaX > threshold && current > 0) {
+        go(current - 1);
+      } else {
+        go(current);
+      }
+      mouseDeltaX = 0;
+    });
+
+    // --- 窗口 resize ---
+    var resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() {
+        galleryW = gallery.offsetWidth;
+        // 无动画直接跳到正确位置
+        track.classList.remove('animating');
+        track.style.transform = 'translateX(' + (-(current * galleryW)) + 'px)';
+      }, 100);
     });
   }
 
-  function goToSlide(index) {
+  // 标记是否发生了拖拽（用于区分 click 和 drag）
+  var didDrag = false;
+
+  // ====== 跳转幻灯片 ======
+  function go(index) {
     if (index < 0) index = 0;
     if (index >= images.length) index = images.length - 1;
-    currentSlide = index;
+    current = index;
 
-    galleryTrack.style.transition = '';
-    galleryTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
-    slideCounter.textContent = `${currentSlide + 1} / ${images.length}`;
+    track.classList.add('animating');
+    track.style.transform = 'translateX(' + (-(current * galleryW)) + 'px)';
+
+    counter.textContent = (current + 1) + ' / ' + images.length;
 
     // 更新缩略图
-    thumbStrip.querySelectorAll('.thumb-item').forEach((t, i) => {
-      t.classList.toggle('active', i === currentSlide);
-    });
+    var thumbEls = thumbs.querySelectorAll('.thumb');
+    for (var i = 0; i < thumbEls.length; i++) {
+      thumbEls[i].classList.toggle('active', i === current);
+    }
+    // 滚动缩略图到可视区
+    if (thumbEls[current]) {
+      thumbEls[current].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
 
-    // 滚动缩略图到可见
-    const activeThumb = thumbStrip.children[currentSlide];
-    if (activeThumb) {
-      activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    // 预加载相邻图片
+    preload(current - 1);
+    preload(current + 1);
+  }
+
+  function preload(i) {
+    if (i >= 0 && i < images.length) {
+      var img = new Image();
+      img.src = images[i];
     }
   }
 
-  // ========== 灯箱逻辑 ==========
-  function openLightbox(index) {
-    lightboxIndex = index;
-    lbImg.src = images[index];
-    lbCounter.textContent = `${index + 1} / ${images.length}`;
-    lightbox.classList.add('open');
-    document.body.style.overflow = 'hidden';
+  // ======================================================
+  //  灯箱逻辑
+  // ======================================================
+  function initLightbox() {
+    // 关闭
+    lbClose.addEventListener('click', function(e) {
+      e.stopPropagation();
+      closeLB();
+    });
+
+    // 点击图片关闭
+    lbImg.addEventListener('click', function(e) {
+      e.stopPropagation();
+      closeLB();
+    });
+
+    // 点击背景关闭
+    lb.addEventListener('click', function(e) {
+      if (e.target === lb) closeLB();
+    });
+
+    // 灯箱箭头
+    lbPrev.addEventListener('click', function(e) {
+      e.stopPropagation();
+      lbGo(lbIndex - 1);
+    });
+    lbNext.addEventListener('click', function(e) {
+      e.stopPropagation();
+      lbGo(lbIndex + 1);
+    });
+
+    // --- 灯箱触摸滑动 ---
+    var lbTouchX = 0;
+    var lbDelta = 0;
+    var lbSwiping = false;
+    var lbDirLocked = false;
+
+    lb.addEventListener('touchstart', function(e) {
+      lbTouchX = e.touches[0].clientX;
+      lbDelta = 0;
+      lbSwiping = false;
+      lbDirLocked = false;
+    }, { passive: true });
+
+    lb.addEventListener('touchmove', function(e) {
+      var dx = e.touches[0].clientX - lbTouchX;
+
+      if (!lbDirLocked) {
+        if (Math.abs(dx) < 10) return;
+        lbDirLocked = true;
+        lbSwiping = true;
+      }
+
+      if (lbSwiping) {
+        lbDelta = dx;
+        // 轻微移动图片作为视觉反馈
+        lbImg.style.transform = 'scale(1) translateX(' + (dx * 0.4) + 'px)';
+      }
+    }, { passive: true });
+
+    lb.addEventListener('touchend', function() {
+      lbImg.style.transform = '';
+      if (!lbSwiping) return;
+      lbSwiping = false;
+
+      if (Math.abs(lbDelta) > 50) {
+        if (lbDelta < 0) lbGo(lbIndex + 1);
+        else lbGo(lbIndex - 1);
+      }
+      lbDelta = 0;
+    }, { passive: true });
   }
 
-  function closeLightbox() {
-    lightbox.classList.remove('open');
+  function openLB(index) {
+    lbIndex = index;
+    lbImg.src = images[index];
+    lbCounter.textContent = (index + 1) + ' / ' + images.length;
+    lb.classList.add('open');
+    lbOpen = true;
+    document.body.style.overflow = 'hidden';
+
+    // 预加载相邻
+    preload(index - 1);
+    preload(index + 1);
+  }
+
+  function closeLB() {
+    lb.classList.remove('open');
+    lbOpen = false;
     document.body.style.overflow = '';
   }
 
-  function lightboxNav(dir) {
-    lightboxIndex += dir;
-    if (lightboxIndex < 0) lightboxIndex = images.length - 1;
-    if (lightboxIndex >= images.length) lightboxIndex = 0;
-    lbImg.src = images[lightboxIndex];
-    lbCounter.textContent = `${lightboxIndex + 1} / ${images.length}`;
+  function lbGo(index) {
+    // 循环
+    if (index < 0) index = images.length - 1;
+    if (index >= images.length) index = 0;
+    lbIndex = index;
+    lbImg.src = images[index];
+    lbCounter.textContent = (index + 1) + ' / ' + images.length;
+
+    preload(index - 1);
+    preload(index + 1);
   }
 
-  lbClose.addEventListener('click', closeLightbox);
-  lbImg.addEventListener('click', closeLightbox);
-  lbLeft.addEventListener('click', () => lightboxNav(-1));
-  lbRight.addEventListener('click', () => lightboxNav(1));
+  // ======================================================
+  //  键盘
+  // ======================================================
+  function initKeyboard() {
+    document.addEventListener('keydown', function(e) {
+      // 灯箱打开时只控制灯箱
+      if (lbOpen) {
+        if (e.key === 'Escape') closeLB();
+        else if (e.key === 'ArrowLeft') lbGo(lbIndex - 1);
+        else if (e.key === 'ArrowRight') lbGo(lbIndex + 1);
+        return;
+      }
+      // 否则控制主轮播
+      if (e.key === 'ArrowLeft') go(current - 1);
+      if (e.key === 'ArrowRight') go(current + 1);
+    });
+  }
 
-  lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) closeLightbox();
-  });
-
-  // 灯箱触摸滑动
-  let lbStartX = 0, lbMoveX = 0, lbDragging = false;
-  lightbox.addEventListener('touchstart', (e) => {
-    lbStartX = e.touches[0].clientX;
-    lbDragging = true;
-  }, { passive: true });
-  lightbox.addEventListener('touchmove', (e) => {
-    if (!lbDragging) return;
-    lbMoveX = e.touches[0].clientX - lbStartX;
-  }, { passive: true });
-  lightbox.addEventListener('touchend', () => {
-    if (!lbDragging) return;
-    lbDragging = false;
-    if (Math.abs(lbMoveX) > 50) {
-      lightboxNav(lbMoveX < 0 ? 1 : -1);
-    }
-    lbMoveX = 0;
-  });
 })();
 </script>
 </body>

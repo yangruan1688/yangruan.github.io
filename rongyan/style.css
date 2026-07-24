@@ -1,68 +1,90 @@
-/* 全局设置 */
+/* =========================================
+   1. 全局基础设置 (修复手机端撑破屏幕的问题)
+   ========================================= */
+*, *::before, *::after {
+    box-sizing: border-box; /* 核心修复：确保 padding 和 border 不会增加元素的总宽度 */
+}
+
 body {
     margin: 0;
     padding: 0;
-    background-color: #F7F5F0; /* 米色背景 */
+    background-color: #F7F5F0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: #333;
+    /* 确保页面可以正常上下滚动，防止被锁死 */
+    overflow-x: hidden; 
+    -webkit-text-size-adjust: 100%; /* 防止手机横屏时字体突然变大 */
 }
 
 .container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 15px; /* 手机端稍微减小内边距，给卡片留出更多空间 */
+    /* 适配 iPhone 底部小黑条，防止最后一个产品被遮挡 */
+    padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
 }
 
-/* 导航栏 */
+/* =========================================
+   2. 导航栏优化 (修复滑动不灵敏、滚动条难看)
+   ========================================= */
 .top-nav {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     overflow-x: auto;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
+    margin-bottom: 5px;
     white-space: nowrap;
+    -webkit-overflow-scrolling: touch; /* 核心修复：让 iOS 手机滑动带有惯性，更丝滑 */
+}
+
+/* 隐藏难看且占用空间的默认横向滚动条 */
+.top-nav::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+.top-nav {
+    -ms-overflow-style: none;  /* IE/Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 
 .nav-btn {
     background: #fff;
     border: 1px solid #E0DCD3;
     border-radius: 20px;
-    padding: 8px 20px;
+    padding: 8px 18px;
     font-size: 14px;
     cursor: pointer;
     color: #666;
     transition: all 0.3s;
+    flex-shrink: 0; /* 防止按钮在 flex 布局中被挤压变形 */
 }
 
 .nav-btn.active, .nav-btn:hover {
     background: #FFFDF5;
-    border-color: #CFAA68; /* 金色边框 */
+    border-color: #CFAA68;
     color: #CFAA68;
     font-weight: bold;
 }
 
-/* 筛选条 */
+/* =========================================
+   3. 筛选条与产品网格 (优化小屏幕排版)
+   ========================================= */
 .filter-bar {
-    margin: 15px 0;
+    margin: 10px 0 15px 0;
     font-size: 14px;
     color: #888;
     border-bottom: 1px solid #EAEAEA;
     padding-bottom: 10px;
 }
 
-/* 产品网格 */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 两列布局 */
-    gap: 15px;
+    grid-template-columns: repeat(2, 1fr); /* 默认双列 */
+    gap: 12px;
 }
 
-@media (max-width: 600px) {
-    .product-grid {
-        grid-template-columns: 1fr; /* 手机端单列 */
-    }
-}
-
-/* 产品卡片 */
+/* =========================================
+   4. 产品卡片 (修复文字截断和图片比例)
+   ========================================= */
 .card {
     background: #fff;
     border-radius: 12px;
@@ -70,60 +92,97 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     cursor: pointer;
     transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
 }
 
-.card:hover {
-    transform: translateY(-3px);
+.card:active {
+    transform: scale(0.98); /* 手机端点击时的反馈效果 */
 }
 
 .card img {
     width: 100%;
-    height: 200px;
+    /* 使用宽高比代替固定高度，防止不同屏幕下图片被拉伸或裁切过多 */
+    aspect-ratio: 1 / 1; 
     object-fit: cover;
     display: block;
+    background-color: #eee; /* 图片加载前的占位底色 */
 }
 
 .card-info {
-    padding: 12px;
+    padding: 10px 12px 12px 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-title {
-    font-size: 15px;
+    font-size: 14px;
     margin: 0 0 8px 0;
     color: #333;
+    line-height: 1.4;
+    /* 核心修复：限制标题最多显示两行，超出显示省略号，防止文字撑破卡片 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* 允许长单词或连续英文/数字换行 */
+    word-break: break-all; 
 }
 
 .card-price {
     font-size: 16px;
-    color: #B8860B; /* 暗金色价格 */
+    color: #B8860B;
     font-weight: bold;
+    margin-top: auto; /* 让价格始终贴在卡片底部 */
 }
 
-/* 详情页样式 */
+/* =========================================
+   5. 详情页样式 (适配移动端阅读)
+   ========================================= */
 .back-link {
     display: inline-block;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     text-decoration: none;
     color: #666;
+    font-size: 14px;
 }
 
 .detail-content {
     background: #fff;
     border-radius: 12px;
-    padding: 20px;
+    padding: 15px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .detail-image-box img {
     width: 100%;
     border-radius: 8px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+
+.detail-info h1 {
+    font-size: 20px;
+    line-height: 1.4;
+    margin: 15px 0 10px 0;
 }
 
 .detail-price {
     font-size: 24px;
     color: #B8860B;
     font-weight: bold;
-    margin: 10px 0;
+    margin: 10px 0 20px 0;
+}
+
+.detail-desc {
+    margin-top: 20px;
+    line-height: 1.6;
+    color: #555;
+    font-size: 15px;
+    /* 确保长文本能自动换行 */
+    word-wrap: break-word;
 }
 
 .buy-btn {
@@ -136,10 +195,29 @@ body {
     font-size: 16px;
     margin-top: 20px;
     cursor: pointer;
+    /* 适配底部安全区，防止按钮被系统手势条遮挡 */
+    margin-bottom: env(safe-area-inset-bottom);
 }
 
-.detail-desc {
-    margin-top: 20px;
-    line-height: 1.6;
-    color: #555;
+/* =========================================
+   6. 响应式微调 (针对极小屏幕或大平板)
+   ========================================= */
+/* 如果屏幕宽度小于 350px (如非常老旧的手机)，改为单列显示 */
+@media (max-width: 350px) {
+    .product-grid {
+        grid-template-columns: 1fr; 
+    }
+}
+
+/* 如果屏幕宽度大于 600px (如平板或电脑)，增加卡片间距 */
+@media (min-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+    .product-grid {
+        gap: 20px;
+    }
+    .card img {
+        aspect-ratio: 4 / 5; /* 电脑上图片可以稍微高一点 */
+    }
 }

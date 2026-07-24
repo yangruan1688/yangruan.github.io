@@ -5,9 +5,9 @@
     "price": 428,
     "category": "发饰",
     "images": [
-      "img/c1.webp",
-      "img/c2.webp",
-      "img/c3.webp"
+      "main/img/c1.webp",
+      "main/img/c2.webp",
+      "main/img/c3.webp"
     ],
     "description": "纯手工制作的红色彼岸花发饰，寓意优美，细节精致。采用优质蚕丝线，光泽度极佳。"
   },

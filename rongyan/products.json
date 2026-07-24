@@ -3,8 +3,8 @@
     "id": 1,
     "name": "绒花 | 彼岸花",
     "price": 428,
-    "category": "其他",
-    "image": "https://via.placeholder.com/400x400?text=彼岸花",
+    "category": "发饰",
+    "image": "https://placehold.co/400x400/e63946/ffffff?text=彼岸花",
     "description": "纯手工制作的红色彼岸花发饰，寓意优美，细节精致。"
   },
   {
@@ -12,7 +12,7 @@
     "name": "绒花 | 丁香花",
     "price": 488,
     "category": "发饰",
-    "image": "https://via.placeholder.com/400x400?text=丁香花",
+    "image": "https://placehold.co/400x400/a2d2ff/ffffff?text=丁香花",
     "description": "淡紫色丁香花，清新淡雅，适合搭配汉服或日常装扮。"
   },
   {
@@ -20,7 +20,15 @@
     "name": "复古蓝色胸针",
     "price": 299,
     "category": "胸针",
-    "image": "https://via.placeholder.com/400x400?text=蓝色胸针",
+    "image": "https://placehold.co/400x400/0077b6/ffffff?text=蓝色胸针",
     "description": "深蓝色丝绒质感胸针，点缀珍珠，高贵典雅。"
+  },
+  {
+    "id": 4,
+    "name": "珍珠流苏耳环",
+    "price": 168,
+    "category": "耳饰",
+    "image": "https://placehold.co/400x400/f4a261/ffffff?text=流苏耳环",
+    "description": "温润珍珠搭配金色流苏，修饰脸型，步步生姿。"
   }
 ]

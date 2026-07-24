@@ -1,46 +1,81 @@
-[
-  {
-    "id": 1,
-    "title": "简约珍珠发夹",
-    "category": "hair",
-    "price": "¥39.99",
-    "description": "经典简约的珍珠发夹，适合各种场合，轻松打造优雅气质。",
-    "images": [
-      "https://picsum.photos/id/10/400/400",
-      "https://picsum.photos/id/11/400/400"
-    ]
-  },
-  {
-    "id": 2,
-    "title": "流苏耳环",
-    "category": "ear",
-    "price": "¥59.99",
-    "description": "时尚复古的流苏耳环，行走间摇曳生姿，彰显独特魅力。",
-    "images": [
-      "https://picsum.photos/id/20/400/400",
-      "https://picsum.photos/id/21/400/400"
-    ]
-  },
-  {
-    "id": 3,
-    "title": "手工珐琅胸针",
-    "category": "brooch",
-    "price": "¥89.99",
-    "description": "精致的手工珐琅胸针，为您的大衣或围巾增添一抹亮色。",
-    "images": [
-      "https://picsum.photos/id/30/400/400"
-    ]
-  },
-  {
-    "id": 4,
-    "title": "可爱卡通发箍",
-    "category": "hair",
-    "price": "¥29.99",
-    "description": "可爱的卡通动物造型发箍，让你瞬间拥有好心情。",
-    "images": [
-      "https://picsum.photos/id/40/400/400",
-      "https://picsum.photos/id/41/400/400",
-      "https://picsum.photos/id/42/400/400"
-    ]
-  }
-]
+{
+  "categories": [
+    {"id": "all", "name": "全部", "active": true},
+    {"id": "hair", "name": "发饰"},
+    {"id": "earrings", "name": "耳饰"},
+    {"id": "brooch", "name": "胸针"},
+    {"id": "other", "name": "其他"}
+  ],
+  "products": [
+    {
+      "id": "p1",
+      "name": "珍珠发簪",
+      "category": "hair",
+      "price": "¥89.00",
+      "cover": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300",
+      "images": [
+        "https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
+        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
+        "https://images.unsplash.com/photo-1595425970375-6f4f6b466832?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800"
+      ]
+    },
+    {
+      "id": "p2",
+      "name": "水晶耳环",
+      "category": "earrings",
+      "price": "¥129.00",
+      "cover": "https://images.unsplash.com/photo-1599640842225-c6b676c37b56?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300",
+      "images": [
+        "https://images.unsplash.com/photo-1599640842225-c6b676c37b56?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
+        "https://images.unsplash.com/photo-1589652717521-10c0d092dea9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800"
+      ]
+    },
+    {
+      "id": "p3",
+      "name": "复古胸针",
+      "category": "brooch",
+      "price": "¥69.00",
+      "cover": "https://images.unsplash.com/photo-1605729335229-1651d169a081?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300",
+      "images": [
+        "https://images.unsplash.com/photo-1605729335229-1651d169a081?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
+        "https://images.unsplash.com/photo-1599640839513-087b7c5b6d8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
+        "https://images.unsplash.com/photo-1599640839513-087b7c5b6d8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800"
+      ]
+    },
+    {
+      "id": "p4",
+      "name": "蝴蝶发夹",
+      "category": "hair",
+      "price": "¥45.00",
+      "cover": "https://images.unsplash.com/photo-1603506152174-6e56a5d1a6b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300",
+      "images": [
+        "https://images.unsplash.com/photo-1603506152174-6e56a5d1a6b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
+        "https://images.unsplash.com/photo-1599640842225-c6b676c37b56?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800"
+      ]
+    },
+    {
+      "id": "p5",
+      "name": "简约耳钉",
+      "category": "earrings",
+      "price": "¥99.00",
+      "cover": "https://images.unsplash.com/photo-1589652717521-10c0d092dea9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300",
+      "images": [
+        "https://images.unsplash.com/photo-1589652717521-10c0d092dea9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
+        "https://images.unsplash.com/photo-1599640839513-087b7c5b6d8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800"
+      ]
+    },
+    {
+      "id": "p6",
+      "name": "手工发饰套装",
+      "category": "other",
+      "price": "¥159.00",
+      "cover": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300",
+      "images": [
+        "https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
+        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
+        "https://images.unsplash.com/photo-1595425970375-6f4f6b466832?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800",
+        "https://images.unsplash.com/photo-1599640842225-c6b676c37b56?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=800"
+      ]
+    }
+  ]
+}

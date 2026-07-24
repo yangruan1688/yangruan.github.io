@@ -1,1 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>产品详情</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- 引入 Swiper 的 CSS 文件 (修正了文件名) -->
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+</head>
+<body id="detail">
+  <header>
+    <a href="index.html" class="back-button">&larr; 返回</a>
+  </header>
 
+  <main class="detail-container" id="detailContainer">
+    <div class="swiper-container">
+      <div class="swiper-wrapper" id="swiperWrapper">
+        <!-- 轮播图图片将通过 JavaScript 动态生成 -->
+      </div>
+      <!-- 左右切换按钮 -->
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>
+
+    <h2 id="detailTitle">产品名称</h2>
+    <p id="detailPrice">¥0.00</p>
+    <p id="detailDescription">产品描述加载中...</p>
+  </main>
+
+  <!-- 引入 Swiper 的 JS 文件 (修正了文件名) -->
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

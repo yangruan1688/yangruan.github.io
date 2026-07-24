@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <meta name="theme-color" content="#faf8f5">
-<title>扬软</title>
+<title>产品详情 · 拾光饰品</title>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -102,10 +102,9 @@
 
   /* ============ 轮播区 ============ */
   .gallery {
-    margin-top: var(--top-h);
+    margin-top: calc(var(--top-h) + env(safe-area-inset-top, 0px));
     position: relative;
     background: #f0ece6;
-    /* 允许纵向滚动穿透，阻止横向 */
     touch-action: pan-y;
     overflow: hidden;
     user-select: none;
@@ -138,9 +137,7 @@
 
   /* 移动端正方形 */
   @media (max-width: 767px) {
-    .slide {
-      padding-top: 100%;
-    }
+    .slide { padding-top: 100%; }
     .slide img {
       position: absolute;
       top: 0; left: 0;
@@ -160,7 +157,6 @@
     }
   }
 
-  /* 计数器 */
   .counter {
     position: absolute;
     bottom: 14px;
@@ -178,7 +174,6 @@
     z-index: 5;
   }
 
-  /* 左右箭头（仅桌面） */
   .arrow {
     position: absolute;
     top: 50%;
@@ -210,7 +205,6 @@
     .gallery:hover .arrow { opacity: 1; }
   }
 
-  /* 缩略图条 */
   .thumbs {
     display: flex;
     gap: 8px;
@@ -328,9 +322,7 @@
     user-select: none;
     pointer-events: auto;
   }
-  .lightbox.open .lb-img {
-    transform: scale(1);
-  }
+  .lightbox.open .lb-img { transform: scale(1); }
 
   .lb-close {
     position: absolute;
@@ -373,10 +365,7 @@
   .lb-prev { left: 12px; }
   .lb-next { right: 12px; }
 
-  /* 手机端隐藏灯箱箭头（用滑动代替） */
-  @media (max-width: 767px) {
-    .lb-arrow { display: none; }
-  }
+  @media (max-width: 767px) { .lb-arrow { display: none; } }
 
   .lb-counter {
     position: absolute;
@@ -390,12 +379,8 @@
     z-index: 10;
   }
 
-  /* ============ 底部安全区 ============ */
-  .safe-bottom {
-    height: env(safe-area-inset-bottom, 0px);
-  }
+  .safe-bottom { height: env(safe-area-inset-bottom, 0px); }
 
-  /* ============ 滚动条 ============ */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #d0c8b8; border-radius: 3px; }
@@ -403,7 +388,6 @@
 </head>
 <body>
 
-<!-- 顶部栏 -->
 <header class="topbar">
   <a class="back-btn" href="index.html">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -413,15 +397,12 @@
   <div class="topbar-right"></div>
 </header>
 
-<!-- 加载状态 -->
 <div class="page-status" id="status">
   <div class="spinner"></div>
   <p>加载中...</p>
 </div>
 
-<!-- 主内容 -->
 <div id="content" style="display:none">
-  <!-- 轮播 -->
   <div class="gallery" id="gallery">
     <div class="track" id="track"></div>
     <button class="arrow arrow-left" id="aLeft" aria-label="上一张">
@@ -433,10 +414,8 @@
     <div class="counter" id="counter">1 / 1</div>
   </div>
 
-  <!-- 缩略图 -->
   <div class="thumbs" id="thumbs"></div>
 
-  <!-- 产品信息 -->
   <div class="info">
     <span class="info-cat" id="iCat"></span>
     <h1 class="info-name" id="iName"></h1>
@@ -466,7 +445,6 @@
 ;(function() {
   'use strict';
 
-  // ====== DOM ======
   var statusEl   = document.getElementById('status');
   var contentEl  = document.getElementById('content');
   var gallery    = document.getElementById('gallery');
@@ -483,18 +461,16 @@
   var lbNext     = document.getElementById('lbNext');
   var lbCounter  = document.getElementById('lbCounter');
 
-  // ====== 状态 ======
   var images       = [];
-  var current      = 0;      // 当前轮播索引
-  var lbIndex      = 0;      // 灯箱当前索引
-  var lbOpen       = false;  // 灯箱是否打开
-  var galleryW     = 0;      // gallery 宽度缓存
+  var current      = 0;
+  var lbIndex      = 0;
+  var lbOpen       = false;
+  var galleryW     = 0;
+  var didDrag      = false;
 
-  // ====== 获取产品ID ======
   var params = new URLSearchParams(window.location.search);
   var pid = parseInt(params.get('id'), 10);
 
-  // ====== 加载数据 ======
   fetch('products.json')
     .then(function(r) {
       if (!r.ok) throw new Error('网络错误');
@@ -510,20 +486,18 @@
       images = product.images;
       document.title = product.name + ' · 拾光饰品';
 
-      // 填充信息
       document.getElementById('iCat').textContent   = product.category;
       document.getElementById('iName').textContent  = product.name;
       document.getElementById('iPrice').textContent = product.price.toFixed(1);
       document.getElementById('iDesc').textContent  = product.description;
 
-      // 构建轮播
       var trackHtml = '';
       var thumbHtml = '';
       for (var i = 0; i < images.length; i++) {
         trackHtml +=
           '<div class="slide">' +
             '<img src="' + images[i] + '" alt="图' + (i+1) + '" draggable="false"' +
-            ' onerror="this.src=\'data:image/svg+xml,' + encodeURIComponent('<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'400\' fill=\'%23f0ece6\'><rect width=\'400\' height=\'400\'/><text x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23ccc\' font-size=\'16\'>图片加载失败</text></svg>') + '\'">' +
+            ' onerror="this.src=\'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" fill="#f0ece6"><rect width="400" height="400"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#ccc" font-size="16">图片加载失败</text></svg>') + '\'">' +
           '</div>';
         thumbHtml +=
           '<div class="thumb' + (i === 0 ? ' active' : '') + '" data-i="' + i + '">' +
@@ -534,20 +508,15 @@
       thumbs.innerHTML = thumbHtml;
 
       counter.textContent = '1 / ' + images.length;
-
-      // 计算宽度
       galleryW = gallery.offsetWidth;
 
-      // 显示内容
       statusEl.style.display = 'none';
       contentEl.style.display = 'block';
 
-      // 初始化交互
       initGallery();
       initLightbox();
       initKeyboard();
 
-      // 预加载第二张图
       if (images.length > 1) {
         var preImg = new Image();
         preImg.src = images[1];
@@ -560,11 +529,7 @@
         '<a href="index.html" style="color:var(--primary);margin-top:12px;text-decoration:none">← 返回首页</a>';
     });
 
-  // ======================================================
-  //  轮播核心逻辑
-  // ======================================================
   function initGallery() {
-    // --- 箭头 ---
     aLeft.addEventListener('click', function(e) {
       e.stopPropagation();
       go(current - 1);
@@ -574,14 +539,11 @@
       go(current + 1);
     });
 
-    // --- 缩略图点击 ---
     thumbs.addEventListener('click', function(e) {
       var t = e.target.closest('.thumb');
       if (t) go(parseInt(t.getAttribute('data-i'), 10));
     });
 
-    // --- 主图点击 → 打开灯箱 ---
-    // 用一个标记区分"拖拽"和"点击"
     track.addEventListener('click', function(e) {
       if (didDrag) {
         didDrag = false;
@@ -592,12 +554,12 @@
       }
     });
 
-    // --- 触摸滑动 ---
+    // 触摸滑动
     var touchStartX = 0;
     var touchStartY = 0;
     var touchDeltaX = 0;
-    var swiping = false;       // 是否正在横向滑动
-    var directionLocked = false; // 方向是否已锁定
+    var swiping = false;
+    var directionLocked = false;
 
     gallery.addEventListener('touchstart', function(e) {
       touchStartX = e.touches[0].clientX;
@@ -613,11 +575,9 @@
       var dx = e.touches[0].clientX - touchStartX;
       var dy = e.touches[0].clientY - touchStartY;
 
-      // 锁定方向（仅首次超过阈值时判断）
       if (!directionLocked) {
         if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
         directionLocked = true;
-        // 如果纵向大于横向 → 不拦截，让页面滚动
         if (Math.abs(dy) >= Math.abs(dx)) {
           swiping = false;
           return;
@@ -626,14 +586,11 @@
       }
 
       if (!swiping) return;
-
-      // 阻止纵向滚动（因为我们确认了横向滑动）
       e.preventDefault();
 
       touchDeltaX = dx;
       didDrag = true;
 
-      // 边界阻尼：第一张向左 / 最后一张向右时增加阻力
       var offset = -(current * galleryW) + touchDeltaX;
       if ((current === 0 && touchDeltaX > 0) ||
           (current === images.length - 1 && touchDeltaX < 0)) {
@@ -653,19 +610,19 @@
       } else if (touchDeltaX > threshold && current > 0) {
         go(current - 1);
       } else {
-        go(current); // 回弹
+        go(current);
       }
       touchDeltaX = 0;
       swiping = false;
     }, { passive: true });
 
-    // --- 鼠标拖拽 ---
+    // 鼠标拖拽
     var mouseStartX = 0;
     var mouseDeltaX = 0;
     var mouseDown = false;
 
     gallery.addEventListener('mousedown', function(e) {
-      if (e.button !== 0) return; // 仅左键
+      if (e.button !== 0) return;
       mouseDown = true;
       mouseStartX = e.clientX;
       mouseDeltaX = 0;
@@ -680,7 +637,6 @@
       if (Math.abs(mouseDeltaX) > 4) didDrag = true;
 
       var offset = -(current * galleryW) + mouseDeltaX;
-      // 边界阻尼
       if ((current === 0 && mouseDeltaX > 0) ||
           (current === images.length - 1 && mouseDeltaX < 0)) {
         offset = -(current * galleryW) + mouseDeltaX * 0.3;
@@ -704,23 +660,17 @@
       mouseDeltaX = 0;
     });
 
-    // --- 窗口 resize ---
     var resizeTimer;
     window.addEventListener('resize', function() {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function() {
         galleryW = gallery.offsetWidth;
-        // 无动画直接跳到正确位置
         track.classList.remove('animating');
         track.style.transform = 'translateX(' + (-(current * galleryW)) + 'px)';
       }, 100);
     });
   }
 
-  // 标记是否发生了拖拽（用于区分 click 和 drag）
-  var didDrag = false;
-
-  // ====== 跳转幻灯片 ======
   function go(index) {
     if (index < 0) index = 0;
     if (index >= images.length) index = images.length - 1;
@@ -731,17 +681,14 @@
 
     counter.textContent = (current + 1) + ' / ' + images.length;
 
-    // 更新缩略图
     var thumbEls = thumbs.querySelectorAll('.thumb');
     for (var i = 0; i < thumbEls.length; i++) {
       thumbEls[i].classList.toggle('active', i === current);
     }
-    // 滚动缩略图到可视区
     if (thumbEls[current]) {
       thumbEls[current].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }
 
-    // 预加载相邻图片
     preload(current - 1);
     preload(current + 1);
   }
@@ -753,28 +700,21 @@
     }
   }
 
-  // ======================================================
-  //  灯箱逻辑
-  // ======================================================
   function initLightbox() {
-    // 关闭
     lbClose.addEventListener('click', function(e) {
       e.stopPropagation();
       closeLB();
     });
 
-    // 点击图片关闭
     lbImg.addEventListener('click', function(e) {
       e.stopPropagation();
       closeLB();
     });
 
-    // 点击背景关闭
     lb.addEventListener('click', function(e) {
       if (e.target === lb) closeLB();
     });
 
-    // 灯箱箭头
     lbPrev.addEventListener('click', function(e) {
       e.stopPropagation();
       lbGo(lbIndex - 1);
@@ -784,7 +724,6 @@
       lbGo(lbIndex + 1);
     });
 
-    // --- 灯箱触摸滑动 ---
     var lbTouchX = 0;
     var lbDelta = 0;
     var lbSwiping = false;
@@ -808,7 +747,6 @@
 
       if (lbSwiping) {
         lbDelta = dx;
-        // 轻微移动图片作为视觉反馈
         lbImg.style.transform = 'scale(1) translateX(' + (dx * 0.4) + 'px)';
       }
     }, { passive: true });
@@ -834,7 +772,6 @@
     lbOpen = true;
     document.body.style.overflow = 'hidden';
 
-    // 预加载相邻
     preload(index - 1);
     preload(index + 1);
   }
@@ -846,7 +783,6 @@
   }
 
   function lbGo(index) {
-    // 循环
     if (index < 0) index = images.length - 1;
     if (index >= images.length) index = 0;
     lbIndex = index;
@@ -857,19 +793,14 @@
     preload(index + 1);
   }
 
-  // ======================================================
-  //  键盘
-  // ======================================================
   function initKeyboard() {
     document.addEventListener('keydown', function(e) {
-      // 灯箱打开时只控制灯箱
       if (lbOpen) {
         if (e.key === 'Escape') closeLB();
         else if (e.key === 'ArrowLeft') lbGo(lbIndex - 1);
         else if (e.key === 'ArrowRight') lbGo(lbIndex + 1);
         return;
       }
-      // 否则控制主轮播
       if (e.key === 'ArrowLeft') go(current - 1);
       if (e.key === 'ArrowRight') go(current + 1);
     });

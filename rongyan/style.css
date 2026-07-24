@@ -1,4 +1,13 @@
-/* 重置样式和基础设置 */
+:root {
+  --primary-color: #c8a97e;
+  --secondary-color: #5a4a42;
+  --light-bg: #f8f5f2;
+  --text-dark: #333;
+  --text-light: #666;
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+  --transition: all 0.3s ease;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,179 +15,241 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
   line-height: 1.6;
-  color: #333;
-  background-color: #f5f5f5;
+  color: var(--text-dark);
+  background-color: var(--light-bg);
+  padding-bottom: 40px;
 }
 
-/* 布局与容器 */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 15px;
-}
-
-/* 头部样式 */
-header {
-  background-color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 15px 0;
-}
-
-header h1 {
-  text-align: center;
-  margin-bottom: 15px;
-  color: #ff4757;
-}
-
-#categoryFilter {
-  list-style: none;
+/* 导航栏样式 */
+.navbar {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 0 15px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 12px 0;
 }
 
-.filter-btn {
+.nav-items {
+  display: flex;
+  gap: 25px;
+  max-width: 1200px;
+  width: 100%;
+  padding: 0 20px;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.nav-items::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.nav-item {
   padding: 8px 15px;
-  border: 1px solid #ddd;
-  background-color: white;
+  border-radius: 20px;
+  font-weight: 500;
   cursor: pointer;
-  border-radius: 5px;
-  transition: all 0.3s ease;
+  transition: var(--transition);
+  white-space: nowrap;
+  position: relative;
+  color: var(--text-light);
 }
 
-.filter-btn.active, .filter-btn:hover {
-  background-color: #ff4757;
-  color: white;
-  border-color: #ff4757;
+.nav-item.active {
+  color: var(--primary-color);
+  font-weight: 600;
 }
 
-/* 主内容区域 */
-main {
-  padding: 20px 0;
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 3px;
+  background: var(--primary-color);
+  border-radius: 3px;
 }
 
+/* 产品网格布局 */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  padding: 0 15px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 25px;
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 20px;
 }
 
 .product-card {
   background: white;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
   cursor: pointer;
 }
 
 .product-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
-.product-card img {
+.product-image {
   width: 100%;
-  height: 250px;
+  height: 260px;
   object-fit: cover;
+  display: block;
 }
 
-.product-card h3 {
-  padding: 10px;
-  font-size: 1.1em;
-  color: #333;
-  margin-bottom: 10px;
+.product-info {
+  padding: 16px;
+}
+
+.product-name {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-dark);
 }
 
 .product-price {
-  font-size: 1.1em;
-  color: #ff4757;
-  font-weight: bold;
-  padding: 0 10px 10px;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 1.1rem;
 }
 
-/* 产品详情页样式 */
-.detail-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+/* 详情页样式 */
+.product-detail {
+  max-width: 1000px;
+  margin: 20px auto;
   background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
 }
 
-.swiper-container {
-  height: 400px;
+.image-gallery {
   position: relative;
+  height: 450px;
+  overflow: hidden;
+  background: #f9f9f9;
 }
 
-.swiper-slide {
-  width: 100%;
+.gallery-container {
+  display: flex;
   height: 100%;
+  transition: transform 0.4s ease;
 }
 
-.swiper-slide img {
-  width: 100%;
+.gallery-image {
+  min-width: 100%;
   height: 100%;
   object-fit: contain;
+  background: #fff;
+  cursor: zoom-in;
+  transition: transform 0.3s ease;
 }
 
-.swiper-button-prev,
-.swiper-button-next {
-  color: #ff4757;
-  background-color: rgba(255, 255, 255, 0.7);
-  width: 40px;
-  height: 40px;
+.gallery-image.zoomed {
+  cursor: zoom-out;
+  transform: scale(2);
+  object-fit: cover;
+}
+
+.image-counter {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  z-index: 10;
+}
+
+.swipe-hint {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.7);
+  font-size: 0.9rem;
+  z-index: 5;
+  display: none;
+}
+
+/* 滑动控件 */
+.swipe-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
+  background: rgba(0,0,0,0.2);
   display: flex;
-  justify-content: center;
   align-items: center;
-  font-size: 18px;
-  font-weight: bold;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 20;
+  opacity: 0;
+  transition: var(--transition);
 }
 
-.swiper-button-prev::after,
-.swiper-button-next::after {
-  font-size: 18px;
+.swipe-control:hover {
+  background: rgba(0,0,0,0.4);
 }
 
-.back-button {
-  display: block;
-  margin: 15px;
-  font-size: 1.2em;
-  color: #ff4757;
-  text-decoration: none;
+.swipe-control.prev {
+  left: 15px;
 }
 
-.product-title {
-  font-size: 1.5em;
-  margin: 15px 0;
-  color: #333;
+.swipe-control.next {
+  right: 15px;
 }
 
-.product-description {
-  margin: 15px 0;
-  color: #666;
-  line-height: 1.8;
+.image-gallery:hover .swipe-control {
+  opacity: 1;
 }
 
-/* Fancybox 样式微调 */
-.fancybox-button {
-  z-index: 10000 !important;
-}
-
-/* 响应式设计 */
+/* 响应式调整 */
 @media (max-width: 768px) {
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
   }
+  
+  .product-image {
+    height: 220px;
+  }
+  
+  .image-gallery {
+    height: 350px;
+  }
+}
 
-  .swiper-container {
+@media (max-width: 480px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+  
+  .product-image {
+    height: 160px;
+  }
+  
+  .image-gallery {
     height: 300px;
+  }
+  
+  .swipe-hint {
+    display: block;
   }
 }

@@ -1,97 +1,96 @@
-// script.js
-
-// 模拟的产品数据
-// 在实际项目中，这些数据可能来自 API 或 JSON 文件
-const products = [
-    {
-        id: 1,
-        name: "绒花 | 彼岸花",
-        price: 428,
-        category: "hair-accessories", // 发饰
-        image: "https://placehold.co/600x400/e63946/ffffff?text=彼岸花", // 替换为你的图片路径，如 'images/image1.jpg'
-        likes: 6
-    },
-    {
-        id: 2,
-        name: "绒花 | 丁香花",
-        price: 488,
-        category: "hair-accessories", // 发饰
-        image: "https://placehold.co/600x400/a2d2ff/ffffff?text=丁香花",
-        likes: 4
-    },
-    {
-        id: 3,
-        name: "郁金香花束",
-        price: 350,
-        category: "other", // 其他
-        image: "https://placehold.co/600x400/ffb5a7/ffffff?text=郁金香",
-        likes: 12
-    },
-    {
-        id: 4,
-        name: "蓝色妖姬胸针",
-        price: 299,
-        category: "brooches", // 胸针
-        image: "https://placehold.co/600x400/0077b6/ffffff?text=蓝色妖姬",
-        likes: 8
+document.addEventListener('DOMContentLoaded', () => {
+    // 获取当前页面的文件名，判断是首页还是详情页
+    const path = window.location.pathname;
+    
+    // 1. 如果是首页 (包含 index.html 或者根目录)
+    if (path.endsWith('index.html') || path.endsWith('/')) {
+        initHomePage();
+    } 
+    // 2. 如果是详情页 (包含 detail.html)
+    else if (path.includes('detail.html')) {
+        initDetailPage();
     }
-];
 
-// 获取DOM元素
-const productListContainer = document.getElementById('product-list');
-const navButtons = document.querySelectorAll('.nav-btn');
-const totalItemsSpan = document.getElementById('total-items');
+    // --- 首页逻辑 ---
+    async function initHomePage() {
+        const grid = document.getElementById('product-grid');
+        const navBtns = document.querySelectorAll('.nav-btn');
+        
+        try {
+            // 获取 JSON 数据
+            const response = await fetch('products.json');
+            const products = await response.json();
 
-// 渲染产品卡片的函数
-function renderProducts(itemsToRender) {
-    productListContainer.innerHTML = ''; // 清空现有内容
+            // 渲染函数
+            function renderProducts(filterCategory) {
+                grid.innerHTML = ''; // 清空当前列表
+                
+                const filtered = filterCategory === '全部' 
+                    ? products 
+                    : products.filter(p => p.category === filterCategory);
 
-    itemsToRender.forEach(product => {
-        const productCard = document.createElement('a');
-        productCard.className = 'product-card';
-        // 点击时跳转到详情页，并带上产品ID
-        productCard.href = `product-detail.html?id=${product.id}`;
+                filtered.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    // 点击跳转到详情页，带上 ID 参数
+                    card.onclick = () => window.location.href = `detail.html?id=${product.id}`;
+                    
+                    card.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}">
+                        <div class="card-info">
+                            <h3 class="card-title">${product.name}</h3>
+                            <div class="card-price">¥${product.price}</div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
 
-        productCard.innerHTML = `
-            <div class="product-image-container">
-                <img src="${product.image}" alt="${product.name}">
-            </div>
-            <div class="product-info">
-                <h3 class="product-name">${product.name}</h3>
-                <p class="product-price">¥${product.price}</p>
-                <p class="product-likes">♡ ${product.likes}</p>
-            </div>
-        `;
-        productListContainer.appendChild(productCard);
-    });
+            // 初始化显示全部
+            renderProducts('全部');
 
-    // 更新显示的商品总数
-    totalItemsSpan.textContent = itemsToRender.length;
-}
+            // 绑定导航点击事件
+            navBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // 移除所有激活状态
+                    navBtns.forEach(b => b.classList.remove('active'));
+                    // 激活当前按钮
+                    e.target.classList.add('active');
+                    // 重新渲染
+                    renderProducts(e.target.dataset.category);
+                });
+            });
 
-// 初始化：默认显示所有产品
-renderProducts(products);
-
-// 为每个导航按钮添加点击事件监听器
-navButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        // 1. 移除所有按钮的 'active' 类
-        navButtons.forEach(btn => btn.classList.remove('active'));
-        // 2. 给当前点击的按钮添加 'active' 类
-        button.classList.add('active');
-
-        // 3. 获取要筛选的分类
-        const category = button.dataset.category;
-
-        // 4. 根据分类筛选产品
-        let filteredProducts;
-        if (category === 'all') {
-            filteredProducts = products;
-        } else {
-            filteredProducts = products.filter(product => product.category === category);
+        } catch (error) {
+            console.error('无法加载产品数据:', error);
+            grid.innerHTML = '<p>加载失败，请检查 products.json 文件是否存在。</p>';
         }
+    }
 
-        // 5. 重新渲染页面
-        renderProducts(filteredProducts);
-    });
+    // --- 详情页逻辑 ---
+    async function initDetailPage() {
+        // 从 URL 获取 ID (例如 ?id=1)
+        const params = new URLSearchParams(window.location.search);
+        const productId = parseInt(params.get('id'));
+
+        try {
+            const response = await fetch('products.json');
+            const products = await response.json();
+            
+            // 查找对应 ID 的产品
+            const product = products.find(p => p.id === productId);
+
+            if (product) {
+                document.title = product.name; // 修改网页标题
+                document.getElementById('detail-img').src = product.image;
+                document.getElementById('detail-title').innerText = product.name;
+                document.getElementById('detail-price').innerText = `¥${product.price}`;
+                document.getElementById('detail-description').innerText = product.description || '暂无详细描述';
+            } else {
+                document.body.innerHTML = '<div class="container"><h1>未找到该产品</h1><a href="index.html">返回首页</a></div>';
+            }
+        } catch (error) {
+            console.error('加载详情失败:', error);
+        }
+    }
 });

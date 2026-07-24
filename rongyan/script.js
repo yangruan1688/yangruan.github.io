@@ -1,124 +1,123 @@
-    // --- 详情页逻辑 (支持多图 + PC端交互增强) ---
-    async function initDetailPage() {
-        const params = new URLSearchParams(window.location.search);
-        const productId = parseInt(params.get('id'));
+// script.js
+let products = [];
 
-        try {
-            const response = await fetch('products.json');
-            const products = await response.json();
-            
-            const product = products.find(p => p.id === productId);
+// 1. 加载产品数据
+async function loadProductData() {
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">加载中...</p>';
 
-            if (product) {
-                document.title = `${product.name} - 我的手工饰品店`; 
-                
-                document.getElementById('detail-title').innerText = product.name;
-                document.getElementById('detail-price').innerText = `¥${product.price}`;
-                document.getElementById('detail-description').innerText = product.description || '暂无详细描述';
-
-                const track = document.getElementById('gallery-track');
-                const indicators = document.getElementById('gallery-indicators');
-                const images = product.images || (product.image ? [product.image] : []);
-
-                // 1. 渲染图片和小圆点
-                images.forEach((imgUrl, index) => {
-                    const img = document.createElement('img');
-                    img.src = imgUrl;
-                    img.alt = `${product.name} 图片 ${index + 1}`;
-                    // 防止拖拽图片时出现“幽灵”图标
-                    img.draggable = false; 
-                    track.appendChild(img);
-
-                    const dot = document.createElement('span');
-                    dot.className = 'dot' + (index === 0 ? ' active' : '');
-                    indicators.appendChild(dot);
-                });
-
-                // 更新小圆点状态的通用函数
-                function updateDots() {
-                    const scrollLeft = track.scrollLeft;
-                    const trackWidth = track.offsetWidth;
-                    const currentIndex = Math.round(scrollLeft / trackWidth);
-                    const dots = indicators.querySelectorAll('.dot');
-                    dots.forEach((dot, i) => {
-                        dot.classList.toggle('active', i === currentIndex);
-                    });
-                }
-                
-                track.addEventListener('scroll', updateDots);
-
-                // ==========================================
-                // ✨ 核心新增：PC 端专属交互逻辑
-                // ==========================================
-
-                // A. 左右箭头点击切换
-                const prevBtn = document.getElementById('prev-btn');
-                const nextBtn = document.getElementById('next-btn');
-                
-                if (prevBtn && nextBtn) {
-                    prevBtn.addEventListener('click', () => {
-                        track.scrollBy({ left: -track.offsetWidth, behavior: 'smooth' });
-                    });
-                    nextBtn.addEventListener('click', () => {
-                        track.scrollBy({ left: track.offsetWidth, behavior: 'smooth' });
-                    });
-                }
-
-                // B. 鼠标滚轮横向滚动 (在图片上滚动鼠标，变成左右翻页)
-                track.addEventListener('wheel', (e) => {
-                    // 如果用户是垂直滚动（上下滚），拦截它，变成横向滚动
-                    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-                        e.preventDefault(); // 阻止页面上下跳动
-                        track.scrollBy({
-                            left: e.deltaY > 0 ? track.offsetWidth : -track.offsetWidth,
-                            behavior: 'smooth'
-                        });
-                    }
-                }, { passive: false });
-
-                // C. 鼠标按住拖拽滑动 (像手机触屏一样)
-                let isDown = false;
-                let startX;
-                let scrollLeftStart;
-
-                track.addEventListener('mousedown', (e) => {
-                    isDown = true;
-                    track.classList.add('dragging');
-                    startX = e.pageX - track.offsetLeft;
-                    scrollLeftStart = track.scrollLeft;
-                });
-
-                track.addEventListener('mouseleave', () => {
-                    isDown = false;
-                    track.classList.remove('dragging');
-                });
-
-                track.addEventListener('mouseup', () => {
-                    isDown = false;
-                    track.classList.remove('dragging');
-                    // 拖拽结束后，重新触发一次 scroll 事件，让 scroll-snap 自动吸附对齐
-                    track.dispatchEvent(new Event('scroll'));
-                });
-
-                track.addEventListener('mousemove', (e) => {
-                    if (!isDown) return;
-                    e.preventDefault();
-                    const x = e.pageX - track.offsetLeft;
-                    const walk = (x - startX) * 1.5; // 1.5 是拖拽速度倍率
-                    track.scrollLeft = scrollLeftStart - walk;
-                });
-
-                // 如果只有一张图，隐藏箭头和圆点
-                if (images.length <= 1) {
-                    if(prevBtn) prevBtn.style.display = 'none';
-                    if(nextBtn) nextBtn.style.display = 'none';
-                    indicators.style.display = 'none';
-                }
-
-            } else {
-                document.body.innerHTML = '<div class="container" style="text-align:center; padding:50px;"><h1>未找到该产品</h1><a href="index.html">返回首页</a></div>';
-            }
-        } catch (error) {
-            console.error('加载详情失败:', error);
-        }
+  try {
+    const response = await fetch('products.json');
+    if (!response.ok) {
+      throw new Error(`加载失败: ${response.status}`);
     }
+    products = await response.json();
+    console.log('产品数据加载成功:', products);
+    initProductList();
+  } catch (error) {
+    console.error('加载产品数据时出错:', error);
+    grid.innerHTML = '<p style="text-align: center; padding: 20px; color: #ff4757;">产品数据加载失败，请检查 products.json 文件路径和格式是否正确。</p>';
+  }
+}
+
+// 2. 初始化产品列表页
+function initProductList() {
+  renderProducts(products);
+
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+      
+      // 更新按钮状态
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // 过滤并渲染产品
+      const filteredProducts = filter === 'all' ? products : products.filter(p => p.category === filter);
+      renderProducts(filteredProducts);
+    });
+  });
+}
+
+// 3. 渲染产品列表
+function renderProducts(productsArray) {
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = '';
+
+  if (productsArray.length === 0) {
+    grid.innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">该分类下暂无产品。</p>';
+    return;
+  }
+
+  productsArray.forEach(product => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <img src="${product.images[0]}" alt="${product.title}" class="product-image">
+      <div class="product-content">
+        <h3 class="product-title">${product.title}</h3>
+        <p class="product-price">${product.price}</p>
+      </div>
+    `;
+    card.addEventListener('click', () => {
+      localStorage.setItem('selectedProduct', JSON.stringify(product));
+      window.location.href = 'product-detail.html';
+    });
+    grid.appendChild(card);
+  });
+}
+
+// 4. 初始化产品详情页
+function initProductDetail() {
+  const product = JSON.parse(localStorage.getItem('selectedProduct'));
+  if (!product) {
+    document.getElementById('detailContainer').innerHTML = '<p style="text-align: center; padding: 20px; color: #ff4757;">产品信息加载失败。</p>';
+    return;
+  }
+
+  document.getElementById('detailTitle').textContent = product.title;
+  document.getElementById('detailPrice').textContent = product.price;
+  document.getElementById('detailDescription').textContent = product.description;
+
+  initCarousel(product.images);
+}
+
+// 5. 初始化轮播图
+function initCarousel(images) {
+  const swiperWrapper = document.getElementById('swiperWrapper');
+  swiperWrapper.innerHTML = '';
+
+  images.forEach(imgSrc => {
+    const slide = document.createElement('div');
+    slide.className = 'swiper-slide';
+    slide.innerHTML = `<img src="${imgSrc}" alt="产品图片">`;
+    swiperWrapper.appendChild(slide);
+  });
+
+  // 确保 Swiper 库已加载
+  if (typeof Swiper !== 'undefined') {
+    new Swiper('.swiper-container', {
+      loop: true,
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+      },
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+    });
+  } else {
+    console.error('Swiper 库未加载成功，请检查网络连接或 CDN 链接。');
+  }
+}
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+  if (document.body.id === 'home') {
+    loadProductData(); // 确保数据加载完成
+  } else if (document.body.id === 'detail') {
+    initProductDetail();
+  }
+});

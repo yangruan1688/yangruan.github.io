@@ -2,30 +2,21 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>绒颜</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body id="home">
-  <header>
-    <h1>绒颜</h1>
-    <nav>
-      <ul id="categoryFilter">
-        <li><button class="filter-btn active" data-filter="all">全部</button></li>
-        <li><button class="filter-btn" data-filter="hair">发饰</button></li>
-        <li><button class="filter-btn" data-filter="ear">耳饰</button></li>
-        <li><button class="filter-btn" data-filter="brooch">胸针</button></li>
-        <li><button class="filter-btn" data-filter="other">其他</button></li>
-      </ul>
-    </nav>
-  </header>
-
-  <main>
-    <div class="products-grid" id="productsGrid">
-      <!-- 产品卡片将通过 JavaScript 动态生成 -->
+<body>
+  <nav class="navbar">
+    <div class="nav-items">
+      <!-- 导航栏将由JavaScript动态生成 -->
     </div>
-  </main>
-
+  </nav>
+  
+  <div class="products-grid">
+    <!-- 产品列表将由JavaScript动态生成 -->
+  </div>
+  
   <script src="script.js"></script>
 </body>
 </html>

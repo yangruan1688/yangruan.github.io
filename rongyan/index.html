@@ -26,7 +26,7 @@
     background: var(--bg);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
-    padding-top: var(--nav-height);
+    padding-top: calc(var(--nav-height) + 8px);
   }
 
   /* ========== 顶部导航栏（固定悬浮） ========== */
@@ -34,7 +34,7 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 1000;
-    height: var(--nav-height);
+    min-height: var(--nav-height);
     background: rgba(255,255,255,0.92);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -42,7 +42,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 0 20px;
+    padding: 10px 12px;
   }
   .navbar-brand {
     text-align: center;
@@ -60,15 +60,19 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    /* 渐隐遮罩：提示用户可左右滑动 */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    padding: 2px 8px;
   }
   .navbar-categories::-webkit-scrollbar { display: none; }
   .nav-btn {
     flex-shrink: 0;
-    padding: 6px 18px;
+    padding: 5px 14px;
     border: none;
     background: transparent;
     color: var(--text);
-    font-size: 14px;
+    font-size: 13px;
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -87,7 +91,31 @@
   }
   .nav-btn .nav-icon {
     margin-right: 4px;
-    font-size: 15px;
+    font-size: 14px;
+  }
+
+  /* ========== 手机小屏适配 ========== */
+  @media (max-width: 480px) {
+    .navbar {
+      padding: 8px 8px;
+    }
+    .navbar-brand {
+      font-size: 12px;
+      letter-spacing: 4px;
+      margin-bottom: 4px;
+    }
+    .navbar-categories {
+      justify-content: flex-start;
+      gap: 4px;
+    }
+    .nav-btn {
+      padding: 4px 12px;
+      font-size: 12px;
+    }
+    .nav-btn .nav-icon {
+      font-size: 13px;
+      margin-right: 2px;
+    }
   }
 
   /* ========== 产品展示区 ========== */
@@ -274,7 +302,7 @@
   </div>
 </div>
 
-<div class="footer">© 2026 扬软 · 用心做好每一件美好</div>
+<div class="footer">© 2026 拾光饰品 · 用心挑选每一件美好</div>
 
 <script>
 (function () {
@@ -316,6 +344,9 @@
       : allProducts.filter(p => p.category === currentCategory);
 
     renderProducts(filtered);
+
+    // 点击后自动滚动到被点击的按钮位置，确保其在可视区居中
+    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   });
 
   // 渲染产品卡片

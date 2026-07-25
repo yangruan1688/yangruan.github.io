@@ -6,13 +6,13 @@
       "category": "发饰",
       "price": 39.9,
       "description": "法式复古风珍珠发夹，优雅大方，适合日常和宴会佩戴。采用优质合金与仿珍珠制作，轻盈舒适不夹发。",
-      "cover": "../img/r4.webp",
+      "cover": "../img/c4.webp",
       "images": [
-        "https://picsum.photos/seed/hair1a/800/800",
-        "https://picsum.photos/seed/hair1b/800/800",
-        "https://picsum.photos/seed/hair1c/800/800",
-        "https://picsum.photos/seed/hair1d/800/800",
-        "https://picsum.photos/seed/hair1e/800/800"
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp"
       ]
     },
     {
@@ -21,12 +21,12 @@
       "category": "发饰",
       "price": 58.0,
       "description": "精致水钻蝴蝶结发箍，闪耀迷人，让您成为派对焦点。弹性设计，适合各种头围。",
-      "cover": "https://picsum.photos/seed/hair2/400/400",
+      "cover": "../img/c4.webp",
       "images": [
-        "https://picsum.photos/seed/hair2a/800/800",
-        "https://picsum.photos/seed/hair2b/800/800",
-        "https://picsum.photos/seed/hair2c/800/800",
-        "https://picsum.photos/seed/hair2d/800/800"
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp"
       ]
     },
     {
@@ -35,11 +35,11 @@
       "category": "发饰",
       "price": 25.8,
       "description": "多色丝绒大肠发圈5件套，触感柔软丝滑，高弹力不松垮，轻松打造慵懒法式发型。",
-      "cover": "https://picsum.photos/seed/hair3/400/400",
+      "cover": "../img/c4.webp",
       "images": [
-        "https://picsum.photos/seed/hair3a/800/800",
-        "https://picsum.photos/seed/hair3b/800/800",
-        "https://picsum.photos/seed/hair3c/800/800"
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp"
       ]
     },
     {
@@ -48,12 +48,12 @@
       "category": "耳饰",
       "price": 32.0,
       "description": "北欧极简风几何耳钉，925银针防过敏，简约百搭，通勤日常两相宜。",
-      "cover": "https://picsum.photos/seed/ear1/400/400",
+      "cover": "../img/c4.webp",
       "images": [
-        "https://picsum.photos/seed/ear1a/800/800",
-        "https://picsum.photos/seed/ear1b/800/800",
-        "https://picsum.photos/seed/ear1c/800/800",
-        "https://picsum.photos/seed/ear1d/800/800"
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp"
       ]
     },
     {
@@ -62,13 +62,13 @@
       "category": "耳饰",
       "price": 45.0,
       "description": "法式复古珍珠流苏耳坠，优雅灵动，走路时轻轻摇曳，尽显女性柔美气质。",
-      "cover": "https://picsum.photos/seed/ear2/400/400",
+      "cover": "../img/c4.webp",
       "images": [
-        "https://picsum.photos/seed/ear2a/800/800",
-        "https://picsum.photos/seed/ear2b/800/800",
-        "https://picsum.photos/seed/ear2c/800/800",
-        "https://picsum.photos/seed/ear2d/800/800",
-        "https://picsum.photos/seed/ear2e/800/800"
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp"
       ]
     },
     {
@@ -77,11 +77,11 @@
       "category": "耳饰",
       "price": 38.5,
       "description": "手工琉璃花朵耳环，色彩通透晶莹，春夏季节的完美搭配单品。",
-      "cover": "https://picsum.photos/seed/ear3/400/400",
+      "cover": "../img/c4.webp",
       "images": [
-        "https://picsum.photos/seed/ear3a/800/800",
-        "https://picsum.photos/seed/ear3b/800/800",
-        "https://picsum.photos/seed/ear3c/800/800"
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp"
       ]
     },
     {
@@ -90,12 +90,12 @@
       "category": "胸针",
       "price": 68.0,
       "description": "复古珐琅工艺花卉胸针，色彩浓郁饱满，可别在西装、围巾、帽子上，提升整体穿搭质感。",
-      "cover": "https://picsum.photos/seed/brooch1/400/400",
+      "cover": "../img/c4.webp",
       "images": [
-        "https://picsum.photos/seed/brooch1a/800/800",
-        "https://picsum.photos/seed/brooch1b/800/800",
-        "https://picsum.photos/seed/brooch1c/800/800",
-        "https://picsum.photos/seed/brooch1d/800/800"
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp"
       ]
     },
     {
@@ -104,11 +104,11 @@
       "category": "胸针",
       "price": 42.0,
       "description": "可爱猫咪造型合金胸针，镶嵌小水钻，萌趣十足，猫奴必备配饰。",
-      "cover": "https://picsum.photos/seed/brooch2/400/400",
+      "cover": "../img/c4.webp",
       "images": [
-        "https://picsum.photos/seed/brooch2a/800/800",
-        "https://picsum.photos/seed/brooch2b/800/800",
-        "https://picsum.photos/seed/brooch2c/800/800"
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp"
       ]
     },
     {
@@ -117,11 +117,11 @@
       "category": "其他",
       "price": 28.0,
       "description": "波西米亚风手工编织手链，天然棉麻材质，佩戴舒适，多层叠戴效果更佳。",
-      "cover": "https://picsum.photos/seed/other1/400/400",
+      "cover": "../img/c4.webp",
       "images": [
-        "https://picsum.photos/seed/other1a/800/800",
-        "https://picsum.photos/seed/other1b/800/800",
-        "https://picsum.photos/seed/other1c/800/800"
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp"
       ]
     },
     {
@@ -130,12 +130,12 @@
       "category": "其他",
       "price": 89.0,
       "description": "100%桑蚕丝印花丝巾，触感细腻柔滑，多种系法，可作围巾、发带、包饰使用。",
-      "cover": "https://picsum.photos/seed/other2/400/400",
+      "cover": "../img/c4.webp",
       "images": [
-        "https://picsum.photos/seed/other2a/800/800",
-        "https://picsum.photos/seed/other2b/800/800",
-        "https://picsum.photos/seed/other2c/800/800",
-        "https://picsum.photos/seed/other2d/800/800"
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp"
       ]
     },
     {
@@ -144,11 +144,11 @@
       "category": "发饰",
       "price": 35.0,
       "description": "韩版金属链条装饰发夹，酷飒与柔美并存，轻松打造时尚造型。",
-      "cover": "https://picsum.photos/seed/hair4/400/400",
+      "cover": "../img/c4.webp",
       "images": [
-        "https://picsum.photos/seed/hair4a/800/800",
-        "https://picsum.photos/seed/hair4b/800/800",
-        "https://picsum.photos/seed/hair4c/800/800"
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp"
       ]
     },
     {

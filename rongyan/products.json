@@ -157,12 +157,12 @@
       "category": "耳饰",
       "price": 52.0,
       "description": "浪漫星月造型吊坠耳环，微镶锆石闪耀星光，约会必备心动单品。",
-      "cover": "https://picsum.photos/seed/ear4/400/400",
+      "cover": "../img/c4.webp",
       "images": [
-        "https://picsum.photos/seed/ear4a/800/800",
-        "https://picsum.photos/seed/ear4b/800/800",
-        "https://picsum.photos/seed/ear4c/800/800",
-        "https://picsum.photos/seed/ear4d/800/800"
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp",
+        "../img/c4.webp"
       ]
     }
   ]

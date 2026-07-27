@@ -2,10 +2,10 @@
   "products": [
     {
       "id": 1,
-      "name": "复古珍珠发夹",
+      "name": "复古发夹",
       "category": "发饰",
-      "price": 39.9,
-      "description": "法式复古风珍珠发夹，优雅大方，适合日常和宴会佩戴。采用优质合金与仿珍珠制作，轻盈舒适不夹发。",
+      "price": 68,
+      "description": "法式复古风发夹，优雅大方，适合日常和宴会佩戴，轻盈舒适不夹发。",
       "cover": "../img/c4.webp",
       "images": [
         "../img/c4.webp",
@@ -17,10 +17,10 @@
     },
     {
       "id": 2,
-      "name": "水钻蝴蝶结发箍",
+      "name": "蝴蝶结发箍",
       "category": "发饰",
-      "price": 58.0,
-      "description": "精致水钻蝴蝶结发箍，闪耀迷人，让您成为派对焦点。弹性设计，适合各种头围。",
+      "price": 168,
+      "description": "精致蝴蝶结发箍，闪耀迷人，让您成为派对焦点。弹性设计，适合各种头围。",
       "cover": "../img/c4.webp",
       "images": [
         "../img/c4.webp",
@@ -31,10 +31,10 @@
     },
     {
       "id": 3,
-      "name": "丝绒大肠发圈套装",
+      "name": "丝绒套装",
       "category": "发饰",
-      "price": 25.8,
-      "description": "多色丝绒大肠发圈5件套，触感柔软丝滑，高弹力不松垮，轻松打造慵懒法式发型。",
+      "price": 398,
+      "description": "多色丝绒发圈5件套，触感柔软丝滑，高弹力不松垮，轻松打造慵懒法式发型。",
       "cover": "../img/c4.webp",
       "images": [
         "../img/c4.webp",
@@ -44,10 +44,10 @@
     },
     {
       "id": 4,
-      "name": "极简几何耳钉",
+      "name": "极简耳钉",
       "category": "耳饰",
-      "price": 32.0,
-      "description": "北欧极简风几何耳钉，925银针防过敏，简约百搭，通勤日常两相宜。",
+      "price": 68,
+      "description": "北欧极简风几何耳钉，简约百搭，通勤日常两相宜。",
       "cover": "../img/c4.webp",
       "images": [
         "../img/c4.webp",
@@ -58,10 +58,10 @@
     },
     {
       "id": 5,
-      "name": "复古珍珠耳坠",
+      "name": "复古耳坠",
       "category": "耳饰",
-      "price": 45.0,
-      "description": "法式复古珍珠流苏耳坠，优雅灵动，走路时轻轻摇曳，尽显女性柔美气质。",
+      "price": 68,
+      "description": "法式复古流苏耳坠，优雅灵动，走路时轻轻摇曳，尽显女性柔美气质。",
       "cover": "../img/c4.webp",
       "images": [
         "../img/c4.webp",
@@ -73,10 +73,10 @@
     },
     {
       "id": 6,
-      "name": "花朵琉璃耳环",
+      "name": "花朵耳环",
       "category": "耳饰",
-      "price": 38.5,
-      "description": "手工琉璃花朵耳环，色彩通透晶莹，春夏季节的完美搭配单品。",
+      "price": 68,
+      "description": "手工花朵耳环，色彩通透晶莹，春夏季节的完美搭配单品。",
       "cover": "../img/c4.webp",
       "images": [
         "../img/c4.webp",
@@ -86,10 +86,10 @@
     },
     {
       "id": 7,
-      "name": "珐琅花卉胸针",
+      "name": "花卉胸针",
       "category": "胸针",
-      "price": 68.0,
-      "description": "复古珐琅工艺花卉胸针，色彩浓郁饱满，可别在西装、围巾、帽子上，提升整体穿搭质感。",
+      "price": 298,
+      "description": "复古工艺花卉胸针，色彩浓郁饱满，可别在西装、围巾、帽子上，提升整体穿搭质感。",
       "cover": "../img/c4.webp",
       "images": [
         "../img/c4.webp",
@@ -100,10 +100,10 @@
     },
     {
       "id": 8,
-      "name": "猫咪造型胸针",
+      "name": "新婚胸针",
       "category": "胸针",
-      "price": 42.0,
-      "description": "可爱猫咪造型合金胸针，镶嵌小水钻，萌趣十足，猫奴必备配饰。",
+      "price": 198,
+      "description": "新婚必备配饰。",
       "cover": "../img/c4.webp",
       "images": [
         "../img/c4.webp",
@@ -113,10 +113,10 @@
     },
     {
       "id": 9,
-      "name": "手工编织手链",
+      "name": "定制款",
       "category": "其他",
-      "price": 28.0,
-      "description": "波西米亚风手工编织手链，天然棉麻材质，佩戴舒适，多层叠戴效果更佳。",
+      "price": 1098,
+      "description": "定制款。",
       "cover": "../img/c4.webp",
       "images": [
         "../img/c4.webp",
@@ -126,10 +126,10 @@
     },
     {
       "id": 10,
-      "name": "真丝印花丝巾",
+      "name": "手捧花",
       "category": "其他",
-      "price": 89.0,
-      "description": "100%桑蚕丝印花丝巾，触感细腻柔滑，多种系法，可作围巾、发带、包饰使用。",
+      "price": 298,
+      "description": "100%桑蚕丝，触感细腻柔滑。",
       "cover": "../img/c4.webp",
       "images": [
         "../img/c4.webp",
@@ -140,10 +140,10 @@
     },
     {
       "id": 11,
-      "name": "金属链条发夹",
+      "name": "绒花发夹",
       "category": "发饰",
-      "price": 35.0,
-      "description": "韩版金属链条装饰发夹，酷飒与柔美并存，轻松打造时尚造型。",
+      "price": 298,
+      "description": "酷飒与柔美并存，轻松打造时尚造型。",
       "cover": "../img/c4.webp",
       "images": [
         "../img/c4.webp",
@@ -155,8 +155,8 @@
       "id": 12,
       "name": "星月吊坠耳环",
       "category": "耳饰",
-      "price": 52.0,
-      "description": "浪漫星月造型吊坠耳环，微镶锆石闪耀星光，约会必备心动单品。",
+      "price":198,
+      "description": "浪漫星月造型吊坠耳环，约会必备心动单品。",
       "cover": "../img/c4.webp",
       "images": [
         "../img/c4.webp",

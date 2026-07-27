@@ -46,8 +46,12 @@
     justify-content: center;
     padding: 10px 12px;
   }
+
+  /* ========== 品牌行：三列 flex 布局，确保居中 ========== */
   .navbar-brand {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    width: 100%;
     font-size: 13px;
     letter-spacing: 6px;
     color: var(--primary);
@@ -55,6 +59,42 @@
     margin-bottom: 6px;
     text-transform: uppercase;
   }
+  .navbar-brand .brand-text {
+    flex: 1;
+    text-align: center;
+  }
+
+  /* ========== 返回按钮样式 ========== */
+  .back-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    min-width: 60px;
+  }
+  .back-btn:hover {
+    background: rgba(184,134,11,0.08);
+    color: var(--primary-light);
+  }
+  .back-btn .back-icon {
+    margin-right: 3px;
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  /* ========== 右侧占位，与返回按钮等宽，保证品牌名视觉居中 ========== */
+  .brand-spacer {
+    flex-shrink: 0;
+    min-width: 60px;
+  }
+
   .navbar-categories {
     display: flex;
     justify-content: center;
@@ -105,6 +145,17 @@
       font-size: 12px;
       letter-spacing: 4px;
       margin-bottom: 4px;
+    }
+    .back-btn {
+      font-size: 12px;
+      padding: 3px 8px;
+      min-width: 50px;
+    }
+    .back-btn .back-icon {
+      font-size: 14px;
+    }
+    .brand-spacer {
+      min-width: 50px;
     }
     .navbar-categories {
       justify-content: flex-start;
@@ -271,7 +322,13 @@
 
 <!-- 固定导航栏 -->
 <nav class="navbar">
-  <div class="navbar-brand">✦ 绒颜 ✦</div>
+  <div class="navbar-brand">
+    <a href="../index.html" class="back-btn" title="返回上一级">
+      <span class="back-icon">←</span>返回
+    </a>
+    <span class="brand-text">✦ 绒颜 ✦</span>
+    <span class="brand-spacer"></span>
+  </div>
   <div class="navbar-categories" id="navCategories">
     <button class="nav-btn active" data-category="全部">
       <span class="nav-icon">🏠</span>全部

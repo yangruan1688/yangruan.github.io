@@ -2,12 +2,10 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>绒颜</title>
- <!-- 新增的网站图标代码 -->
-    <link rel="icon" href="../logo.jpg" type="image/jpeg">
+<link rel="icon" href="../logo.jpg" type="image/jpeg">
 <style>
-  /* ========== 基础重置与全局 ========== */
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
     --primary: #b8860b;
@@ -28,10 +26,11 @@
     background: var(--bg);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
-    padding-top: calc(var(--nav-height) + 50px);
+    padding-top: 130px; /* JS 会动态修正此值 */
+    overflow-x: hidden; /* 防止任何元素导致横向滚动 */
   }
 
-  /* ========== 顶部导航栏（固定悬浮） ========== */
+  /* ========== 顶部导航栏 ========== */
   .navbar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -46,8 +45,6 @@
     justify-content: center;
     padding: 10px 12px 0;
   }
-
-  /* ========== 品牌行：三列 flex 布局，确保居中 ========== */
   .navbar-brand {
     display: flex;
     align-items: center;
@@ -59,12 +56,7 @@
     margin-bottom: 6px;
     text-transform: uppercase;
   }
-  .navbar-brand .brand-text {
-    flex: 1;
-    text-align: center;
-  }
-
-  /* ========== 返回按钮样式 ========== */
+  .navbar-brand .brand-text { flex: 1; text-align: center; }
   .back-btn {
     flex-shrink: 0;
     display: inline-flex;
@@ -79,22 +71,9 @@
     transition: all 0.3s ease;
     min-width: 60px;
   }
-  .back-btn:hover {
-    background: rgba(184,134,11,0.08);
-    color: var(--primary-light);
-  }
-  .back-btn .back-icon {
-    margin-right: 3px;
-    font-size: 16px;
-    line-height: 1;
-  }
-
-  /* ========== 右侧占位，与返回按钮等宽，保证品牌名视觉居中 ========== */
-  .brand-spacer {
-    flex-shrink: 0;
-    min-width: 60px;
-  }
-
+  .back-btn:hover { background: rgba(184,134,11,0.08); color: var(--primary-light); }
+  .back-btn .back-icon { margin-right: 3px; font-size: 16px; line-height: 1; }
+  .brand-spacer { flex-shrink: 0; min-width: 60px; }
   .navbar-categories {
     display: flex;
     justify-content: center;
@@ -102,7 +81,6 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    /* 渐隐遮罩：提示用户可左右滑动 */
     -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
     padding: 2px 8px;
@@ -122,24 +100,14 @@
     white-space: nowrap;
     position: relative;
   }
-  .nav-btn:hover {
-    color: var(--primary);
-    background: rgba(184,134,11,0.06);
-  }
-  .nav-btn.active {
-    background: var(--primary);
-    color: #fff;
-    box-shadow: 0 2px 12px rgba(184,134,11,0.3);
-  }
-  .nav-btn .nav-icon {
-    margin-right: 4px;
-    font-size: 14px;
-  }
+  .nav-btn:hover { color: var(--primary); background: rgba(184,134,11,0.06); }
+  .nav-btn.active { background: var(--primary); color: #fff; box-shadow: 0 2px 12px rgba(184,134,11,0.3); }
+  .nav-btn .nav-icon { margin-right: 4px; font-size: 14px; }
 
   /* ========== 排序搜索工具栏 ========== */
   .toolbar {
     position: fixed;
-    top: var(--nav-height);
+    top: 0; /* JS 动态计算位置 */
     left: 0; right: 0;
     z-index: 999;
     background: rgba(255,255,255,0.95);
@@ -150,8 +118,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    overflow: hidden; /* 防止内部元素撑破容器 */
   }
-
   .toolbar-btn {
     display: inline-flex;
     align-items: center;
@@ -166,21 +134,13 @@
     transition: all 0.25s ease;
     white-space: nowrap;
     position: relative;
+    flex-shrink: 0; /* 关键：防止按钮在空间不足时被挤压变形 */
   }
-  .toolbar-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-  }
-  .toolbar-btn.active {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: rgba(184,134,11,0.06);
-  }
-  .toolbar-btn .btn-icon {
-    font-size: 14px;
-  }
+  .toolbar-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .toolbar-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(184,134,11,0.06); }
+  .toolbar-btn .btn-icon { font-size: 14px; }
 
-  /* 排序下拉菜单 */
+  /* 排序下拉 */
   .sort-dropdown {
     position: absolute;
     top: calc(100% + 6px);
@@ -196,11 +156,7 @@
     transition: all 0.25s ease;
     z-index: 1001;
   }
-  .sort-dropdown.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-  }
+  .sort-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
   .sort-dropdown .sort-option {
     display: block;
     width: 100%;
@@ -213,33 +169,27 @@
     cursor: pointer;
     transition: background 0.2s;
   }
-  .sort-dropdown .sort-option:hover {
-    background: rgba(184,134,11,0.08);
-  }
-  .sort-dropdown .sort-option.active {
-    color: var(--primary);
-    font-weight: 600;
-  }
+  .sort-dropdown .sort-option:hover { background: rgba(184,134,11,0.08); }
+  .sort-dropdown .sort-option.active { color: var(--primary); font-weight: 600; }
 
-  /* 搜索框容器 */
+  /* 搜索框 */
   .search-container {
-    flex: 1;
+    flex: 1; /* 占据剩余空间 */
     display: flex;
     align-items: center;
     overflow: hidden;
     max-width: 0;
     opacity: 0;
     transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    min-width: 0; /* 关键：允许 flex 子项缩小到 0，防止撑破父容器 */
   }
-  .search-container.show {
-    max-width: 400px;
-    opacity: 1;
-  }
+  .search-container.show { max-width: 400px; opacity: 1; }
   .search-input-wrap {
     flex: 1;
     position: relative;
     display: flex;
     align-items: center;
+    width: 100%;
   }
   .search-input {
     width: 100%;
@@ -251,12 +201,8 @@
     transition: border-color 0.25s;
     background: #fff;
   }
-  .search-input:focus {
-    border-color: var(--primary);
-  }
-  .search-input::placeholder {
-    color: #bbb;
-  }
+  .search-input:focus { border-color: var(--primary); }
+  .search-input::placeholder { color: #bbb; }
   .search-clear {
     position: absolute;
     right: 10px;
@@ -269,96 +215,38 @@
     cursor: pointer;
     padding: 2px;
     display: none;
+    line-height: 1;
   }
-  .search-clear.show {
-    display: block;
-  }
-  .search-clear:hover {
-    color: var(--text);
-  }
+  .search-clear.show { display: block; }
+  .search-clear:hover { color: var(--text); }
 
-  /* ========== 手机小屏适配 ========== */
+  /* ========== 手机小屏适配 (核心优化区) ========== */
   @media (max-width: 480px) {
-    .navbar {
-      padding: 8px 8px 0;
-    }
-    .navbar-brand {
-      font-size: 12px;
-      letter-spacing: 4px;
-      margin-bottom: 4px;
-    }
-    .back-btn {
-      font-size: 12px;
-      padding: 3px 8px;
-      min-width: 50px;
-    }
-    .back-btn .back-icon {
-      font-size: 14px;
-    }
-    .brand-spacer {
-      min-width: 50px;
-    }
-    .navbar-categories {
-      justify-content: flex-start;
-      gap: 4px;
-    }
-    .nav-btn {
-      padding: 4px 12px;
-      font-size: 12px;
-    }
-    .nav-btn .nav-icon {
-      font-size: 13px;
-      margin-right: 2px;
-    }
-    .toolbar {
-      padding: 6px 10px;
-      gap: 6px;
-    }
-    .toolbar-btn {
-      padding: 5px 10px;
-      font-size: 12px;
-    }
-    .search-container.show {
-      max-width: 200px;
-    }
-    .search-input {
-      padding: 6px 32px 6px 12px;
-      font-size: 12px;
-    }
+    .navbar { padding: 8px 8px 0; }
+    .navbar-brand { font-size: 12px; letter-spacing: 4px; margin-bottom: 4px; }
+    .back-btn { font-size: 12px; padding: 3px 8px; min-width: 50px; }
+    .back-btn .back-icon { font-size: 14px; }
+    .brand-spacer { min-width: 50px; }
+    .navbar-categories { justify-content: flex-start; gap: 4px; }
+    .nav-btn { padding: 4px 12px; font-size: 12px; }
+    .nav-btn .nav-icon { font-size: 13px; margin-right: 2px; }
+    
+    .toolbar { padding: 6px 10px; gap: 8px; }
+    .toolbar-btn { padding: 5px 10px; font-size: 12px; }
+    
+    /* 关键优化：手机端搜索框展开时，取消最大宽度限制，让它占满剩余空间 */
+    .search-container.show { max-width: none; }
+    .search-input { padding: 6px 32px 6px 12px; font-size: 12px; }
   }
 
   /* ========== 产品展示区 ========== */
-  .main-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px 16px 60px;
-  }
-  .section-title {
-    text-align: center;
-    margin-bottom: 28px;
-    font-size: 15px;
-    color: var(--text-light);
-    letter-spacing: 2px;
-  }
-  .section-title span {
-    color: var(--primary);
-    font-weight: 600;
-  }
-
-  /* ========== 产品网格 ========== */
-  .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 16px;
-  }
+  .main-container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 60px; }
+  .section-title { text-align: center; margin-bottom: 28px; font-size: 15px; color: var(--text-light); letter-spacing: 2px; }
+  .section-title span { color: var(--primary); font-weight: 600; }
+  .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
   @media (min-width: 768px) {
-    .product-grid {
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 24px;
-    }
+    .product-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
   }
-
-  /* ========== 产品卡片 ========== */
   .product-card {
     background: var(--card-bg);
     border-radius: var(--radius);
@@ -371,104 +259,23 @@
     display: block;
     animation: cardIn 0.5s ease backwards;
   }
-  .product-card:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-hover);
-  }
-  @keyframes cardIn {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .product-card .card-img-wrap {
-    position: relative;
-    width: 100%;
-    padding-top: 100%;
-    overflow: hidden;
-    background: #f0ece6;
-  }
-  .product-card .card-img-wrap img {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-  }
-  .product-card:hover .card-img-wrap img {
-    transform: scale(1.06);
-  }
-  .product-card .card-tag {
-    position: absolute;
-    top: 10px; left: 10px;
-    background: rgba(255,255,255,0.88);
-    backdrop-filter: blur(6px);
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    color: var(--primary);
-    font-weight: 600;
-  }
-  .product-card .card-info {
-    padding: 14px 14px 16px;
-  }
-  .product-card .card-name {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 6px;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .product-card .card-price {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--primary);
-  }
-  .product-card .card-price::before {
-    content: '¥';
-    font-size: 12px;
-    margin-right: 1px;
-  }
-
-  /* ========== 空状态 ========== */
-  .empty-state {
-    text-align: center;
-    padding: 80px 20px;
-    color: var(--text-light);
-  }
+  .product-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
+  @keyframes cardIn { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .product-card .card-img-wrap { position: relative; width: 100%; padding-top: 100%; overflow: hidden; background: #f0ece6; }
+  .product-card .card-img-wrap img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+  .product-card:hover .card-img-wrap img { transform: scale(1.06); }
+  .product-card .card-tag { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.88); backdrop-filter: blur(6px); padding: 3px 10px; border-radius: 20px; font-size: 11px; color: var(--primary); font-weight: 600; }
+  .product-card .card-info { padding: 14px 14px 16px; }
+  .product-card .card-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .product-card .card-price { font-size: 18px; font-weight: 700; color: var(--primary); }
+  .product-card .card-price::before { content: '¥'; font-size: 12px; margin-right: 1px; }
+  .empty-state { text-align: center; padding: 80px 20px; color: var(--text-light); }
   .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
   .empty-state p { font-size: 15px; }
-
-  /* ========== 加载动画 ========== */
-  .loading {
-    text-align: center;
-    padding: 60px;
-    color: var(--text-light);
-  }
-  .loading .spinner {
-    width: 32px; height: 32px;
-    border: 3px solid #eee;
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 12px;
-  }
+  .loading { text-align: center; padding: 60px; color: var(--text-light); }
+  .loading .spinner { width: 32px; height: 32px; border: 3px solid #eee; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ========== 页脚 ========== */
-  .footer {
-    text-align: center;
-    padding: 30px;
-    color: var(--text-light);
-    font-size: 12px;
-    letter-spacing: 1px;
-    border-top: 1px solid rgba(0,0,0,0.05);
-    margin-top: 40px;
-  }
-
-  /* ========== 滚动条美化 ========== */
+  .footer { text-align: center; padding: 30px; color: var(--text-light); font-size: 12px; letter-spacing: 1px; border-top: 1px solid rgba(0,0,0,0.05); margin-top: 40px; }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #d0c8b8; border-radius: 3px; }
@@ -476,8 +283,7 @@
 </head>
 <body>
 
-<!-- 固定导航栏 -->
-<nav class="navbar">
+<nav class="navbar" id="navbar">
   <div class="navbar-brand">
     <a href="../index.html" class="back-btn" title="返回上一级">
       <span class="back-icon">←</span>返回
@@ -486,27 +292,17 @@
     <span class="brand-spacer"></span>
   </div>
   <div class="navbar-categories" id="navCategories">
-    <button class="nav-btn active" data-category="全部">
-      <span class="nav-icon">🏠</span>全部
-    </button>
-    <button class="nav-btn" data-category="发饰">
-      <span class="nav-icon">💇‍♀️</span>发饰
-    </button>
-    <button class="nav-btn" data-category="耳饰">
-      <span class="nav-icon">✨</span>耳饰
-    </button>
-    <button class="nav-btn" data-category="胸针">
-      <span class="nav-icon">🌸</span>胸针
-    </button>
-    <button class="nav-btn" data-category="其他">
-      <span class="nav-icon">🎁</span>其他
-    </button>
+    <button class="nav-btn active" data-category="全部"><span class="nav-icon">🏠</span>全部</button>
+    <button class="nav-btn" data-category="发饰"><span class="nav-icon">💇‍♀️</span>发饰</button>
+    <button class="nav-btn" data-category="耳饰"><span class="nav-icon">✨</span>耳饰</button>
+    <button class="nav-btn" data-category="胸针"><span class="nav-icon">🌸</span>胸针</button>
+    <button class="nav-btn" data-category="其他"><span class="nav-icon">🎁</span>其他</button>
   </div>
 </nav>
 
-<!-- 排序搜索工具栏（悬浮） -->
+<!-- 排序搜索工具栏 -->
 <div class="toolbar" id="toolbar">
-  <div style="position:relative">
+  <div style="position:relative; flex-shrink: 0;">
     <button class="toolbar-btn" id="sortBtn">
       <span class="btn-icon">↕</span>排序
     </button>
@@ -528,7 +324,6 @@
   </div>
 </div>
 
-<!-- 主内容区 -->
 <div class="main-container">
   <div class="section-title" id="sectionTitle">
     —— 为你精选 <span>全部</span> 饰品 ——
@@ -553,21 +348,37 @@
   const grid = document.getElementById('productGrid');
   const navContainer = document.getElementById('navCategories');
   const sectionTitle = document.getElementById('sectionTitle');
+  const navbar = document.getElementById('navbar');
 
-  // 排序搜索相关
   const sortBtn = document.getElementById('sortBtn');
   const sortDropdown = document.getElementById('sortDropdown');
   const searchBtn = document.getElementById('searchBtn');
   const searchContainer = document.getElementById('searchContainer');
   const searchInput = document.getElementById('searchInput');
   const searchClear = document.getElementById('searchClear');
+  const toolbar = document.getElementById('toolbar');
 
-  // 加载 JSON 数据
+  // ========== 动态计算工具栏位置 ==========
+  function updateToolbarPosition() {
+    const navH = navbar.offsetHeight;
+    const toolH = toolbar.offsetHeight;
+    toolbar.style.top = navH + 'px';
+    document.body.style.paddingTop = (navH + toolH + 8) + 'px';
+  }
+  
+  // 初始化及窗口大小改变时重新计算
+  updateToolbarPosition();
+  window.addEventListener('resize', updateToolbarPosition);
+  // 监听字体加载完成或图片加载导致的布局变化
+  window.addEventListener('load', updateToolbarPosition);
+
+  // ========== 加载数据 ==========
   fetch('products.json')
     .then(r => r.json())
     .then(data => {
       allProducts = data.products;
       updateView();
+      updateToolbarPosition(); // 数据渲染后再次校准位置
     })
     .catch(() => {
       grid.innerHTML = `
@@ -577,66 +388,46 @@
         </div>`;
     });
 
-  // ========== 导航点击 ==========
+  // ========== 导航分类点击 ==========
   navContainer.addEventListener('click', function (e) {
     const btn = e.target.closest('.nav-btn');
     if (!btn) return;
-
     navContainer.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
     currentCategory = btn.dataset.category;
     updateView();
-
     btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   });
 
-  // ========== 排序按钮点击 ==========
+  // ========== 排序按钮 ==========
   sortBtn.addEventListener('click', function (e) {
     e.stopPropagation();
     sortDropdown.classList.toggle('show');
     sortBtn.classList.toggle('active');
-    // 关闭搜索框
-    // searchContainer.classList.remove('show');
-    // searchBtn.classList.remove('active');
   });
 
-  // 排序选项点击
   sortDropdown.addEventListener('click', function (e) {
     const option = e.target.closest('.sort-option');
     if (!option) return;
-
     sortDropdown.querySelectorAll('.sort-option').forEach(o => o.classList.remove('active'));
     option.classList.add('active');
-
     currentSort = option.dataset.sort;
     sortBtn.innerHTML = `<span class="btn-icon">↕</span>${option.textContent}`;
-
     sortDropdown.classList.remove('show');
     sortBtn.classList.remove('active');
-
     updateView();
+    updateToolbarPosition(); // 排序按钮文字变长可能导致高度微调，重新计算
   });
 
-  // 点击其他地方关闭排序下拉
-  document.addEventListener('click', function (e) {
-    if (!sortBtn.contains(e.target) && !sortDropdown.contains(e.target)) {
-      sortDropdown.classList.remove('show');
-      sortBtn.classList.remove('active');
-    }
-  });
-
-  // ========== 搜索按钮点击 ==========
-  searchBtn.addEventListener('click', function () {
+  // ========== 搜索按钮 ==========
+  searchBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
     const isShowing = searchContainer.classList.contains('show');
     searchContainer.classList.toggle('show');
     searchBtn.classList.toggle('active');
-
     if (!isShowing) {
-      // 展开后聚焦输入框
       setTimeout(() => searchInput.focus(), 350);
     } else {
-      // 收起时清空搜索
       searchInput.value = '';
       currentSearch = '';
       searchClear.classList.remove('show');
@@ -644,12 +435,11 @@
     }
   });
 
-  // 搜索输入
+  // ========== 搜索输入（300ms 防抖） ==========
   let searchTimer = null;
   searchInput.addEventListener('input', function () {
     const val = this.value.trim();
     searchClear.classList.toggle('show', val.length > 0);
-
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => {
       currentSearch = val;
@@ -657,7 +447,7 @@
     }, 300);
   });
 
-  // 搜索清空按钮
+  // ========== 搜索清空按钮 ==========
   searchClear.addEventListener('click', function () {
     searchInput.value = '';
     currentSearch = '';
@@ -666,48 +456,60 @@
     updateView();
   });
 
+  // ========== 点击页面空白处关闭 ==========
+  document.addEventListener('click', function (e) {
+    if (!sortBtn.contains(e.target) && !sortDropdown.contains(e.target)) {
+      sortDropdown.classList.remove('show');
+      sortBtn.classList.remove('active');
+    }
+    if (searchContainer.classList.contains('show') && !toolbar.contains(e.target)) {
+      searchContainer.classList.remove('show');
+      searchBtn.classList.remove('active');
+    }
+  });
+
+  // ========== Escape 键关闭 ==========
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      if (searchContainer.classList.contains('show')) {
+        searchInput.blur();
+        searchContainer.classList.remove('show');
+        searchBtn.classList.remove('active');
+      }
+      if (sortDropdown.classList.contains('show')) {
+        sortDropdown.classList.remove('show');
+        sortBtn.classList.remove('active');
+      }
+    }
+  });
+
   // ========== 核心：更新视图 ==========
   function updateView() {
-    // 1. 分类筛选
     let products = currentCategory === '全部'
       ? [...allProducts]
       : allProducts.filter(p => p.category === currentCategory);
 
-    // 2. 搜索筛选
     if (currentSearch) {
       products = products.filter(p =>
         p.name.toLowerCase().includes(currentSearch.toLowerCase())
       );
     }
 
-    // 3. 排序
     switch (currentSort) {
-      case 'price-asc':
-        products.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        products.sort((a, b) => b.price - a.price);
-        break;
-      case 'newest':
-        products.sort((a, b) => b.id - a.id);
-        break;
-      default:
-        // 默认按原始顺序
-        break;
+      case 'price-asc':  products.sort((a, b) => a.price - b.price); break;
+      case 'price-desc': products.sort((a, b) => b.price - a.price); break;
+      case 'newest':     products.sort((a, b) => b.id - a.id); break;
     }
 
-    // 4. 更新标题
     if (currentSearch) {
       sectionTitle.innerHTML = `—— 搜索 "<span>${currentSearch}</span>" 的结果 (${products.length}) ——`;
     } else {
       sectionTitle.innerHTML = `—— 为你精选 <span>${currentCategory}</span> 饰品 ——`;
     }
 
-    // 5. 渲染
     renderProducts(products);
   }
 
-  // 渲染产品卡片
   function renderProducts(products) {
     if (products.length === 0) {
       grid.innerHTML = `
@@ -717,7 +519,6 @@
         </div>`;
       return;
     }
-
     grid.innerHTML = products.map((p, i) => `
       <a class="product-card" href="detail.html?id=${p.id}"
          style="animation-delay:${i * 0.06}s">

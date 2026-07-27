@@ -2,11 +2,12 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"> <!-- [优化] 添加 viewport-fit=cover 支持刘海屏 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>绒颜</title>
+    <!-- 新增的网站图标代码 -->
     <link rel="icon" href="logo.jpg" type="image/jpeg">
     <style>
-        /* ... (前面的 CSS 保持不变) ... */
+        /* 重置样式与基础设置 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
@@ -16,8 +17,6 @@
             --light-golden: #E6C875;
             --text-dark: #333;
             --text-light: #555;
-            /* [优化] 定义 CSS 变量用于 JS 动态计算 vh */
-            --vh: 1vh; 
         }
 
         body {
@@ -26,11 +25,9 @@
             color: var(--text-dark);
             line-height: 1.6;
             overflow-x: hidden;
-            /* [优化] 防止 iOS 橡皮筋效果导致布局错乱 */
-            -webkit-overflow-scrolling: touch; 
         }
 
-        /* ... (Header, Intro, Gallery 样式保持不变) ... */
+        /* 顶部导航 */
         .header {
             background-color: var(--dark-brown);
             color: white;
@@ -43,26 +40,19 @@
 
         .brand-area { display: flex; align-items: center; gap: 1.2rem; }
 
-        .logo-img {
-            width: 65px; height: 65px;
-            object-fit: contain;
-            border-radius: 50%;
-            border: 2px solid var(--golden);
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 4px;
-        }
-
         .company-name { font-size: 1.8rem; font-weight: 700; color: var(--golden); letter-spacing: 2px; }
         .business-type { font-size: 1.1rem; color: var(--light-golden); margin-top: 0.3rem; }
 
+        /* 公司介绍 */
         .intro {
             text-align: center; padding: 2.5rem 5%; max-width: 1200px; margin: 0 auto;
             background-color: rgba(255, 255, 255, 0.8); border-bottom: 2px solid var(--golden);
         }
         .intro h2 { color: var(--dark-brown); font-size: 1.6rem; margin-bottom: 1rem; position: relative; display: inline-block; }
         .intro h2::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 60px; height: 3px; background-color: var(--golden); }
-        .intro p { font-size: 1.1rem; color: var(--text-light); max-width: 800px; margin: 0.8rem auto 0; }
+        .intro p { font-size: 1.1rem; color: var(--text-light); max-width: 800px; margin: 0 auto; }
 
+        /* 馆别展示区 */
         .gallery-section { padding: 3rem 5%; max-width: 1200px; margin: 0 auto; }
         .gallery-title { text-align: center; color: var(--dark-brown); font-size: 1.8rem; margin-bottom: 2rem; position: relative; }
         .gallery-title::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background-color: var(--golden); }
@@ -70,40 +60,27 @@
         .gallery-container {
             overflow: hidden; margin: 1.5rem 0 2.5rem; position: relative;
             border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            background-color: #eaddcf;
-            /* [优化] 防止触摸时选中文本或触发系统菜单 */
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
+            background-color: #eaddcf; /* 容器占位背景色 */
         }
 
-        .gallery-track {
-            display: flex;
-            will-change: transform;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-        }
+        .gallery-track { display: flex; /* 动画由JS控制 */ }
 
         @keyframes scroll {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(var(--scroll-distance, -50%)); }
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
         .gallery-item {
             flex: 0 0 auto; width: 280px; margin: 0 15px; cursor: pointer;
             border-radius: 6px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s;
-            /* [优化] 防止 iOS 点击高亮 */
-            -webkit-tap-highlight-color: transparent;
         }
         .gallery-item:hover { transform: scale(1.03); }
 
         .gallery-item img {
             width: 100%; height: 220px; object-fit: cover; display: block;
-            background-color: #d9c4a9;
+            background-color: #d9c4a9; 
             opacity: 0; transition: opacity 0.6s ease-in;
-            /* [优化] 防止图片拖拽 */
-            pointer-events: none; 
         }
         .gallery-item img.loaded { opacity: 1; }
 
@@ -120,42 +97,13 @@
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.9); z-index: 1000;
             justify-content: center; align-items: center; padding: 20px;
-            /* [优化] 适配刘海屏安全区域 */
-            padding-top: calc(20px + env(safe-area-inset-top));
-            padding-bottom: calc(20px + env(safe-area-inset-bottom));
         }
         .modal-content { max-width: 90%; max-height: 90%; }
-        .modal-content img { 
-            max-width: 100%; 
-            /* [修复#2] 解决 iOS Safari 100vh 问题：优先使用 dvh，降级使用 fill-available 和 vh */
-            max-height: 90dvh; 
-            max-height: calc(var(--vh, 1vh) * 90);
-            max-height: -webkit-fill-available;
-            object-fit: contain; 
-            border: 3px solid var(--golden); 
-            border-radius: 4px; 
-        }
-        .close { 
-            position: absolute; 
-            /* [优化] 调整关闭按钮位置，避开刘海和状态栏 */
-            top: calc(20px + env(safe-area-inset-top)); 
-            right: calc(20px + env(safe-area-inset-right)); 
-            color: white; 
-            font-size: 2.5rem; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: color 0.3s;
-            /* [优化] 增大点击区域 */
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1001;
-        }
+        .modal-content img { max-width: 100%; max-height: 90vh; object-fit: contain; border: 3px solid var(--golden); border-radius: 4px; }
+        .close { position: absolute; top: 20px; right: 30px; color: white; font-size: 2.5rem; font-weight: bold; cursor: pointer; transition: color 0.3s; }
         .close:hover { color: var(--golden); }
 
-        /* ... (Footer 和响应式样式保持不变) ... */
+        /* 页脚 */
         .footer { background-color: var(--dark-brown); color: white; padding: 2.5rem 5%; text-align: center; }
         .contact-info { max-width: 600px; margin: 0 auto; }
         .contact-title { color: var(--golden); font-size: 1.4rem; margin-bottom: 1.2rem; }
@@ -163,9 +111,9 @@
         .contact-details p { margin: 0.5rem 0; }
         .copyright { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); }
 
+        /* 响应式设计 */
         @media (max-width: 768px) {
             .header { flex-direction: column; text-align: center; gap: 0.5rem; }
-            .logo-img { width: 50px; height: 50px; }
             .brand-area { gap: 0.8rem; }
             .company-name { font-size: 1.5rem; }
             .business-type { font-size: 1rem; }
@@ -180,16 +128,12 @@
             .gallery-title { font-size: 1.3rem; }
             .intro h2 { font-size: 1.3rem; }
             .intro p { font-size: 1rem; }
-            /* [优化] 手机端隐藏英文标语，节省空间 */
-            .business-type:last-child { display: none; }
         }
     </style>
 </head>
 <body>
-    <!-- ... (HTML 结构保持不变) ... -->
     <header class="header">
         <div class="brand-area">
-            <img src="logo.jpg" alt="绒颜品牌Logo" class="logo-img">
             <div class="brand-text">
                 <h1 class="company-name">扬州•绒花|缠花</h1>
                 <div class="business-type">"扬古韵今风，琢时光入软"</div>
@@ -199,46 +143,51 @@
     </header>
 
     <section class="intro">
-        <h2>文创品牌：绒颜（May the blossoms bloom in your hair）</h2>
+        <h2>文创品牌：绒颜（May the blossoms bloom in your hair）
+        </h2>
         <p>●绒花，以细腻的铜丝为骨，彩色蚕丝为绒，经过剪裁、卷曲、烫制、组装等繁复工序，将花朵的柔美与丰盈定格于时光之中。每一朵绒花都仿佛带着丝绸的温润光泽，如真花般灵动，又比真花更添一份永恒的美，为生活注入典雅的东方韵味。</p>
         <p>●缠花，选取坚韧铜丝或铁丝为骨架，用多色丝线层层缠绕，勾勒出花鸟虫鱼的灵动画卷。技法融合编织与雕塑的精髓，看似纤细的丝线在指尖流转，最终化作立体生动的艺术品，展现出手工创作的无限巧思。</p>
         <p>●作为手工爱好，绒颜将以现代审美与传统技法结合，创作这些绒花/缠花作品，将古典之美融入日常。</p>
     </section>
 
+    <!-- 绒花馆 -->
     <section class="gallery-section">
         <h2 class="gallery-title">绒颜•绒花馆</h2>
         <div class="gallery-container">
             <div class="gallery-track">
-                <div class="gallery-item"><img src="img/r1.webp" alt="绒花作品一" loading="eager" fetchpriority="high" decoding="async"></div>
-                <div class="gallery-item"><img src="img/r2.webp" alt="绒花作品二" loading="lazy" decoding="async"></div>
-                <div class="gallery-item"><img src="img/r3.webp" alt="绒花作品三" loading="lazy" decoding="async"></div>
-                <div class="gallery-item"><img src="img/r4.webp" alt="绒花作品四" loading="lazy" decoding="async"></div>
+                <!-- 首图使用 eager 和 fetchpriority="high" 提升 LCP 性能 -->
+                <div class="gallery-item"><img src="img/r1.webp" alt="绒花作品" loading="eager" fetchpriority="high"></div>
+                <div class="gallery-item"><img src="img/r2.webp" alt="绒花作品" loading="lazy"></div>
+                <div class="gallery-item"><img src="img/r3.webp" alt="绒花作品" loading="lazy"></div>
+                <div class="gallery-item"><img src="img/r4.webp" alt="绒花作品" loading="lazy"></div>
             </div>
         </div>
         <a href="rongyan/index.html" class="view-all">查看更多</a>
     </section>
 
+    <!-- 缠花馆 -->
     <section class="gallery-section">
         <h2 class="gallery-title">绒颜•缠花馆</h2>
         <div class="gallery-container">
             <div class="gallery-track">
-                <div class="gallery-item"><img src="img/c1.webp" alt="缠花作品一" loading="lazy" decoding="async"></div>
-                <div class="gallery-item"><img src="img/c2.webp" alt="缠花作品二" loading="lazy" decoding="async"></div>
-                <div class="gallery-item"><img src="img/c3.webp" alt="缠花作品三" loading="lazy" decoding="async"></div>
-                <div class="gallery-item"><img src="img/c4.webp" alt="缠花作品四" loading="lazy" decoding="async"></div>
+                <div class="gallery-item"><img src="img/c1.webp" alt="缠花作品" loading="lazy"></div>
+                <div class="gallery-item"><img src="img/c2.webp" alt="缠花作品" loading="lazy"></div>
+                <div class="gallery-item"><img src="img/c3.webp" alt="缠花作品" loading="lazy"></div>
+                <div class="gallery-item"><img src="img/c4.webp" alt="缠花作品" loading="lazy"></div>
             </div>
         </div>
         <a href="rongyan/index.html" class="view-all">查看更多</a>
     </section>
 
+    <!-- 饰品馆 -->
     <section class="gallery-section">
         <h2 class="gallery-title">绒颜•饰品馆</h2>
         <div class="gallery-container">
             <div class="gallery-track">
-                <div class="gallery-item"><img src="img/s1.webp" alt="饰品作品一" loading="lazy" decoding="async"></div>
-                <div class="gallery-item"><img src="img/s2.webp" alt="饰品作品二" loading="lazy" decoding="async"></div>
-                <div class="gallery-item"><img src="img/s3.webp" alt="饰品作品三" loading="lazy" decoding="async"></div>
-                <div class="gallery-item"><img src="img/c4.webp" alt="饰品作品四" loading="lazy" decoding="async"></div>
+                <div class="gallery-item"><img src="img/s1.webp" alt="饰品作品" loading="lazy"></div>
+                <div class="gallery-item"><img src="img/s2.webp" alt="饰品作品" loading="lazy"></div>
+                <div class="gallery-item"><img src="img/s3.webp" alt="饰品作品" loading="lazy"></div>
+                <div class="gallery-item"><img src="img/c4.webp" alt="饰品作品" loading="lazy"></div>
             </div>
         </div>
         <a href="rongyan/index.html" class="view-all">查看更多</a>
@@ -257,8 +206,8 @@
         </div>
     </footer>
 
-    <div id="imageModal" class="modal" role="dialog" aria-modal="true" aria-label="图片预览">
-        <span class="close" role="button" aria-label="关闭图片预览" tabindex="0">&times;</span>
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
         <div class="modal-content">
             <img id="modalImage" src="" alt="放大图片">
         </div>
@@ -266,147 +215,64 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // [优化] 动态计算真实的 viewport 高度，解决 iOS Safari 100vh 问题
-            let vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
-            window.addEventListener('resize', () => {
-                let vh = window.innerHeight * 0.01;
-                document.documentElement.style.setProperty('--vh', `${vh}px`);
-            });
-
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImage');
             const closeBtn = document.querySelector('.close');
             const tracks = document.querySelectorAll('.gallery-track');
             const containers = document.querySelectorAll('.gallery-container');
-
+            
             // ==========================================
-            // 轮播：克隆 + 精确偏移 + 动态时长 + 触摸支持
+            // 优化1：使用 cloneNode 安全克隆图片，避免 innerHTML 导致的懒加载重置问题
             // ==========================================
             tracks.forEach(track => {
                 const children = Array.from(track.children);
-                const itemCount = children.length;
-
-                // 克隆图片
+                // 克隆并追加到末尾
                 children.forEach(child => {
-                    const clone = child.cloneNode(true);
-                    const cloneImg = clone.querySelector('img');
-                    if (cloneImg) {
-                        // [修复#1] 移除强制 eager，让浏览器自行管理懒加载，节省手机端带宽
-                        cloneImg.removeAttribute('fetchpriority');
-                        // 克隆图片绑定淡入逻辑
-                        if (cloneImg.complete) {
-                            cloneImg.classList.add('loaded');
-                        } else {
-                            cloneImg.addEventListener('load', function() { this.classList.add('loaded'); });
-                            cloneImg.addEventListener('error', function() {
-                                this.classList.add('loaded');
-                                this.style.backgroundColor = '#ccc';
-                            });
-                        }
-                    }
-                    track.appendChild(clone);
+                    track.appendChild(child.cloneNode(true));
                 });
+                
+                // 克隆完成后再添加动画，防止克隆前就触发滚动
+                track.style.width = '200%';
+                track.style.animation = 'scroll 30s linear infinite';
+            });
 
-                // 计算偏移量并启动动画
-                const initAnimation = () => {
-                    const halfWidth = track.scrollWidth / 2;
-                    track.style.setProperty('--scroll-distance', `-${halfWidth}px`);
-                    const duration = itemCount * 7;
-                    track.style.animation = `scroll ${duration}s linear infinite`;
-                };
-
-                // 使用 requestAnimationFrame 确保 DOM 渲染完成后再计算
-                requestAnimationFrame(initAnimation);
-
-                // [优化] 监听图片加载，如果图片加载后撑开了容器，重新计算偏移量
-                const imgs = track.querySelectorAll('img');
-                let loadedCount = 0;
-                imgs.forEach(img => {
-                    img.addEventListener('load', () => {
-                        loadedCount++;
-                        if (loadedCount === imgs.length) {
-                            // 所有图片加载完成，重新计算一次以确保精确
-                            requestAnimationFrame(initAnimation);
-                        }
+            // ==========================================
+            // 优化2：图片淡入效果（处理缓存与异步加载）
+            // ==========================================
+            const allImages = document.querySelectorAll('.gallery-item img');
+            allImages.forEach(img => {
+                if (img.complete) {
+                    img.classList.add('loaded');
+                } else {
+                    img.addEventListener('load', function() { this.classList.add('loaded'); });
+                    img.addEventListener('error', function() { 
+                        this.classList.add('loaded'); 
+                        this.style.backgroundColor = '#ccc'; // 加载失败显示灰色
                     });
-                });
+                }
             });
-
+            
             // ==========================================
-            // 原始图片淡入效果
+            // 优化3：使用“事件委托”处理点击放大（完美兼容 JS 克隆出来的图片）
             // ==========================================
             containers.forEach(container => {
-                const track = container.querySelector('.gallery-track');
-                const originalItems = Array.from(track.children).slice(0, track.children.length / 2);
-                originalItems.forEach(item => {
-                    const img = item.querySelector('img');
-                    if (!img) return;
-                    if (img.complete) {
-                        img.classList.add('loaded');
-                    } else {
-                        img.addEventListener('load', function() { this.classList.add('loaded'); });
-                        img.addEventListener('error', function() {
-                            this.classList.add('loaded');
-                            this.style.backgroundColor = '#ccc';
-                        });
-                    }
-                });
-            });
-
-            // ==========================================
-            // 事件委托：点击放大（带触摸防抖）
-            // ==========================================
-            let touchStartX = 0;
-            let touchStartY = 0;
-
-            containers.forEach(container => {
-                // 记录触摸起始位置
-                container.addEventListener('touchstart', function(e) {
-                    touchStartX = e.touches[0].clientX;
-                    touchStartY = e.touches[0].clientY;
-                }, { passive: true });
-
                 container.addEventListener('click', function(e) {
-                    // [优化] 如果是触摸设备，检查是否发生了滑动
-                    if (touchStartX !== 0 || touchStartY !== 0) {
-                        // 这里简单处理：如果是点击事件触发，且之前有触摸，
-                        // 我们依赖浏览器判断是 click 还是 swipe。
-                        // 更严谨的做法是监听 touchend 计算位移。
-                        // 这里为了代码简洁，直接放行，因为 CSS 动画暂停会处理。
-                    }
-
+                    // 查找被点击的 gallery-item
                     const item = e.target.closest('.gallery-item');
-                    if (!item) return;
-
+                    if (!item) return; // 如果点击的不是图片项，则退出
+                    
                     const img = item.querySelector('img');
                     if (!img) return;
 
                     modalImg.src = img.src;
                     modal.style.display = 'flex';
                     document.body.style.overflow = 'hidden';
-
+                    
+                    // 暂停所有轮播动画
                     tracks.forEach(track => { track.style.animationPlayState = 'paused'; });
-                    closeBtn.focus();
                 });
-
-                // [优化] 触摸时暂停动画，提升交互体验
-                container.addEventListener('touchstart', () => {
-                    const track = container.querySelector('.gallery-track');
-                    track.style.animationPlayState = 'paused';
-                }, { passive: true });
-
-                container.addEventListener('touchend', () => {
-                    // 延迟恢复，避免误触
-                    setTimeout(() => {
-                        if (modal.style.display !== 'flex') {
-                            const track = container.querySelector('.gallery-track');
-                            track.style.animationPlayState = 'running';
-                        }
-                    }, 300);
-                }, { passive: true });
             });
-
+            
             // 关闭模态框逻辑
             const closeModal = () => {
                 modal.style.display = 'none';
@@ -417,19 +283,6 @@
             closeBtn.addEventListener('click', closeModal);
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) closeModal();
-            });
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && modal.style.display === 'flex') {
-                    closeModal();
-                }
-            });
-
-            closeBtn.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    closeModal();
-                }
             });
         });
     </script>

@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>绒颜</title>
-<link rel="icon" href="../logo.jpg" type="image/jpeg">
+ <!-- 新增的网站图标代码 -->
+    <link rel="icon" href="../logo.jpg" type="image/jpeg">
 <style>
   /* ========== 基础重置与全局 ========== */
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -27,7 +28,7 @@
     background: var(--bg);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
-    padding-top: calc(var(--nav-height) + 8px);
+    padding-top: calc(var(--nav-height) + 50px);
   }
 
   /* ========== 顶部导航栏（固定悬浮） ========== */
@@ -43,10 +44,10 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 10px 12px;
+    padding: 10px 12px 0;
   }
 
-  /* ========== 品牌行 ========== */
+  /* ========== 品牌行：三列 flex 布局，确保居中 ========== */
   .navbar-brand {
     display: flex;
     align-items: center;
@@ -63,7 +64,7 @@
     text-align: center;
   }
 
-  /* ========== 返回按钮 ========== */
+  /* ========== 返回按钮样式 ========== */
   .back-btn {
     flex-shrink: 0;
     display: inline-flex;
@@ -88,6 +89,7 @@
     line-height: 1;
   }
 
+  /* ========== 右侧占位，与返回按钮等宽，保证品牌名视觉居中 ========== */
   .brand-spacer {
     flex-shrink: 0;
     min-width: 60px;
@@ -100,6 +102,7 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    /* 渐隐遮罩：提示用户可左右滑动 */
     -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
     padding: 2px 8px;
@@ -133,61 +136,151 @@
     font-size: 14px;
   }
 
-  /* ========== ★ 排序工具栏 ========== */
-  .sort-bar {
+  /* ========== 排序搜索工具栏 ========== */
+  .toolbar {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0; right: 0;
+    z-index: 999;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    padding: 8px 16px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 16px 4px;
+    gap: 10px;
   }
-  .sort-bar .sort-label {
-    font-size: 13px;
-    color: var(--text-light);
-    letter-spacing: 1px;
-    flex-shrink: 0;
-  }
-  .sort-bar .sort-options {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .sort-bar .sort-options::-webkit-scrollbar { display: none; }
-  .sort-btn {
-    flex-shrink: 0;
-    padding: 5px 14px;
-    border: 1px solid rgba(0,0,0,0.08);
-    background: var(--card-bg);
-    color: var(--text-light);
-    font-size: 12px;
+
+  .toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: #fff;
     border-radius: 20px;
+    font-size: 13px;
+    color: var(--text);
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
+    transition: all 0.25s ease;
     white-space: nowrap;
-    letter-spacing: 0.5px;
+    position: relative;
   }
-  .sort-btn:hover {
+  .toolbar-btn:hover {
     border-color: var(--primary);
     color: var(--primary);
   }
-  .sort-btn.active {
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: #fff;
-    border-color: transparent;
-    box-shadow: 0 2px 10px rgba(184,134,11,0.25);
+  .toolbar-btn.active {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(184,134,11,0.06);
   }
-  .sort-btn .sort-icon {
-    margin-right: 3px;
-    font-size: 12px;
+  .toolbar-btn .btn-icon {
+    font-size: 14px;
+  }
+
+  /* 排序下拉菜单 */
+  .sort-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    min-width: 130px;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.25s ease;
+    z-index: 1001;
+  }
+  .sort-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .sort-dropdown .sort-option {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .sort-dropdown .sort-option:hover {
+    background: rgba(184,134,11,0.08);
+  }
+  .sort-dropdown .sort-option.active {
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  /* 搜索框容器 */
+  .search-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    max-width: 0;
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .search-container.show {
+    max-width: 400px;
+    opacity: 1;
+  }
+  .search-input-wrap {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .search-input {
+    width: 100%;
+    padding: 7px 36px 7px 14px;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 20px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.25s;
+    background: #fff;
+  }
+  .search-input:focus {
+    border-color: var(--primary);
+  }
+  .search-input::placeholder {
+    color: #bbb;
+  }
+  .search-clear {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #bbb;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px;
+    display: none;
+  }
+  .search-clear.show {
+    display: block;
+  }
+  .search-clear:hover {
+    color: var(--text);
   }
 
   /* ========== 手机小屏适配 ========== */
   @media (max-width: 480px) {
     .navbar {
-      padding: 8px 8px;
+      padding: 8px 8px 0;
     }
     .navbar-brand {
       font-size: 12px;
@@ -217,17 +310,20 @@
       font-size: 13px;
       margin-right: 2px;
     }
-    /* ★ 排序栏小屏适配 */
-    .sort-bar {
-      padding: 10px 8px 2px;
+    .toolbar {
+      padding: 6px 10px;
       gap: 6px;
     }
-    .sort-bar .sort-label {
+    .toolbar-btn {
+      padding: 5px 10px;
       font-size: 12px;
     }
-    .sort-btn {
-      padding: 4px 12px;
-      font-size: 11px;
+    .search-container.show {
+      max-width: 200px;
+    }
+    .search-input {
+      padding: 6px 32px 6px 12px;
+      font-size: 12px;
     }
   }
 
@@ -408,31 +504,35 @@
   </div>
 </nav>
 
+<!-- 排序搜索工具栏（悬浮） -->
+<div class="toolbar" id="toolbar">
+  <div style="position:relative">
+    <button class="toolbar-btn" id="sortBtn">
+      <span class="btn-icon">↕</span>排序
+    </button>
+    <div class="sort-dropdown" id="sortDropdown">
+      <button class="sort-option active" data-sort="default">默认排序</button>
+      <button class="sort-option" data-sort="price-asc">价格升序</button>
+      <button class="sort-option" data-sort="price-desc">价格降序</button>
+      <button class="sort-option" data-sort="newest">最新上架</button>
+    </div>
+  </div>
+  <button class="toolbar-btn" id="searchBtn">
+    <span class="btn-icon">🔍</span>搜索
+  </button>
+  <div class="search-container" id="searchContainer">
+    <div class="search-input-wrap">
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索产品名称...">
+      <button class="search-clear" id="searchClear">×</button>
+    </div>
+  </div>
+</div>
+
 <!-- 主内容区 -->
 <div class="main-container">
   <div class="section-title" id="sectionTitle">
     —— 为你精选 <span>全部</span> 饰品 ——
   </div>
-
-  <!-- ★ 排序工具栏（新增） -->
-  <div class="sort-bar">
-    <span class="sort-label">排序：</span>
-    <div class="sort-options" id="sortOptions">
-      <button class="sort-btn active" data-sort="default">
-        <span class="sort-icon">📋</span>默认
-      </button>
-      <button class="sort-btn" data-sort="price-asc">
-        <span class="sort-icon">↑</span>价格升序
-      </button>
-      <button class="sort-btn" data-sort="price-desc">
-        <span class="sort-icon">↓</span>价格降序
-      </button>
-      <button class="sort-btn" data-sort="newest">
-        <span class="sort-icon">🆕</span>最新上架
-      </button>
-    </div>
-  </div>
-
   <div class="product-grid" id="productGrid">
     <div class="loading">
       <div class="spinner"></div>
@@ -447,19 +547,27 @@
 (function () {
   let allProducts = [];
   let currentCategory = '全部';
-  let currentSort = 'default'; // ★ 当前排序方式
+  let currentSort = 'default';
+  let currentSearch = '';
 
   const grid = document.getElementById('productGrid');
   const navContainer = document.getElementById('navCategories');
   const sectionTitle = document.getElementById('sectionTitle');
-  const sortContainer = document.getElementById('sortOptions'); // ★ 排序容器
+
+  // 排序搜索相关
+  const sortBtn = document.getElementById('sortBtn');
+  const sortDropdown = document.getElementById('sortDropdown');
+  const searchBtn = document.getElementById('searchBtn');
+  const searchContainer = document.getElementById('searchContainer');
+  const searchInput = document.getElementById('searchInput');
+  const searchClear = document.getElementById('searchClear');
 
   // 加载 JSON 数据
   fetch('products.json')
     .then(r => r.json())
     .then(data => {
       allProducts = data.products;
-      applyFilterAndSort();
+      updateView();
     })
     .catch(() => {
       grid.innerHTML = `
@@ -469,46 +577,7 @@
         </div>`;
     });
 
-  // ========== ★ 核心：筛选 + 排序 ==========
-  function applyFilterAndSort() {
-    // 1. 先按分类筛选
-    let filtered = currentCategory === '全部'
-      ? [...allProducts]
-      : allProducts.filter(p => p.category === currentCategory);
-
-    // 2. 再按排序方式排序
-    filtered = sortProducts(filtered, currentSort);
-
-    // 3. 渲染
-    renderProducts(filtered);
-  }
-
-  // ★ 排序函数
-  function sortProducts(products, sortType) {
-    const sorted = [...products];
-    switch (sortType) {
-      case 'price-asc':
-        sorted.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        sorted.sort((a, b) => b.price - a.price);
-        break;
-      case 'newest':
-        sorted.sort((a, b) => {
-          // 优先用 createdAt，没有则用 id 兜底
-          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : a.id;
-          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : b.id;
-          return dateB - dateA; // 新的在前
-        });
-        break;
-      default:
-        // 默认不排序，保持原始顺序
-        break;
-    }
-    return sorted;
-  }
-
-  // 导航点击（分类筛选）
+  // ========== 导航点击 ==========
   navContainer.addEventListener('click', function (e) {
     const btn = e.target.closest('.nav-btn');
     if (!btn) return;
@@ -517,25 +586,126 @@
     btn.classList.add('active');
 
     currentCategory = btn.dataset.category;
-    sectionTitle.innerHTML = `—— 为你精选 <span>${currentCategory}</span> 饰品 ——`;
-
-    applyFilterAndSort();
+    updateView();
 
     btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   });
 
-  // ★ 排序按钮点击
-  sortContainer.addEventListener('click', function (e) {
-    const btn = e.target.closest('.sort-btn');
-    if (!btn) return;
-
-    sortContainer.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    currentSort = btn.dataset.sort;
-
-    applyFilterAndSort();
+  // ========== 排序按钮点击 ==========
+  sortBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    sortDropdown.classList.toggle('show');
+    sortBtn.classList.toggle('active');
+    // 关闭搜索框
+    // searchContainer.classList.remove('show');
+    // searchBtn.classList.remove('active');
   });
+
+  // 排序选项点击
+  sortDropdown.addEventListener('click', function (e) {
+    const option = e.target.closest('.sort-option');
+    if (!option) return;
+
+    sortDropdown.querySelectorAll('.sort-option').forEach(o => o.classList.remove('active'));
+    option.classList.add('active');
+
+    currentSort = option.dataset.sort;
+    sortBtn.innerHTML = `<span class="btn-icon">↕</span>${option.textContent}`;
+
+    sortDropdown.classList.remove('show');
+    sortBtn.classList.remove('active');
+
+    updateView();
+  });
+
+  // 点击其他地方关闭排序下拉
+  document.addEventListener('click', function (e) {
+    if (!sortBtn.contains(e.target) && !sortDropdown.contains(e.target)) {
+      sortDropdown.classList.remove('show');
+      sortBtn.classList.remove('active');
+    }
+  });
+
+  // ========== 搜索按钮点击 ==========
+  searchBtn.addEventListener('click', function () {
+    const isShowing = searchContainer.classList.contains('show');
+    searchContainer.classList.toggle('show');
+    searchBtn.classList.toggle('active');
+
+    if (!isShowing) {
+      // 展开后聚焦输入框
+      setTimeout(() => searchInput.focus(), 350);
+    } else {
+      // 收起时清空搜索
+      searchInput.value = '';
+      currentSearch = '';
+      searchClear.classList.remove('show');
+      updateView();
+    }
+  });
+
+  // 搜索输入
+  let searchTimer = null;
+  searchInput.addEventListener('input', function () {
+    const val = this.value.trim();
+    searchClear.classList.toggle('show', val.length > 0);
+
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      currentSearch = val;
+      updateView();
+    }, 300);
+  });
+
+  // 搜索清空按钮
+  searchClear.addEventListener('click', function () {
+    searchInput.value = '';
+    currentSearch = '';
+    searchClear.classList.remove('show');
+    searchInput.focus();
+    updateView();
+  });
+
+  // ========== 核心：更新视图 ==========
+  function updateView() {
+    // 1. 分类筛选
+    let products = currentCategory === '全部'
+      ? [...allProducts]
+      : allProducts.filter(p => p.category === currentCategory);
+
+    // 2. 搜索筛选
+    if (currentSearch) {
+      products = products.filter(p =>
+        p.name.toLowerCase().includes(currentSearch.toLowerCase())
+      );
+    }
+
+    // 3. 排序
+    switch (currentSort) {
+      case 'price-asc':
+        products.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        products.sort((a, b) => b.price - a.price);
+        break;
+      case 'newest':
+        products.sort((a, b) => b.id - a.id);
+        break;
+      default:
+        // 默认按原始顺序
+        break;
+    }
+
+    // 4. 更新标题
+    if (currentSearch) {
+      sectionTitle.innerHTML = `—— 搜索 "<span>${currentSearch}</span>" 的结果 (${products.length}) ——`;
+    } else {
+      sectionTitle.innerHTML = `—— 为你精选 <span>${currentCategory}</span> 饰品 ——`;
+    }
+
+    // 5. 渲染
+    renderProducts(products);
+  }
 
   // 渲染产品卡片
   function renderProducts(products) {
@@ -543,7 +713,7 @@
       grid.innerHTML = `
         <div class="empty-state" style="grid-column:1/-1">
           <div class="empty-icon">🔍</div>
-          <p>该分类暂无产品</p>
+          <p>${currentSearch ? '未找到相关产品' : '该分类暂无产品'}</p>
         </div>`;
       return;
     }

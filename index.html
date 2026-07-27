@@ -63,12 +63,7 @@
             background-color: #eaddcf; /* 容器占位背景色 */
         }
 
-        .gallery-track { display: flex; /* 动画由JS控制 */ }
-
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
+        .gallery-track { display: flex; /* 动画由JS动态控制 */ }
 
         .gallery-item {
             flex: 0 0 auto; width: 280px; margin: 0 15px; cursor: pointer;
@@ -111,6 +106,16 @@
         .contact-details p { margin: 0.5rem 0; }
         .copyright { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.9rem; color: rgba(255, 255, 255, 0.7); }
 
+        /* 页脚链接样式 */
+        .contact-details a {
+            color: var(--golden);
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+        .contact-details a:hover {
+            color: var(--light-golden);
+        }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .header { flex-direction: column; text-align: center; gap: 0.5rem; }
@@ -128,6 +133,19 @@
             .gallery-title { font-size: 1.3rem; }
             .intro h2 { font-size: 1.3rem; }
             .intro p { font-size: 1rem; }
+        }
+
+        /* 无障碍：尊重用户的动画偏好设置 */
+        @media (prefers-reduced-motion: reduce) {
+            .gallery-track {
+                animation: none !important;
+            }
+            .gallery-item img {
+                transition: none !important;
+            }
+            .gallery-item {
+                transition: none !important;
+            }
         }
     </style>
 </head>
@@ -197,7 +215,7 @@
         <div class="contact-info">
             <h3 class="contact-title">联系我们</h3>
             <div class="contact-details">
-                <p>tel：<a href="tel:+8618361301686" style="color: white; text-decoration: none;">+86 183-6130-1686</a></p>
+                <p>tel：<a href="tel:+8618361301686">+86 183-6130-1686</a></p>
                 <p>mail：rongyan@yangruan.cn</p>
             </div>
         </div>
@@ -222,22 +240,58 @@
             const containers = document.querySelectorAll('.gallery-container');
             
             // ==========================================
-            // 优化1：使用 cloneNode 安全克隆图片，避免 innerHTML 导致的懒加载重置问题
+            // 步骤1：使用 cloneNode 安全克隆图片，避免 innerHTML 导致的懒加载重置问题
+            // ⚠️ 注意：必须先完成克隆，再进行事件绑定（步骤2）
+            // 因为 cloneNode(true) 只复制 DOM 属性和子节点，不会复制 addEventListener 绑定的事件
+            // 如果顺序颠倒，克隆出来的图片将没有 load/error 事件监听，导致淡入效果失效
             // ==========================================
             tracks.forEach(track => {
                 const children = Array.from(track.children);
+                const itemCount = children.length; // 原始项目数量（通常为4）
+                
                 // 克隆并追加到末尾
                 children.forEach(child => {
                     track.appendChild(child.cloneNode(true));
                 });
                 
-                // 克隆完成后再添加动画，防止克隆前就触发滚动
-                track.style.width = '200%';
-                track.style.animation = 'scroll 30s linear infinite';
+                // ==========================================
+                // 关键修复：动态计算精确的动画位移距离
+                // 计算原始项目的总宽度（包括margin），确保无缝循环
+                // ==========================================
+                let originalWidth = 0;
+                children.forEach(child => {
+                    // 获取每个项目的实际占用宽度（包括margin）
+                    const style = window.getComputedStyle(child);
+                    const itemWidth = child.offsetWidth 
+                        + parseFloat(style.marginLeft) 
+                        + parseFloat(style.marginRight);
+                    originalWidth += itemWidth;
+                });
+                
+                // 设置 track 宽度为内容的 200%（原始 + 克隆）
+                track.style.width = `${originalWidth * 2}px`;
+                
+                // 动态生成关键帧动画，使用精确像素值
+                const animationName = `scroll-${Math.random().toString(36).substr(2, 9)}`;
+                const keyframes = `
+                    @keyframes ${animationName} {
+                        0% { transform: translateX(0); }
+                        100% { transform: translateX(-${originalWidth}px); }
+                    }
+                `;
+                
+                // 注入动态关键帧
+                const styleSheet = document.createElement('style');
+                styleSheet.textContent = keyframes;
+                document.head.appendChild(styleSheet);
+                
+                // 应用动画（30秒循环一次）
+                track.style.animation = `${animationName} 30s linear infinite`;
             });
 
             // ==========================================
-            // 优化2：图片淡入效果（处理缓存与异步加载）
+            // 步骤2：图片淡入效果（处理缓存与异步加载）
+            // 此步骤必须在步骤1克隆完成之后执行，以确保 querySelectorAll 能选到克隆节点
             // ==========================================
             const allImages = document.querySelectorAll('.gallery-item img');
             allImages.forEach(img => {
@@ -253,7 +307,7 @@
             });
             
             // ==========================================
-            // 优化3：使用“事件委托”处理点击放大（完美兼容 JS 克隆出来的图片）
+            // 步骤3：使用"事件委托"处理点击放大（完美兼容 JS 克隆出来的图片）
             // ==========================================
             containers.forEach(container => {
                 container.addEventListener('click', function(e) {

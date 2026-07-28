@@ -58,14 +58,15 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             background-color: #eaddcf;
-            /* 触摸滑动时防止触发页面纵向滚动 */
-            touch-action: pan-y;
+            /* 修复：明确容器高度，防止图片未加载时塌陷 */
+            min-height: 220px;
         }
 
         .gallery-track {
             display: flex;
             flex-wrap: nowrap;
-            /* 仅保留最基本的 GPU 提示，不加 will-change 和 backface-visibility 避免与 overflow:hidden 冲突 */
+            /* 修复：移除 will-change，避免与 overflow:hidden 冲突 */
+            /* 仅保留最基本的 GPU 提示 */
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
         }
@@ -73,7 +74,7 @@
         .gallery-item {
             flex: 0 0 auto;
             width: 280px;
-            min-width: 280px;
+            min-width: 280px; /* 修复：防止被压缩 */
             margin: 0 15px;
             cursor: pointer;
             border-radius: 6px;
@@ -84,9 +85,13 @@
         .gallery-item:hover { transform: scale(1.03); }
 
         .gallery-item img {
-            width: 100%; height: 220px; object-fit: cover; display: block;
+            width: 100%; 
+            height: 220px; 
+            object-fit: cover; 
+            display: block;
             background-color: #d9c4a9;
-            opacity: 0; transition: opacity 0.6s ease-in;
+            opacity: 0;
+            transition: opacity 0.6s ease-in;
         }
         .gallery-item img.loaded { opacity: 1; }
 
@@ -122,23 +127,19 @@
             .brand-area { gap: 0.8rem; }
             .company-name { font-size: 1.5rem; }
             .business-type { font-size: 1rem; }
+            .gallery-container { min-height: 180px; }
             .gallery-item { width: 220px; min-width: 220px; margin: 0 10px; }
             .gallery-item img { height: 180px; }
             .gallery-title { font-size: 1.5rem; }
         }
 
         @media (max-width: 480px) {
+            .gallery-container { min-height: 150px; }
             .gallery-item { width: 180px; min-width: 180px; margin: 0 8px; }
             .gallery-item img { height: 150px; }
             .gallery-title { font-size: 1.3rem; }
             .intro h2 { font-size: 1.3rem; }
             .intro p { font-size: 1rem; }
-        }
-
-        /* 无障碍 */
-        @media (prefers-reduced-motion: reduce) {
-            .gallery-item img { transition: none !important; }
-            .gallery-item { transition: none !important; }
         }
     </style>
 </head>
@@ -221,14 +222,16 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        /* ========== 基础元素引用 ========== */
-        var modal     = document.getElementById('imageModal');
-        var modalImg  = document.getElementById('modalImage');
-        var closeBtn  = document.querySelector('.close');
-        var tracks    = document.querySelectorAll('.gallery-track');
-        var containers= document.querySelectorAll('.gallery-container');
+        var modal = document.getElementById('imageModal');
+        var modalImg = document.getElementById('modalImage');
+        var closeBtn = document.querySelector('.close');
+        var tracks = document.querySelectorAll('.gallery-track');
+        var containers = document.querySelectorAll('.gallery-container');
 
-        /* ========== 图片淡入 ========== */
+        // 动画状态管理
+        var animations = new Map();
+
+        // 图片淡入效果
         function applyFadeIn() {
             document.querySelectorAll('.gallery-item img').forEach(function(img) {
                 if (img.complete && img.naturalWidth > 0) {
@@ -246,174 +249,176 @@
         }
         applyFadeIn();
 
-        /* ========== 检查用户是否偏好减少动画 ========== */
-        var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        /* ========== 核心：requestAnimationFrame 滚动动画 ========== */
-        /**
-         * 每个 track 的动画状态对象
-         * {
-         *   offset      : number   — 当前水平偏移（负值 = 向左滚动）
-         *   speed       : number   — 每帧移动的像素数
-         *   oneLoop     : number   — 一组原始内容的总宽度
-         *   running     : boolean  — 是否正在运动
-         *   rafId       : number   — requestAnimationFrame 返回的 ID
-         *   lastTime    : number   — 上一帧的时间戳
-         * }
-         */
-        var animStates = new Map();
-
+        // 核心：requestAnimationFrame 滚动动画
         function animateTrack(track, timestamp) {
-            var st = animStates.get(track);
-            if (!st) return;
+            var state = animations.get(track);
+            if (!state) return;
 
-            // 计算 delta，保证帧率无关的匀速运动
-            if (!st.lastTime) st.lastTime = timestamp;
-            var delta = timestamp - st.lastTime;
-            st.lastTime = timestamp;
+            // 计算时间差（秒）
+            if (!state.lastTime) state.lastTime = timestamp;
+            var delta = (timestamp - state.lastTime) / 1000;
+            state.lastTime = timestamp;
 
-            // delta 上限 100ms，防止切后台回来一次跳太远
-            if (delta > 100) delta = 16.67;
+            // 限制最大 delta，防止切后台回来跳太远
+            if (delta > 0.1) delta = 0.016;
 
-            if (st.running) {
-                // speed 单位是 px/s，乘以 delta/1000 得到本帧位移
-                st.offset -= st.speed * (delta / 1000);
+            if (state.running) {
+                // 更新偏移量（向左移动）
+                state.offset -= state.speed * delta;
 
                 // 无缝循环：当偏移量达到一组内容的宽度时归零
-                if (st.offset <= -st.oneLoop) {
-                    st.offset += st.oneLoop;
+                if (state.offset <= -state.oneLoop) {
+                    state.offset += state.oneLoop;
                 }
 
-                track.style.transform = 'translate3d(' + st.offset + 'px, 0, 0)';
+                // 直接操作 transform，绕过 CSS 动画所有限制
+                track.style.transform = 'translate3d(' + state.offset + 'px, 0, 0)';
             }
 
-            st.rafId = requestAnimationFrame(function(ts) {
+            // 继续下一帧
+            state.rafId = requestAnimationFrame(function(ts) {
                 animateTrack(track, ts);
             });
         }
 
-        /* ========== 初始化单个 gallery ========== */
+        // 初始化单个 gallery
         function initGallery(track) {
-            if (track.dataset.inited === '1') return; // 防止重复初始化
+            if (track.dataset.initialized === 'true') {
+                // 清理旧状态
+                var oldState = animations.get(track);
+                if (oldState) {
+                    cancelAnimationFrame(oldState.rafId);
+                    animations.delete(track);
+                }
+                
+                var originalCount = parseInt(track.dataset.originalCount);
+                while (track.children.length > originalCount) {
+                    track.removeChild(track.lastChild);
+                }
+                track.style.transform = '';
+                track.style.width = '';
+                void track.offsetWidth; // 强制重排
+            }
 
-            /* --- 1. 克隆子元素实现无缝 --- */
-            var originalChildren = Array.from(track.children);
-            var originalCount = originalChildren.length;
-            track.dataset.originalCount = originalCount;
+            var children = Array.from(track.children);
+            track.dataset.originalCount = children.length;
 
-            originalChildren.forEach(function(child) {
+            // 克隆内容实现无缝循环
+            children.forEach(function(child) {
                 var clone = child.cloneNode(true);
+                var cloneImg = clone.querySelector('img');
+                if (cloneImg) {
+                    // 修复：克隆的图片强制设为 eager，确保加载
+                    cloneImg.setAttribute('loading', 'eager');
+                    // 立即触发淡入
+                    if (cloneImg.complete && cloneImg.naturalWidth > 0) {
+                        cloneImg.classList.add('loaded');
+                    } else {
+                        cloneImg.addEventListener('load', function() {
+                            this.classList.add('loaded');
+                        }, { once: true });
+                    }
+                }
                 track.appendChild(clone);
             });
 
-            /* --- 2. 强制所有图片（含克隆）设为 eager 并触发淡入 --- */
-            track.querySelectorAll('img').forEach(function(img) {
-                img.removeAttribute('loading');
-                img.setAttribute('loading', 'eager');
-                if (img.complete && img.naturalWidth > 0) {
-                    img.classList.add('loaded');
-                } else {
-                    img.addEventListener('load', function() {
-                        this.classList.add('loaded');
-                    }, { once: true });
-                    img.addEventListener('error', function() {
-                        this.classList.add('loaded');
-                        this.style.backgroundColor = '#ccc';
-                    }, { once: true });
-                }
-            });
-
-            /* --- 3. 计算一组原始内容的总宽度 --- */
+            // 计算原始内容的总宽度
             var oneLoop = 0;
-            originalChildren.forEach(function(child) {
-                var rect  = child.getBoundingClientRect();
+            children.forEach(function(child) {
+                var rect = child.getBoundingClientRect();
                 var style = window.getComputedStyle(child);
-                oneLoop += rect.width
-                    + parseFloat(style.marginLeft)
+                var itemWidth = rect.width 
+                    + parseFloat(style.marginLeft) 
                     + parseFloat(style.marginRight);
+                oneLoop += itemWidth;
             });
 
-            if (oneLoop <= 0) return; // 安全检查
+            // 安全检查：如果宽度为 0，说明图片还没加载，稍后重试
+            if (oneLoop === 0) {
+                setTimeout(function() {
+                    initGallery(track);
+                }, 500);
+                return;
+            }
 
-            /* --- 4. 设置 track 宽度 --- */
+            // 设置 track 宽度
             track.style.width = (oneLoop * 2) + 'px';
 
-            /* --- 5. 创建动画状态 --- */
-            // 速度：40px/s 比较舒适（约 30 秒滚完 1200px 的一组内容）
-            var speed = 40;
-            if (prefersReducedMotion) speed = 0; // 无障碍：不滚动
-
+            // 创建动画状态
             var state = {
-                offset   : 0,
-                speed    : speed,
-                oneLoop  : oneLoop,
-                running  : !prefersReducedMotion,
-                rafId    : 0,
-                lastTime : 0
+                offset: 0,
+                speed: 40, // 每秒移动 40 像素
+                oneLoop: oneLoop,
+                running: true,
+                rafId: null,
+                lastTime: 0
             };
-            animStates.set(track, state);
 
-            /* --- 6. 启动 rAF 循环 --- */
+            animations.set(track, state);
+
+            // 启动动画循环
             state.rafId = requestAnimationFrame(function(ts) {
                 animateTrack(track, ts);
             });
 
-            track.dataset.inited = '1';
+            track.dataset.initialized = 'true';
         }
 
-        /* ========== 销毁并重建（resize 时用） ========== */
-        function reinitGallery(track) {
-            var st = animStates.get(track);
-            if (st) {
-                cancelAnimationFrame(st.rafId);
-                animStates.delete(track);
-            }
+        // 等待图片加载后初始化
+        function waitForImages(container) {
+            var imgs = container.querySelectorAll('img');
+            var promises = Array.from(imgs).map(function(img) {
+                // 修复：强制所有图片立即加载，不使用 lazy
+                img.setAttribute('loading', 'eager');
+                
+                if (img.complete && img.naturalWidth > 0) {
+                    return Promise.resolve();
+                }
+                return new Promise(function(resolve) {
+                    img.addEventListener('load', resolve, { once: true });
+                    img.addEventListener('error', resolve, { once: true });
+                    // 缩短超时时间，避免等待过久
+                    setTimeout(resolve, 1000);
+                });
+            });
+            return Promise.all(promises);
+        }
 
-            // 移除克隆节点
-            var origCount = parseInt(track.dataset.originalCount) || track.children.length;
-            while (track.children.length > origCount) {
-                track.removeChild(track.lastChild);
-            }
-
-            track.style.transform = '';
-            track.style.width = '';
-            track.dataset.inited = '0';
-
-            // 等一帧让浏览器完成布局
-            requestAnimationFrame(function() {
+        // 初始化所有 gallery
+        async function setupAllGalleries() {
+            for (var i = 0; i < tracks.length; i++) {
+                var track = tracks[i];
+                await waitForImages(track);
+                // 等待至少 2 帧，确保布局完成
+                await new Promise(function(resolve) { 
+                    requestAnimationFrame(function() {
+                        requestAnimationFrame(resolve);
+                    });
+                });
                 initGallery(track);
-            });
+            }
         }
 
-        /* ========== 按顺序初始化所有 gallery ========== */
-        function setupAll() {
-            tracks.forEach(function(track) {
-                initGallery(track);
-            });
-        }
+        // 启动初始化
+        setupAllGalleries();
 
-        // 等 DOM 稳定后再初始化（给图片一点加载时间）
-        // 使用双重 rAF + 短延时确保移动端布局完成
-        requestAnimationFrame(function() {
-            requestAnimationFrame(function() {
-                setTimeout(setupAll, 100);
-            });
-        });
-
-        /* ========== 点击放大 ========== */
+        // 点击放大
         containers.forEach(function(container) {
             container.addEventListener('click', function(e) {
                 var item = e.target.closest('.gallery-item');
                 if (!item) return;
+                
                 var img = item.querySelector('img');
                 if (!img) return;
 
                 modalImg.src = img.src;
                 modal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
-
+                
                 // 暂停所有动画
-                animStates.forEach(function(st) { st.running = false; });
+                animations.forEach(function(state) {
+                    state.running = false;
+                });
             });
         });
 
@@ -421,11 +426,9 @@
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
             // 恢复所有动画
-            animStates.forEach(function(st) {
-                if (!prefersReducedMotion) {
-                    st.running = true;
-                    st.lastTime = 0; // 重置时间戳防止大跳
-                }
+            animations.forEach(function(state) {
+                state.running = true;
+                state.lastTime = 0; // 重置时间戳防止大跳
             });
         }
 
@@ -434,43 +437,53 @@
             if (e.target === modal) closeModal();
         });
 
-        /* ========== 触屏手动滑动 ========== */
+        // 窗口 resize 重新计算
+        var resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                tracks.forEach(function(track) {
+                    if (track.dataset.initialized === 'true') {
+                        initGallery(track);
+                    }
+                });
+                applyFadeIn();
+            }, 300);
+        });
+
+        // 触屏滑动支持
         containers.forEach(function(container, index) {
             var track = tracks[index];
             var startX = 0;
             var startOffset = 0;
-            var dragging = false;
+            var isDragging = false;
 
             container.addEventListener('touchstart', function(e) {
-                var st = animStates.get(track);
-                if (!st) return;
-                dragging = true;
+                var state = animations.get(track);
+                if (!state) return;
+                isDragging = true;
                 startX = e.touches[0].clientX;
-                startOffset = st.offset;
-                st.running = false;
+                startOffset = state.offset;
+                state.running = false;
             }, { passive: true });
 
             container.addEventListener('touchmove', function(e) {
-                if (!dragging) return;
-                var st = animStates.get(track);
-                if (!st) return;
+                if (!isDragging) return;
+                var state = animations.get(track);
+                if (!state) return;
                 var dx = e.touches[0].clientX - startX;
-                st.offset = startOffset + dx;
-                // 保持循环边界
-                while (st.offset > 0) st.offset -= st.oneLoop;
-                while (st.offset < -st.oneLoop) st.offset += st.oneLoop;
-                track.style.transform = 'translate3d(' + st.offset + 'px, 0, 0)';
+                state.offset = startOffset + dx;
+                track.style.transform = 'translate3d(' + state.offset + 'px, 0, 0)';
             }, { passive: true });
 
             function endDrag() {
-                if (!dragging) return;
-                dragging = false;
-                // 1.2 秒后自动恢复滚动
+                if (!isDragging) return;
+                isDragging = false;
                 setTimeout(function() {
-                    var st = animStates.get(track);
-                    if (st && modal.style.display !== 'flex' && !prefersReducedMotion) {
-                        st.running = true;
-                        st.lastTime = 0;
+                    var state = animations.get(track);
+                    if (state && modal.style.display !== 'flex') {
+                        state.running = true;
+                        state.lastTime = 0;
                     }
                 }, 1200);
             }
@@ -479,29 +492,16 @@
             container.addEventListener('touchcancel', endDrag, { passive: true });
         });
 
-        /* ========== 页面可见性：切后台再回来恢复动画 ========== */
+        // 页面可见性恢复
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
-                animStates.forEach(function(st) {
-                    if (!prefersReducedMotion && modal.style.display !== 'flex') {
-                        st.running = true;
-                        st.lastTime = 0; // 重置防止大跳
+                animations.forEach(function(state) {
+                    if (modal.style.display !== 'flex') {
+                        state.running = true;
+                        state.lastTime = 0;
                     }
                 });
             }
-        });
-
-        /* ========== 窗口 resize 重新计算 ========== */
-        var resizeTimer;
-        window.addEventListener('resize', function() {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                tracks.forEach(function(track) {
-                    if (track.dataset.inited === '1') {
-                        reinitGallery(track);
-                    }
-                });
-            }, 300);
         });
     });
     </script>

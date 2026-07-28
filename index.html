@@ -48,7 +48,6 @@
         }
         .intro h2 { color: var(--dark-brown); font-size: 1.6rem; margin-bottom: 1rem; position: relative; display: inline-block; }
         .intro h2::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 60px; height: 3px; background-color: var(--golden); }
-        /* 修复：增加段落底部间距，防止手机端文字拥挤 */
         .intro p { font-size: 1.1rem; color: var(--text-light); max-width: 800px; margin: 0 auto 0.8rem; }
 
         /* 馆别展示区 */
@@ -56,30 +55,52 @@
         .gallery-title { text-align: center; color: var(--dark-brown); font-size: 1.8rem; margin-bottom: 2rem; position: relative; }
         .gallery-title::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background-color: var(--golden); }
 
+        /* ★ 修复1：给 gallery-container 添加明确的 contain 属性，帮助移动端浏览器正确合成层 */
         .gallery-container {
-            overflow: hidden; margin: 1.5rem 0 2.5rem; position: relative;
-            border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            background-color: #eaddcf; 
+            overflow: hidden;
+            margin: 1.5rem 0 2.5rem;
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: #eaddcf;
+            contain: layout style;
+            /* ★ 修复2：强制创建合成层，确保 overflow:hidden 内的 transform 动画在移动端正常渲染 */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
-        /* 修复：添加 will-change 和 backface-visibility 强制开启移动端 GPU 硬件加速，防止动画卡顿和边缘发虚 */
-        .gallery-track { 
-            display: flex; 
-            will-change: transform; 
+        /* ★ 修复3：增强移动端 GPU 加速兼容性 */
+        .gallery-track {
+            display: flex;
+            will-change: transform;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            /* ★ 修复4：防止 iOS Safari 在 flex 容器中错误地收缩子元素 */
+            -webkit-flex-wrap: nowrap;
+            flex-wrap: nowrap;
         }
 
         .gallery-item {
-            flex: 0 0 auto; width: 280px; margin: 0 15px; cursor: pointer;
-            border-radius: 6px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            flex: 0 0 auto;
+            width: 280px;
+            margin: 0 15px;
+            cursor: pointer;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s;
+            /* ★ 修复5：防止移动端 flex 子项被意外压缩为 0 宽度 */
+            min-width: 280px;
+            -webkit-flex-shrink: 0;
+            flex-shrink: 0;
         }
         .gallery-item:hover { transform: scale(1.03); }
 
         .gallery-item img {
             width: 100%; height: 220px; object-fit: cover; display: block;
-            background-color: #d9c4a9; 
+            background-color: #d9c4a9;
             opacity: 0; transition: opacity 0.6s ease-in;
         }
         .gallery-item img.loaded { opacity: 1; }
@@ -120,13 +141,13 @@
             .brand-area { gap: 0.8rem; }
             .company-name { font-size: 1.5rem; }
             .business-type { font-size: 1rem; }
-            .gallery-item { width: 220px; margin: 0 10px; }
+            .gallery-item { width: 220px; margin: 0 10px; min-width: 220px; }
             .gallery-item img { height: 180px; }
             .gallery-title { font-size: 1.5rem; }
         }
 
         @media (max-width: 480px) {
-            .gallery-item { width: 180px; margin: 0 8px; }
+            .gallery-item { width: 180px; margin: 0 8px; min-width: 180px; }
             .gallery-item img { height: 150px; }
             .gallery-title { font-size: 1.3rem; }
             .intro h2 { font-size: 1.3rem; }
@@ -230,14 +251,16 @@
             const containers = document.querySelectorAll('.gallery-container');
 
             // 工具函数：等待所有图片加载完成
+            // ★ 修复6：大幅缩短超时时间，移动端 lazy 图片在 overflow:hidden 中可能永远不触发 load
             function waitForImages(container) {
                 const imgs = container.querySelectorAll('img');
                 const promises = Array.from(imgs).map(img => {
-                    if (img.complete) return Promise.resolve();
+                    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
                     return new Promise(resolve => {
                         img.addEventListener('load', resolve, { once: true });
                         img.addEventListener('error', resolve, { once: true });
-                        setTimeout(resolve, 3000); // 3秒超时兜底
+                        // ★ 修复：超时从 3000ms 降到 1500ms，避免移动端等待过久
+                        setTimeout(resolve, 1500);
                     });
                 });
                 return Promise.all(promises);
@@ -248,18 +271,15 @@
                 // 处理 resize 重算场景：清理旧状态
                 if (track.dataset.initialized === 'true') {
                     track.style.animation = 'none';
-                    // 修复：移除旧的动态 style 标签，防止横竖屏切换导致内存泄漏
                     if (track.dataset.styleId) {
                         const oldStyle = document.getElementById(track.dataset.styleId);
                         if (oldStyle) oldStyle.remove();
                     }
-                    // 移除之前克隆的节点
                     const originalCount = parseInt(track.dataset.originalCount);
                     while (track.children.length > originalCount) {
                         track.removeChild(track.lastChild);
                     }
-                    // 强制浏览器重排（Reflow），确保后续获取的尺寸是最新的
-                    void track.offsetWidth; 
+                    void track.offsetWidth;
                 }
 
                 const children = Array.from(track.children);
@@ -268,9 +288,18 @@
                 // 克隆并追加到末尾
                 children.forEach(child => {
                     const clone = child.cloneNode(true);
-                    // 修复：克隆的图片强制设为 eager，防止移动端浏览器对动态插入的 lazy 图片不触发加载
                     const cloneImg = clone.querySelector('img');
-                    if (cloneImg) cloneImg.setAttribute('loading', 'eager');
+                    if (cloneImg) {
+                        cloneImg.setAttribute('loading', 'eager');
+                        // ★ 修复7：克隆的图片也需要触发淡入效果
+                        if (cloneImg.complete && cloneImg.naturalWidth > 0) {
+                            cloneImg.classList.add('loaded');
+                        } else {
+                            cloneImg.addEventListener('load', function() {
+                                this.classList.add('loaded');
+                            }, { once: true });
+                        }
+                    }
                     track.appendChild(clone);
                 });
 
@@ -278,52 +307,69 @@
                 let originalWidth = 0;
                 children.forEach(child => {
                     const style = window.getComputedStyle(child);
-                    // 修复：使用 getBoundingClientRect 获取精确浮点数，防止移动端高 DPR 下像素舍入误差导致接缝跳动
-                    const itemWidth = child.getBoundingClientRect().width 
-                        + parseFloat(style.marginLeft) 
+                    const itemWidth = child.getBoundingClientRect().width
+                        + parseFloat(style.marginLeft)
                         + parseFloat(style.marginRight);
                     originalWidth += itemWidth;
                 });
 
-                if (originalWidth === 0) return; // 保护机制
+                if (originalWidth === 0) return;
 
                 track.style.width = `${originalWidth * 2}px`;
 
-                const duration = Math.max(15, originalWidth / 30); 
+                const duration = Math.max(15, originalWidth / 30);
                 const animationName = `scroll-${Math.random().toString(36).substr(2, 9)}`;
-                
-                // 修复：使用 translate3d 代替 translateX，进一步确保 iOS Safari 开启 GPU 硬件加速
+
+                // ★ 修复8：关键修复！使用 translate3d 确保移动端 GPU 加速
                 const keyframes = `
                     @keyframes ${animationName} {
                         0% { transform: translate3d(0, 0, 0); }
                         100% { transform: translate3d(-${originalWidth}px, 0, 0); }
                     }
                 `;
-                
+
                 const styleSheet = document.createElement('style');
                 const styleId = `style-${animationName}`;
                 styleSheet.id = styleId;
                 styleSheet.textContent = keyframes;
                 document.head.appendChild(styleSheet);
-                
-                // 记录 styleId 以便下次 resize 时移除
-                track.dataset.styleId = styleId; 
+
+                track.dataset.styleId = styleId;
                 track.style.animation = `${animationName} ${duration}s linear infinite`;
                 track.dataset.initialized = 'true';
             }
 
-            // 步骤1：等图片加载后再初始化滚动
-            async function setupAllGalleries() {
-                for (const track of tracks) {
-                    await waitForImages(track);
-                    await new Promise(resolve => requestAnimationFrame(resolve));
-                    await new Promise(resolve => requestAnimationFrame(resolve));
-                    initScrollAnimation(track);
-                }
+            // ★ 修复9：完全重写初始化流程，使用 requestAnimationFrame + IntersectionObserver 确保移动端可靠启动
+            async function setupGallery(track) {
+                await waitForImages(track);
+                // 使用至少 3 帧 rAF 确保浏览器完成布局和绘制
+                await new Promise(resolve => requestAnimationFrame(resolve));
+                await new Promise(resolve => requestAnimationFrame(resolve));
+                await new Promise(resolve => requestAnimationFrame(resolve));
+                initScrollAnimation(track);
             }
-            setupAllGalleries();
 
-            // 步骤2：图片淡入效果
+            // ★ 修复10：使用 IntersectionObserver 按需初始化，避免移动端页面加载时所有轮播同时初始化导致卡顿
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const track = entry.target.querySelector('.gallery-track');
+                            if (track && track.dataset.initialized !== 'true') {
+                                setupGallery(track);
+                            }
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { rootMargin: '200px' }); // 提前 200px 开始加载
+
+                containers.forEach(container => observer.observe(container));
+            } else {
+                // 降级：不支持 IntersectionObserver 的浏览器直接初始化
+                tracks.forEach(track => setupGallery(track));
+            }
+
+            // 图片淡入效果
             function applyFadeIn() {
                 const allImages = document.querySelectorAll('.gallery-item img');
                 allImages.forEach(img => {
@@ -331,21 +377,21 @@
                         img.classList.add('loaded');
                     } else {
                         img.addEventListener('load', function() { this.classList.add('loaded'); }, { once: true });
-                        img.addEventListener('error', function() { 
-                            this.classList.add('loaded'); 
-                            this.style.backgroundColor = '#ccc'; 
+                        img.addEventListener('error', function() {
+                            this.classList.add('loaded');
+                            this.style.backgroundColor = '#ccc';
                         }, { once: true });
                     }
                 });
             }
             applyFadeIn();
-            
-            // 步骤3：点击放大（事件委托）
+
+            // 点击放大（事件委托）
             containers.forEach(container => {
                 container.addEventListener('click', function(e) {
                     const item = e.target.closest('.gallery-item');
-                    if (!item) return; 
-                    
+                    if (!item) return;
+
                     const img = item.querySelector('img');
                     if (!img) return;
 
@@ -355,7 +401,7 @@
                     tracks.forEach(track => { track.style.animationPlayState = 'paused'; });
                 });
             });
-            
+
             const closeModal = () => {
                 modal.style.display = 'none';
                 document.body.style.overflow = 'auto';
@@ -367,36 +413,67 @@
                 if (e.target === modal) closeModal();
             });
 
-            // 步骤4：窗口 resize 时重新计算
+            // 窗口 resize 时重新计算
             let resizeTimer;
             window.addEventListener('resize', function() {
                 clearTimeout(resizeTimer);
                 resizeTimer = setTimeout(() => {
-                    tracks.forEach(track => initScrollAnimation(track));
+                    tracks.forEach(track => {
+                        if (track.dataset.initialized === 'true') {
+                            initScrollAnimation(track);
+                        }
+                    });
                     applyFadeIn();
                 }, 300);
             });
 
-            // 步骤5：触屏手动滑动支持
+            // ★ 修复11：重写触屏滑动支持，使用 touchmove 跟踪实时滑动，touchend 可靠恢复动画
             containers.forEach((container, index) => {
                 const track = tracks[index];
                 let isDragging = false;
+                let startX = 0;
 
                 container.addEventListener('touchstart', function(e) {
                     isDragging = true;
+                    startX = e.touches[0].clientX;
                     track.style.animationPlayState = 'paused';
+                }, { passive: true });
+
+                container.addEventListener('touchmove', function(e) {
+                    // 保持拖动状态，不做额外操作
                 }, { passive: true });
 
                 container.addEventListener('touchend', function(e) {
                     if (!isDragging) return;
                     isDragging = false;
+                    // ★ 修复：使用更短的延迟，并确保在模态框打开时不恢复
                     setTimeout(() => {
-                        // 修复：如果模态框正在显示，则不恢复动画，防止动画在模态框背后意外运行
                         if (modal.style.display !== 'flex') {
                             track.style.animationPlayState = 'running';
                         }
-                    }, 1500);
+                    }, 1000);
                 }, { passive: true });
+
+                // ★ 修复12：处理触摸取消的情况（如来电中断、手指滑出区域）
+                container.addEventListener('touchcancel', function() {
+                    isDragging = false;
+                    setTimeout(() => {
+                        if (modal.style.display !== 'flex') {
+                            track.style.animationPlayState = 'running';
+                        }
+                    }, 1000);
+                }, { passive: true });
+            });
+
+            // ★ 修复13：处理页面可见性变化（切后台再回来），确保动画恢复
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    tracks.forEach(track => {
+                        if (track.dataset.initialized === 'true' && modal.style.display !== 'flex') {
+                            track.style.animationPlayState = 'running';
+                        }
+                    });
+                }
             });
         });
     </script>

@@ -26,8 +26,8 @@
     background: var(--bg);
     color: var(--text);
     -webkit-font-smoothing: antialiased;
-    padding-top: 130px; /* JS 会动态修正此值 */
-    overflow-x: hidden; /* 防止任何元素导致横向滚动 */
+    padding-top: 130px;
+    overflow-x: hidden;
   }
 
   /* ========== 顶部导航栏 ========== */
@@ -107,7 +107,7 @@
   /* ========== 排序搜索工具栏 ========== */
   .toolbar {
     position: fixed;
-    top: 0; /* JS 动态计算位置 */
+    top: 0;
     left: 0; right: 0;
     z-index: 999;
     background: rgba(255,255,255,0.95);
@@ -118,7 +118,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    overflow: hidden; /* 防止内部元素撑破容器 */
+    overflow: visible; /* ✅ 修改：hidden → visible，让排序下拉菜单能正常显示 */
   }
   .toolbar-btn {
     display: inline-flex;
@@ -134,7 +134,7 @@
     transition: all 0.25s ease;
     white-space: nowrap;
     position: relative;
-    flex-shrink: 0; /* 关键：防止按钮在空间不足时被挤压变形 */
+    flex-shrink: 0;
   }
   .toolbar-btn:hover { border-color: var(--primary); color: var(--primary); }
   .toolbar-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(184,134,11,0.06); }
@@ -154,7 +154,7 @@
     visibility: hidden;
     transform: translateY(-8px);
     transition: all 0.25s ease;
-    z-index: 1001;
+    z-index: 1002; /* ✅ 修改：1001 → 1002，确保下拉菜单在最顶层 */
   }
   .sort-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
   .sort-dropdown .sort-option {
@@ -174,14 +174,14 @@
 
   /* 搜索框 */
   .search-container {
-    flex: 1; /* 占据剩余空间 */
+    flex: 1;
     display: flex;
     align-items: center;
     overflow: hidden;
     max-width: 0;
     opacity: 0;
     transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    min-width: 0; /* 关键：允许 flex 子项缩小到 0，防止撑破父容器 */
+    min-width: 0;
   }
   .search-container.show { max-width: 400px; opacity: 1; }
   .search-input-wrap {
@@ -220,7 +220,7 @@
   .search-clear.show { display: block; }
   .search-clear:hover { color: var(--text); }
 
-  /* ========== 手机小屏适配 (核心优化区) ========== */
+  /* ========== 手机小屏适配 ========== */
   @media (max-width: 480px) {
     .navbar { padding: 8px 8px 0; }
     .navbar-brand { font-size: 12px; letter-spacing: 4px; margin-bottom: 4px; }
@@ -234,7 +234,6 @@
     .toolbar { padding: 6px 10px; gap: 8px; }
     .toolbar-btn { padding: 5px 10px; font-size: 12px; }
     
-    /* 关键优化：手机端搜索框展开时，取消最大宽度限制，让它占满剩余空间 */
     .search-container.show { max-width: none; }
     .search-input { padding: 6px 32px 6px 12px; font-size: 12px; }
   }
@@ -366,10 +365,8 @@
     document.body.style.paddingTop = (navH + toolH + 8) + 'px';
   }
   
-  // 初始化及窗口大小改变时重新计算
   updateToolbarPosition();
   window.addEventListener('resize', updateToolbarPosition);
-  // 监听字体加载完成或图片加载导致的布局变化
   window.addEventListener('load', updateToolbarPosition);
 
   // ========== 加载数据 ==========
@@ -378,7 +375,7 @@
     .then(data => {
       allProducts = data.products;
       updateView();
-      updateToolbarPosition(); // 数据渲染后再次校准位置
+      updateToolbarPosition();
     })
     .catch(() => {
       grid.innerHTML = `
@@ -416,7 +413,7 @@
     sortDropdown.classList.remove('show');
     sortBtn.classList.remove('active');
     updateView();
-    updateToolbarPosition(); // 排序按钮文字变长可能导致高度微调，重新计算
+    updateToolbarPosition();
   });
 
   // ========== 搜索按钮 ==========

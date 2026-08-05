@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>绒颜</title>
 <link rel="icon" href="../logo.jpg" type="image/jpeg">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -56,9 +57,13 @@
     margin-bottom: 6px;
     text-transform: uppercase;
   }
-  .navbar-brand .brand-text { flex: 1; text-align: center; }
-  .back-btn {
-    flex-shrink: 0;
+  .navbar-brand .brand-text {
+    flex: 1;
+    text-align: center;
+  }
+  /* ========== 左右按钮统一样式（三等分） ========== */
+  .nav-side-btn {
+    flex: 1;
     display: inline-flex;
     align-items: center;
     font-size: 13px;
@@ -69,11 +74,14 @@
     padding: 4px 10px;
     border-radius: 20px;
     transition: all 0.3s ease;
-    min-width: 60px;
+    cursor: pointer;
+    border: none;
+    background: none;
   }
-  .back-btn:hover { background: rgba(184,134,11,0.08); color: var(--primary-light); }
-  .back-btn .back-icon { margin-right: 3px; font-size: 16px; line-height: 1; }
-  .brand-spacer { flex-shrink: 0; min-width: 60px; }
+  .nav-side-btn:hover { background: rgba(184,134,11,0.08); color: var(--primary-light); }
+  .nav-side-btn .back-icon { margin-right: 3px; font-size: 16px; line-height: 1; }
+  .nav-side-btn.right { justify-content: flex-end; }
+
   .navbar-categories {
     display: flex;
     justify-content: center;
@@ -118,7 +126,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    overflow: visible; /* ✅ 修改：hidden → visible，让排序下拉菜单能正常显示 */
+    overflow: visible;
   }
   .toolbar-btn {
     display: inline-flex;
@@ -154,7 +162,7 @@
     visibility: hidden;
     transform: translateY(-8px);
     transition: all 0.25s ease;
-    z-index: 1002; /* ✅ 修改：1001 → 1002，确保下拉菜单在最顶层 */
+    z-index: 1002;
   }
   .sort-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
   .sort-dropdown .sort-option {
@@ -224,9 +232,8 @@
   @media (max-width: 480px) {
     .navbar { padding: 8px 8px 0; }
     .navbar-brand { font-size: 12px; letter-spacing: 4px; margin-bottom: 4px; }
-    .back-btn { font-size: 12px; padding: 3px 8px; min-width: 50px; }
-    .back-btn .back-icon { font-size: 14px; }
-    .brand-spacer { min-width: 50px; }
+    .nav-side-btn { font-size: 12px; padding: 3px 8px; }
+    .nav-side-btn .back-icon { font-size: 14px; }
     .navbar-categories { justify-content: flex-start; gap: 4px; }
     .nav-btn { padding: 4px 12px; font-size: 12px; }
     .nav-btn .nav-icon { font-size: 13px; margin-right: 2px; }
@@ -284,11 +291,13 @@
 
 <nav class="navbar" id="navbar">
   <div class="navbar-brand">
-    <a href="../index.html" class="back-btn" title="返回上一级">
+    <a href="../index.html" class="nav-side-btn" title="返回上一级">
       <span class="back-icon">←</span>返回
     </a>
     <span class="brand-text">✦ 绒颜 ✦</span>
-    <span class="brand-spacer"></span>
+    <a href="admin.html" class="nav-side-btn right" title="进入管理后台">
+      ⚙️管理
+    </a>
   </div>
   <div class="navbar-categories" id="navCategories">
     <button class="nav-btn active" data-category="全部"><span class="nav-icon">🏠</span>全部</button>
@@ -339,6 +348,11 @@
 
 <script>
 (function () {
+  // ⚠️⚠️⚠️ 这里也要填你的 Supabase 配置（和管理后台一样）⚠️⚠️⚠️
+  const SUPABASE_URL = '你的_SUPABASE_URL';
+  const SUPABASE_KEY = '你的_SUPABASE_KEY';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
   let allProducts = [];
   let currentCategory = '全部';
   let currentSort = 'default';
@@ -369,21 +383,28 @@
   window.addEventListener('resize', updateToolbarPosition);
   window.addEventListener('load', updateToolbarPosition);
 
-  // ========== 加载数据 ==========
-  fetch('products.json')
-    .then(r => r.json())
-    .then(data => {
-      allProducts = data.products;
-      updateView();
-      updateToolbarPosition();
-    })
-    .catch(() => {
+  // ========== 从 Supabase 云端加载数据 ==========
+  async function loadProducts() {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (error) {
       grid.innerHTML = `
         <div class="empty-state" style="grid-column:1/-1">
           <div class="empty-icon">😢</div>
-          <p>产品加载失败，请确认 products.json 文件存在</p>
+          <p>产品加载失败，请检查网络连接</p>
         </div>`;
-    });
+      return;
+    }
+
+    allProducts = data || [];
+    updateView();
+    updateToolbarPosition();
+  }
+
+  loadProducts();
 
   // ========== 导航分类点击 ==========
   navContainer.addEventListener('click', function (e) {

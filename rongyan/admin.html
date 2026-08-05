@@ -230,18 +230,18 @@
   const SUPABASE_URL = 'https://nafoqfrghouuivgdngqz.supabase.co'; 
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hZm9xZnJnaG91dWl2Z2RuZ3F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4OTgzODEsImV4cCI6MjEwMTQ3NDM4MX0.CgUylzQbItStoPhu2QmgBSCVy3WpCX7KNK_Gh6fpzLo';
 
-  // 初始化 Supabase 客户端
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // 🛠️ 修复冲突：将实例重命名为 db，避免和全局的 supabase 对象冲突
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // ==========================================
-  // 🔐 云端安全验证逻辑 (已增加详细错误捕获)
+  // 🔐 云端安全验证逻辑
   // ==========================================
   async function checkAuth() {
     try {
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const { data: { session }, error } = await db.auth.getSession();
       console.log('🔍 checkAuth - session:', session, 'error:', error); 
       if (error) console.error('checkAuth 错误:', error.message);       
-        
+      
       if (session) {
         showMainApp();
       } else {
@@ -264,8 +264,8 @@
     btn.disabled = true;
     btn.textContent = '验证中...';
 
-    // 向 Supabase 云端发送登录请求核对密码
-    const { data, error } = await supabase.auth.signInWithPassword({ email: email, password: pwd });
+    // 🛠️ 修复：使用 db 代替 supabase
+    const { data, error } = await db.auth.signInWithPassword({ email: email, password: pwd });
     
     console.log('🔍 doLogin - data:', data, 'error:', error); 
 
@@ -273,7 +273,6 @@
     btn.textContent = '验证并进入';
 
     if (error) {
-      // 👇 关键修改：显示 Supabase 返回的真实错误信息！
       showToast('❌ ' + (error.message || '登录失败'));
       console.error('❌ 登录失败详情:', error);
       document.getElementById('passwordInput').value = '';
@@ -283,7 +282,7 @@
   }
 
   async function doLogout() {
-    await supabase.auth.signOut();
+    await db.auth.signOut();
     location.reload(); 
   }
 
@@ -293,7 +292,6 @@
     initApp();
   }
 
-  // 支持回车键登录
   document.getElementById('passwordInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') doLogin();
   });
@@ -406,7 +404,9 @@
   async function loadProductList() {
     const list = document.getElementById('productList');
     list.innerHTML = '<p style="text-align:center; color:#999; padding:40px 0;">加载中...</p>';
-    const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false });
+    
+    // 🛠️ 修复：使用 db 代替 supabase
+    const { data, error } = await db.from('products').select('*').order('id', { ascending: false });
     if (error) { 
       console.error('加载产品列表失败:', error);
       list.innerHTML = '<p style="text-align:center; color:red;">加载失败: ' + error.message + '</p>'; 
@@ -464,11 +464,13 @@
         btn.textContent = `⏳ 处理图片 (${i + 1}/${files.length})...`;
         const compressed = await compressImage(files[i]);
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.jpg`; 
-        const { error } = await supabase.storage.from('product-images').upload(fileName, compressed, {
+        
+        // 🛠️ 修复：使用 db 代替 supabase
+        const { error } = await db.storage.from('product-images').upload(fileName, compressed, {
           cacheControl: '3600', upsert: false, contentType: 'image/jpeg'
         });
         if (error) throw error;
-        const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
+        const { data: urlData } = db.storage.from('product-images').getPublicUrl(fileName);
         newUrls.push(urlData.publicUrl);
       }
 
@@ -485,10 +487,11 @@
       btn.textContent = '⏳ 正在保存数据...';
       let dbError;
       if (isEdit) {
-        const { error } = await supabase.from('products').update(dbData).eq('id', currentEditId);
+        // 🛠️ 修复：使用 db 代替 supabase
+        const { error } = await db.from('products').update(dbData).eq('id', currentEditId);
         dbError = error;
       } else {
-        const { error } = await supabase.from('products').insert([dbData]);
+        const { error } = await db.from('products').insert([dbData]);
         dbError = error;
       }
       if (dbError) throw dbError;
@@ -518,7 +521,8 @@
     btn.disabled = true;
     btn.textContent = '⏳ 正在删除...';
     try {
-      const { error } = await supabase.from('products').delete().eq('id', currentEditId);
+      // 🛠️ 修复：使用 db 代替 supabase
+      const { error } = await db.from('products').delete().eq('id', currentEditId);
       if (error) throw error;
       showToast('✅ 产品已删除');
       switchTab('manage');

@@ -226,7 +226,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // ⚠️⚠️⚠️ 请务必修改下面这两行，填入你自己的 Supabase 配置！⚠️⚠️⚠️
+  // ⚠️⚠️⚠️ 你的 Supabase 配置 ⚠️⚠️⚠️
   const SUPABASE_URL = 'https://nafoqfrghouuivgdngqz.supabase.co'; 
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hZm9xZnJnaG91dWl2Z2RuZ3F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4OTgzODEsImV4cCI6MjEwMTQ3NDM4MX0.CgUylzQbItStoPhu2QmgBSCVy3WpCX7KNK_Gh6fpzLo';
 
@@ -234,14 +234,22 @@
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // ==========================================
-  // 🔐 云端安全验证逻辑
+  // 🔐 云端安全验证逻辑 (已增加详细错误捕获)
   // ==========================================
   async function checkAuth() {
-    // 向云端查询当前浏览器是否有有效的登录会话
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      showMainApp();
-    } else {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      console.log('🔍 checkAuth - session:', session, 'error:', error); 
+      if (error) console.error('checkAuth 错误:', error.message);       
+        
+      if (session) {
+        showMainApp();
+      } else {
+        document.getElementById('authOverlay').style.display = 'flex';
+        document.getElementById('mainApp').style.display = 'none';
+      }
+    } catch (e) {
+      console.error('❌ checkAuth 异常:', e);                            
       document.getElementById('authOverlay').style.display = 'flex';
       document.getElementById('mainApp').style.display = 'none';
     }
@@ -257,13 +265,17 @@
     btn.textContent = '验证中...';
 
     // 向 Supabase 云端发送登录请求核对密码
-    const { error } = await supabase.auth.signInWithPassword({ email: email, password: pwd });
+    const { data, error } = await supabase.auth.signInWithPassword({ email: email, password: pwd });
+    
+    console.log('🔍 doLogin - data:', data, 'error:', error); 
 
     btn.disabled = false;
     btn.textContent = '验证并进入';
 
     if (error) {
-      showToast('❌ 账号或密码错误');
+      // 👇 关键修改：显示 Supabase 返回的真实错误信息！
+      showToast('❌ ' + (error.message || '登录失败'));
+      console.error('❌ 登录失败详情:', error);
       document.getElementById('passwordInput').value = '';
     } else {
       showMainApp();
@@ -272,7 +284,7 @@
 
   async function doLogout() {
     await supabase.auth.signOut();
-    location.reload(); // 退出并刷新页面
+    location.reload(); 
   }
 
   function showMainApp() {
@@ -284,6 +296,9 @@
   // 支持回车键登录
   document.getElementById('passwordInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') doLogin();
+  });
+  document.getElementById('emailInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('passwordInput').focus();
   });
 
   // ==========================================
@@ -392,7 +407,11 @@
     const list = document.getElementById('productList');
     list.innerHTML = '<p style="text-align:center; color:#999; padding:40px 0;">加载中...</p>';
     const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false });
-    if (error) { list.innerHTML = '<p style="text-align:center; color:red;">加载失败</p>'; return; }
+    if (error) { 
+      console.error('加载产品列表失败:', error);
+      list.innerHTML = '<p style="text-align:center; color:red;">加载失败: ' + error.message + '</p>'; 
+      return; 
+    }
     
     list.innerHTML = '';
     if (data.length === 0) {

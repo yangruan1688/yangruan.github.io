@@ -4,7 +4,7 @@
       "id": 1,
       "name": "绒花｜彼岸花",
       "category": "发饰",
-      "price": "/",
+      "price": 0,
       "description": "彼岸花",
       "cover": "../img/bah.webp",
       "images": ["../img/bah.webp","../img/dp.webp"]
@@ -13,7 +13,7 @@
       "id": 2,
       "name": "绒花｜彼岸花",
       "category": "发饰",
-      "price": "/",
+      "price": 0,
       "description": "彼岸花",
       "cover": "../img/dxh.webp",
       "images": ["../img/dxh.webp","../img/dp.webp"]
@@ -22,7 +22,7 @@
       "id": 3,
       "name": "绒花｜郁金香",
       "category": "其他",
-      "price": "/",
+      "price": 0,
       "description": "郁金香",
       "cover": "../img/yjx01.webp",
       "images": ["../img/yjx01.webp","../img/yjx02.webp","../img/yjx03.webp","../img/dp.webp"]
@@ -31,7 +31,7 @@
       "id": 4,
       "name": "绒花｜蓝芍",
       "category": "其他",
-      "price": "/",
+      "price": 0,
       "description": "蓝芍",
       "cover": "../img/ls01.webp",
       "images": ["../img/ls01.webp","../img/ls02.webp","../img/ls03.webp","../img/dp.webp"]
@@ -40,7 +40,7 @@
       "id": 5,
       "name": "绒花｜小樱花",
       "category": "耳饰",
-      "price": "/",
+      "price": 0,
       "description": "小樱花",
       "cover": "../img/yh01.webp",
       "images": ["../img/yh01.webp","../img/yh02.webp","../img/yh03.webp","../img/yh04.webp","../img/dp.webp"]
@@ -49,7 +49,7 @@
       "id": 6,
       "name": "绒花｜青提",
       "category": "胸饰",
-      "price": "/",
+      "price": 0,
       "description": "青提",
       "cover": "../img/qt01.webp",
       "images": ["../img/qt01.webp","../img/qt02.webp","../img/qt03.webp","../img/dp.webp"]
@@ -58,7 +58,7 @@
       "id": 7,
       "name": "绒花｜荷烬",
       "category": "头饰",
-      "price": "/",
+      "price": 0,
       "description": "荷烬",
       "cover": "../img/hh01.webp",
       "images": ["../img/hh01.webp","../img/hh02.webp","../img/dp.webp"]
@@ -67,7 +67,7 @@
       "id": 8,
       "name": "绒花｜婆婆纳",
       "category": "发饰",
-      "price": "/",
+      "price": 0,
       "description": "婆婆纳",
       "cover": "../img/ppn01.webp",
       "images": ["../img/ppn01.webp","../img/ppn02.webp","../img/dp.webp"]
@@ -76,7 +76,7 @@
       "id": 9,
       "name": "缠花｜玫瑰",
       "category": "其他",
-      "price": "/",
+      "price": 0,
       "description": "玫瑰",
       "cover": "../img/mg01.webp",
       "images": ["../img/mg01.webp","../img/mg02.webp","../img/dp.webp"]
@@ -85,7 +85,7 @@
       "id": 10,
       "name": "绒花｜紫玉",
       "category": "胸饰",
-      "price": "/",
+      "price": 0,
       "description": "紫玉",
       "cover": "../img/zy01.webp",
       "images": ["../img/zy01.webp","../img/zy02.webp","../img/dp.webp"]
@@ -94,7 +94,7 @@
       "id": 11,
       "name": "绒花｜复古款",
       "category": "其他",
-      "price": "/",
+      "price": 0,
       "description": "复古款",
       "cover": "../img/fh01.webp",
       "images": ["../img/fh01.webp","../img/fh02.webp","../img/dp.webp"]
@@ -103,7 +103,7 @@
       "id": 12,
       "name": "绒花｜海棠",
       "category": "发饰",
-      "price": "/",
+      "price": 0,
       "description": "海棠",
       "cover": "../img/ht01.webp",
       "images": ["../img/ht01.webp","../img/ht02.webp","../img/dp.webp"]

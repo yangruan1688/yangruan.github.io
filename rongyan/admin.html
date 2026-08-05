@@ -264,11 +264,11 @@ select.form-input{appearance:none;-webkit-appearance:none;
       </div>
 
       <div class="form-group">
-        <label>产品图片 * <span style="font-weight:400;color:var(--text-light)">（第一张为封面）</span></label>
+        <label>产品图片 * <span style="font-weight:400;color:var(--text-light)">（第一张为封面，自动转为WebP）</span></label> <!-- ✅ 修改：提示文字 -->
         <div class="upload-area" id="uploadArea">
           <input type="file" id="fileInput" accept="image/*" multiple>
           <div class="upload-icon">📷</div>
-          <div class="upload-text">点击或拖放图片到这里<br><span style="font-size:11px">支持 JPG / PNG / WEBP</span></div>
+          <div class="upload-text">点击或拖放图片到这里<br><span style="font-size:11px">支持 JPG / PNG / WEBP，上传自动压缩转换</span></div> <!-- ✅ 修改：提示文字 -->
         </div>
         <div class="preview-grid" id="previewGrid"></div>
       </div>
@@ -324,8 +324,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
   const GITHUB_API    = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${PRODUCTS_FILE}`;
   const CDN_BASE      = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
   const TOKEN_KEY     = 'rongyan_admin_token';
-
-  // ✅ 修改：新增 CDN 清除基础 URL
   const PURGE_BASE    = `https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
 
   // ============================
@@ -346,14 +344,13 @@ select.form-input{appearance:none;-webkit-appearance:none;
   //   状态
   // ============================
   let products = [];
-  let images = []; // {src: string, isNew: boolean, fileName: string}
+  let images = [];
   let fileSha = null;
   let isSubmitting = false;
 
   // ============================
   //   工具函数
   // ============================
-  
   function escapeHTML(str) {
     if (!str) return '';
     const div = document.createElement('div');
@@ -389,7 +386,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
   function setToken(t){ localStorage.setItem(TOKEN_KEY, t.trim()); }
   function removeToken(){ localStorage.removeItem(TOKEN_KEY); }
 
-  // ✅ 修改：新增通用 CDN 缓存清除函数
   async function purgeCdn(path) {
     try {
       const purgeUrl = `${PURGE_BASE}/${path}`;
@@ -405,7 +401,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
   }
 
   // ============================
-  //   图片压缩
+  //   ✅ 修改：图片压缩（转换为 WEBP 格式）
   // ============================
   function compressImage(file, maxSize=800, quality=0.75){
     return new Promise((resolve, reject)=>{
@@ -423,7 +419,16 @@ select.form-input{appearance:none;-webkit-appearance:none;
           canvas.height = h;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', quality));
+          
+          // ✅ 修改：优先转换为 WEBP 格式，体积比 JPEG 小 25%~35%
+          let dataUrl = canvas.toDataURL('image/webp', quality);
+          
+          // 兼容处理：极少数老旧浏览器不支持 webp 导出（会回退为 png），此时改用 jpeg
+          if (dataUrl.indexOf('data:image/webp') !== 0) {
+            dataUrl = canvas.toDataURL('image/jpeg', quality);
+          }
+          
+          resolve(dataUrl);
         };
         img.onerror = reject;
         img.src = e.target.result;
@@ -481,7 +486,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
     const result = await res.json();
     fileSha = result.content.sha;
 
-    // ✅ 修改：保存成功后自动清除 products.json 的 CDN 缓存
     await purgeCdn(PRODUCTS_FILE);
 
     return result;
@@ -516,8 +520,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
     }
 
     const cdnUrl = `${CDN_BASE}/${filePath}`;
-
-    // ✅ 修改：上传图片后自动清除该图片的 CDN 缓存
     await purgeCdn(filePath);
 
     return cdnUrl;
@@ -616,7 +618,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
     if(!files.length) return;
 
     for(let i = 0; i < files.length; i++){
-      showProgress(((i+1)/files.length*80).toFixed(0), `压缩图片 ${i+1}/${files.length}...`);
+      showProgress(((i+1)/files.length*80).toFixed(0), `压缩并转换图片 ${i+1}/${files.length}...`); // ✅ 修改：提示文字
       try {
         const compressed = await compressImage(files[i]);
         images.push({ src: compressed, isNew: true, fileName: null });
@@ -739,7 +741,10 @@ select.form-input{appearance:none;-webkit-appearance:none;
           
           const timestamp = Date.now();
           const randomStr = Math.random().toString(36).substring(2, 8);
-          const fileName = `${timestamp}_${randomStr}.jpg`;
+          
+          // ✅ 修改：根据 dataUrl 的实际格式动态决定文件后缀名（webp 或 jpg）
+          const ext = img.src.indexOf('data:image/webp') === 0 ? 'webp' : 'jpg';
+          const fileName = `${timestamp}_${randomStr}.${ext}`;
           
           const cdnUrl = await uploadImageToGitHub(img.src, fileName);
           finalImageUrls.push(cdnUrl);
@@ -786,7 +791,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
       showProgress(90, '更新 products.json...');
       await saveProductsToGitHub(products);
 
-      // ✅ 修改：提交完成后再次确认刷新 CDN 缓存（双重保障）
       showProgress(95, '刷新CDN缓存，确保前台可见...');
       await purgeCdn(PRODUCTS_FILE);
 
@@ -878,7 +882,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
       this.disabled = true;
       this.textContent = '⏳ 刷新中...';
       try {
-        // ✅ 修改：使用统一的 purgeCdn 函数
         await purgeCdn(PRODUCTS_FILE);
         showToast('CDN 缓存已刷新，前台刷新页面即可看到最新数据', 'success', 4000);
       } catch(e){

@@ -334,14 +334,13 @@
 
 <script>
 (function () {
-  // ⚠️⚠️⚠️ 修改为你自己的 GitHub 配置（只需要 owner、repo、branch）⚠️⚠️⚠️
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
 
-  // ✅ 修改：CDN 地址 + GitHub Raw 备用地址
-  const PRODUCTS_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
-  const PRODUCTS_FALLBACK_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
+  // ✅ 优化：配置多个 CDN 源和 Raw 源，确保加载成功率
+  const CDN_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
+  const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
 
   let allProducts = [];
   let currentCategory = '全部';
@@ -370,50 +369,41 @@
   window.addEventListener('resize', updateToolbarPosition);
   window.addEventListener('load', updateToolbarPosition);
 
-  // ✅ 修改：加载产品数据，增加 GitHub Raw 回退机制
+  // ✅ 优化：智能多源加载数据
   async function loadProducts() {
-    try {
-      // 优先从 CDN 加载（速度快）
-      let res = await fetch(PRODUCTS_URL + '?_=' + Date.now());
-      
-      // ✅ 修改：CDN 失败时回退到 GitHub Raw（无缓存，数据最新）
-      if (!res.ok) {
-        console.warn('CDN 加载失败，回退到 GitHub Raw...');
-        res = await fetch(PRODUCTS_FALLBACK_URL + '?_=' + Date.now());
-      }
-      
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      allProducts = data || [];
-      updateView();
-      updateToolbarPosition();
-    } catch (err) {
-      console.error('加载产品失败:', err);
-      if (err.message.includes('404')) {
-        allProducts = [];
-        updateView();
-      } else {
-        // ✅ 修改：CDN 出错时再试一次 GitHub Raw
-        try {
-          const res = await fetch(PRODUCTS_FALLBACK_URL + '?_=' + Date.now());
-          if (res.ok) {
-            const data = await res.json();
-            allProducts = data || [];
-            updateView();
-            updateToolbarPosition();
-            return;
-          }
-        } catch (e2) {
-          console.error('备用加载也失败:', e2);
+    const timestamp = Date.now();
+    const urls = [
+      `${CDN_BASE}?_=${timestamp}`,
+      `${RAW_BASE}?_=${timestamp}`
+    ];
+
+    let dataLoaded = false;
+
+    for (const url of urls) {
+      try {
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          allProducts = Array.isArray(data) ? data : (data.products || []);
+          dataLoaded = true;
+          break; // 成功加载，跳出循环
         }
-        
-        grid.innerHTML = `
-          <div class="empty-state" style="grid-column:1/-1">
-            <div class="empty-icon">😢</div>
-            <p>产品加载失败，请检查网络连接</p>
-          </div>`;
+      } catch (err) {
+        console.warn('数据源加载失败，尝试下一个:', url, err.message);
       }
     }
+
+    if (!dataLoaded) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-icon">😢</div>
+          <p>产品加载失败，请检查网络连接或刷新重试</p>
+        </div>`;
+      return;
+    }
+
+    updateView();
+    updateToolbarPosition();
   }
 
   loadProducts();
@@ -541,19 +531,30 @@
         </div>`;
       return;
     }
-    grid.innerHTML = products.map((p, i) => `
-      <a class="product-card" href="detail.html?id=${p.id}"
-         style="animation-delay:${i * 0.06}s">
-        <div class="card-img-wrap">
-          <img src="${p.cover}" alt="${p.name}" loading="lazy">
-          <span class="card-tag">${p.category}</span>
-        </div>
-        <div class="card-info">
-          <div class="card-name">${p.name}</div>
-          <div class="card-price">${p.price.toFixed(1)}</div>
-        </div>
-      </a>
-    `).join('');
+    
+    // ✅ 优化：给图片 URL 加上时间戳，防止 CDN 缓存导致新上传的图片不显示
+    const imgTimestamp = Date.now();
+    
+    grid.innerHTML = products.map((p, i) => {
+      let coverUrl = p.cover;
+      if (coverUrl && !coverUrl.includes('?')) {
+        coverUrl += `?_=${imgTimestamp}`;
+      }
+      
+      return `
+        <a class="product-card" href="detail.html?id=${p.id}"
+           style="animation-delay:${i * 0.06}s">
+          <div class="card-img-wrap">
+            <img src="${coverUrl}" alt="${p.name}" loading="lazy">
+            <span class="card-tag">${p.category}</span>
+          </div>
+          <div class="card-info">
+            <div class="card-name">${p.name}</div>
+            <div class="card-price">${Number(p.price).toFixed(1)}</div>
+          </div>
+        </a>
+      `;
+    }).join('');
   }
 })();
 </script>

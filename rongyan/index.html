@@ -339,8 +339,9 @@
   const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
 
-  // 产品数据的 CDN 地址（公开仓库无需 Token）
+  // ✅ 修改：CDN 地址 + GitHub Raw 备用地址
   const PRODUCTS_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
+  const PRODUCTS_FALLBACK_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
 
   let allProducts = [];
   let currentCategory = '全部';
@@ -369,11 +370,18 @@
   window.addEventListener('resize', updateToolbarPosition);
   window.addEventListener('load', updateToolbarPosition);
 
-  // ========== 从 GitHub 加载产品数据 ==========
+  // ✅ 修改：加载产品数据，增加 GitHub Raw 回退机制
   async function loadProducts() {
     try {
-      // 加时间戳防缓存
-      const res = await fetch(PRODUCTS_URL + '?t=' + Date.now());
+      // 优先从 CDN 加载（速度快）
+      let res = await fetch(PRODUCTS_URL + '?_=' + Date.now());
+      
+      // ✅ 修改：CDN 失败时回退到 GitHub Raw（无缓存，数据最新）
+      if (!res.ok) {
+        console.warn('CDN 加载失败，回退到 GitHub Raw...');
+        res = await fetch(PRODUCTS_FALLBACK_URL + '?_=' + Date.now());
+      }
+      
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       allProducts = data || [];
@@ -381,11 +389,24 @@
       updateToolbarPosition();
     } catch (err) {
       console.error('加载产品失败:', err);
-      // 如果 products.json 还不存在（首次使用），显示空状态
       if (err.message.includes('404')) {
         allProducts = [];
         updateView();
       } else {
+        // ✅ 修改：CDN 出错时再试一次 GitHub Raw
+        try {
+          const res = await fetch(PRODUCTS_FALLBACK_URL + '?_=' + Date.now());
+          if (res.ok) {
+            const data = await res.json();
+            allProducts = data || [];
+            updateView();
+            updateToolbarPosition();
+            return;
+          }
+        } catch (e2) {
+          console.error('备用加载也失败:', e2);
+        }
+        
         grid.innerHTML = `
           <div class="empty-state" style="grid-column:1/-1">
             <div class="empty-icon">😢</div>

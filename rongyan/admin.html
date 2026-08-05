@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>绒颜 · 手机管理后台</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/compressorjs@1.2.1/dist/compressor.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --primary: #b8860b; --bg: #f5f5f7; --card: #fff; --text: #1c1c1e;
+    --text2: #8e8e93; --border: #e5e5ea; --danger: #ff3b30; --success: #34c759;
+  }
+  body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; padding: 16px; padding-bottom: 100px; }
+  h2 { text-align: center; margin-bottom: 20px; color: var(--primary); font-size: 22px;}
+  
+  /* 顶部 Tab 切换 */
+  .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+  .tab {
+    flex: 1; padding: 12px; text-align: center; background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; font-size: 16px; font-weight: 600; color: var(--text2); cursor: pointer; transition: all 0.2s;
+  }
+  .tab.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 10px rgba(184,134,11,0.3); }
+  
+  .form-group { margin-bottom: 18px; }
+  .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 10px;
+    font-size: 16px; background: var(--card); outline: none; -webkit-appearance: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--primary); }
+  .form-textarea { min-height: 80px; font-family: inherit; resize: vertical;}
+  
+  .upload-area {
+    border: 2px dashed var(--primary); border-radius: 12px; padding: 30px 10px; text-align: center;
+    background: #fffbf0; cursor: pointer; transition: all 0.2s;
+  }
+  .upload-area:active { transform: scale(0.98); background: #fff5e0;}
+  .upload-area .icon { font-size: 40px; }
+  .upload-area p { font-size: 14px; color: var(--text2); margin-top: 8px; }
+  .upload-area input { display: none; }
+  
+  .preview-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+  .preview-item {
+    position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden;
+    background: #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+  .preview-item .badge { position: absolute; top: 4px; left: 4px; background: var(--primary); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+  .preview-item .badge.new { background: var(--success); }
+  .preview-item .remove-btn {
+    position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; background: rgba(0,0,0,0.6);
+    color: #fff; border: none; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center;
+  }
+
+  .btn {
+    width: 100%; padding: 16px; border: none; border-radius: 14px;
+    font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 10px;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn:disabled { background: #ccc !important; box-shadow: none !important; color: #999; }
+  
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 20px rgba(184,134,11,0.4); }
+  .btn-danger { background: #fff; color: var(--danger); border: 1px solid var(--danger); }
+  .btn-back { background: #fff; color: var(--text); border: 1px solid var(--border); font-size: 16px; padding: 12px;}
+
+  /* 产品列表 */
+  .product-list { display: flex; flex-direction: column; gap: 12px; }
+  .product-card {
+    display: flex; align-items: center; gap: 12px; background: var(--card); padding: 12px;
+    border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s;
+  }
+  .product-card:active { transform: scale(0.98); background: #fafafa; }
+  .product-card img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; background: #eee;}
+  .product-info { flex: 1; }
+  .product-info h3 { font-size: 16px; margin-bottom: 4px; }
+  .product-info p { font-size: 13px; color: var(--text2); }
+
+  .toast {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.85); color: #fff; padding: 16px 28px; border-radius: 10px;
+    font-size: 15px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    text-align: center; max-width: 80%;
+  }
+  .toast.show { opacity: 1; }
+  
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<h2>📦 绒颜 · 管理后台</h2>
+
+<div class="tabs" id="mainTabs">
+  <button class="tab active" onclick="switchTab('add')">➕ 添加产品</button>
+  <button class="tab" onclick="switchTab('manage')">✏️ 管理产品</button>
+</div>
+
+<!-- 视图 1：添加产品 -->
+<div id="view-add">
+  <div class="form-group">
+    <label class="form-label">产品名称 *</label>
+    <input type="text" class="form-input" id="fName" placeholder="例：绒花｜紫玉">
+  </div>
+  <div class="form-group">
+    <label class="form-label">分类 *</label>
+    <select class="form-select" id="fCategory">
+      <option value="发饰">发饰</option>
+      <option value="耳饰">耳饰</option>
+      <option value="胸针">胸针</option>
+      <option value="胸饰">胸饰</option>
+      <option value="头饰">头饰</option>
+      <option value="其他">其他</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label class="form-label">价格（元）</label>
+    <input type="number" class="form-input" id="fPrice" value="0" min="0" step="0.1">
+  </div>
+  <div class="form-group">
+    <label class="form-label">描述</label>
+    <textarea class="form-textarea" id="fDesc" placeholder="产品描述、材质、尺寸等..."></textarea>
+  </div>
+  <div class="form-group">
+    <label class="form-label">产品图片（可多选，第一张为封面，自动压缩）</label>
+    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+      <div class="icon">📷</div>
+      <p>点击这里，从手机相册选图</p>
+      <input type="file" id="fileInput" multiple accept="image/*">
+    </div>
+    <div class="preview-list" id="previewList"></div>
+  </div>
+  <button class="btn btn-primary" id="submitBtn" onclick="submitProduct('add')">🚀 保存并上传到云端</button>
+</div>
+
+<!-- 视图 2：管理产品列表 -->
+<div id="view-manage" class="hidden">
+  <div class="product-list" id="productList">
+    <p style="text-align:center; color:#999; padding:40px 0;">加载中...</p>
+  </div>
+</div>
+
+<!-- 视图 3：编辑产品表单 -->
+<div id="view-edit" class="hidden">
+  <button class="btn btn-back" onclick="switchTab('manage')">← 返回产品列表</button>
+  <div style="height: 16px;"></div>
+  
+  <div class="form-group">
+    <label class="form-label">产品名称 *</label>
+    <input type="text" class="form-input" id="eName">
+  </div>
+  <div class="form-group">
+    <label class="form-label">分类 *</label>
+    <select class="form-select" id="eCategory">
+      <option value="发饰">发饰</option><option value="耳饰">耳饰</option><option value="胸针">胸针</option>
+      <option value="胸饰">胸饰</option><option value="头饰">头饰</option><option value="其他">其他</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label class="form-label">价格（元）</label>
+    <input type="number" class="form-input" id="ePrice" min="0" step="0.1">
+  </div>
+  <div class="form-group">
+    <label class="form-label">描述</label>
+    <textarea class="form-textarea" id="eDesc"></textarea>
+  </div>
+  <div class="form-group">
+    <label class="form-label">产品图片（点击 × 删除老图，或上传新图）</label>
+    <div class="upload-area" onclick="document.getElementById('editFileInput').click()">
+      <div class="icon">📷</div>
+      <p>点击补充新图片</p>
+      <input type="file" id="editFileInput" multiple accept="image/*">
+    </div>
+    <div class="preview-list" id="editPreviewList"></div>
+  </div>
+  <button class="btn btn-primary" id="updateBtn" onclick="submitProduct('edit')">💾 保存修改</button>
+  <button class="btn btn-danger" onclick="deleteProduct()">🗑️ 彻底删除此产品</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ⚠️⚠️⚠️ 请把下面这两行换成你自己的 Supabase URL 和 Key！⚠️⚠️⚠️
+  const SUPABASE_URL = '你的_SUPABASE_URL'; 
+  const SUPABASE_KEY = '你的_SUPABASE_KEY';
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  
+  // 全局状态
+  let addFiles = [];       // 添加模式下的新文件
+  let editFiles = [];      // 编辑模式下的新文件
+  let existingUrls = [];   // 编辑模式下，保留的老图片 URL
+  let currentEditId = null;// 当前正在编辑的产品 ID
+  let allProducts = [];    // 缓存产品列表
+
+  // --- 视图切换 ---
+  function switchTab(tab) {
+    document.getElementById('view-add').classList.add('hidden');
+    document.getElementById('view-manage').classList.add('hidden');
+    document.getElementById('view-edit').classList.add('hidden');
+    document.getElementById('mainTabs').classList.remove('hidden');
+
+    if (tab === 'add') {
+      document.getElementById('view-add').classList.remove('hidden');
+      document.querySelectorAll('.tab')[0].classList.add('active');
+      document.querySelectorAll('.tab')[1].classList.remove('active');
+    } else if (tab === 'manage') {
+      document.getElementById('view-manage').classList.remove('hidden');
+      document.querySelectorAll('.tab')[0].classList.remove('active');
+      document.querySelectorAll('.tab')[1].classList.add('active');
+      loadProductList();
+    } else if (tab === 'edit') {
+      document.getElementById('view-edit').classList.remove('hidden');
+      document.getElementById('mainTabs').classList.add('hidden'); // 编辑时隐藏顶部Tab
+    }
+  }
+
+  // --- 图片压缩函数 ---
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      new Compressor(file, {
+        quality: 0.7, maxWidth: 1200, maxHeight: 1200,
+        mimeType: 'image/jpeg', convertSize: 1000000,
+        success: resolve, error: reject,
+      });
+    });
+  }
+
+  // --- 添加模式：图片处理 ---
+  document.getElementById('fileInput').addEventListener('change', function(e) {
+    addFiles = addFiles.concat(Array.from(e.target.files));
+    renderAddPreviews();
+    e.target.value = '';
+  });
+
+  function renderAddPreviews() {
+    const list = document.getElementById('previewList');
+    list.innerHTML = '';
+    addFiles.forEach((file, i) => {
+      list.appendChild(createPreviewItem(URL.createObjectURL(file), i, 'add', i === 0));
+    });
+  }
+
+  // --- 编辑模式：图片处理 ---
+  document.getElementById('editFileInput').addEventListener('change', function(e) {
+    editFiles = editFiles.concat(Array.from(e.target.files));
+    renderEditPreviews();
+    e.target.value = '';
+  });
+
+  function renderEditPreviews() {
+    const list = document.getElementById('editPreviewList');
+    list.innerHTML = '';
+    
+    // 1. 渲染保留的老图片
+    existingUrls.forEach((url, i) => {
+      list.appendChild(createPreviewItem(url, i, 'existing', i === 0 && editFiles.length === 0));
+    });
+    
+    // 2. 渲染新选的图片
+    editFiles.forEach((file, i) => {
+      const isCover = (existingUrls.length === 0 && i === 0); // 如果没有老图，第一张新图就是封面
+      list.appendChild(createPreviewItem(URL.createObjectURL(file), i, 'edit', isCover));
+    });
+  }
+
+  // --- 通用：生成图片预览卡片 ---
+  function createPreviewItem(src, index, type, isCover) {
+    const div = document.createElement('div');
+    div.className = 'preview-item';
+    
+    const img = document.createElement('img');
+    img.src = src;
+    div.appendChild(img);
+
+    if (isCover) {
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = '封面';
+      div.appendChild(badge);
+    } else if (type === 'edit') {
+      const badge = document.createElement('span');
+      badge.className = 'badge new';
+      badge.textContent = '新增';
+      div.appendChild(badge);
+    }
+
+    const btn = document.createElement('button');
+    btn.className = 'remove-btn';
+    btn.innerHTML = '×';
+    btn.onclick = (ev) => { 
+      ev.stopPropagation(); 
+      if (type === 'add') { addFiles.splice(index, 1); renderAddPreviews(); }
+      else if (type === 'edit') { editFiles.splice(index, 1); renderEditPreviews(); }
+      else if (type === 'existing') { existingUrls.splice(index, 1); renderEditPreviews(); }
+    };
+    div.appendChild(btn);
+    return div;
+  }
+
+  // --- 加载产品列表 ---
+  async function loadProductList() {
+    const list = document.getElementById('productList');
+    list.innerHTML = '<p style="text-align:center; color:#999; padding:40px 0;">加载中...</p>';
+    
+    const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false });
+    
+    if (error) { list.innerHTML = '<p style="text-align:center; color:red;">加载失败</p>'; return; }
+    
+    allProducts = data;
+    list.innerHTML = '';
+    
+    if (data.length === 0) {
+      list.innerHTML = '<p style="text-align:center; color:#999; padding:40px 0;">暂无产品，请先添加</p>';
+      return;
+    }
+
+    data.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.onclick = () => openEditForm(p);
+      
+      card.innerHTML = `
+        <img src="${p.cover}" onerror="this.src='https://via.placeholder.com/60?text=No+Img'">
+        <div class="product-info">
+          <h3>${p.name}</h3>
+          <p>${p.category} · ¥${p.price} · ${p.images ? p.images.length : 0}张图</p>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  // --- 打开编辑表单 ---
+  function openEditForm(product) {
+    currentEditId = product.id;
+    document.getElementById('eName').value = product.name;
+    document.getElementById('eCategory').value = product.category;
+    document.getElementById('ePrice').value = product.price;
+    document.getElementById('eDesc').value = product.description || '';
+    
+    existingUrls = [...(product.images || [])]; // 拷贝老图片数组
+    editFiles = []; // 清空新文件
+    
+    renderEditPreviews();
+    switchTab('edit');
+  }
+
+  // --- 核心提交逻辑 (兼容 add 和 edit) ---
+  async function submitProduct(mode) {
+    const isEdit = mode === 'edit';
+    const name = document.getElementById(isEdit ? 'eName' : 'fName').value.trim();
+    
+    if (!name) return showToast('⚠️ 请输入产品名称');
+    
+    const files = isEdit ? editFiles : addFiles;
+    const oldUrls = isEdit ? existingUrls : [];
+    
+    if (files.length === 0 && oldUrls.length === 0) return showToast('⚠️ 请至少保留或上传一张图片');
+
+    const btn = document.getElementById(isEdit ? 'updateBtn' : 'submitBtn');
+    btn.disabled = true;
+
+    try {
+      // 1. 压缩并上传新图片
+      const newUrls = [];
+      for (let i = 0; i < files.length; i++) {
+        btn.textContent = `⏳ 处理图片 (${i + 1}/${files.length})...`;
+        const compressed = await compressImage(files[i]);
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.jpg`; 
+        
+        const { error } = await supabase.storage.from('product-images').upload(fileName, compressed, {
+          cacheControl: '3600', upsert: false, contentType: 'image/jpeg'
+        });
+        if (error) throw error;
+
+        const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
+        newUrls.push(urlData.publicUrl);
+      }
+
+      // 2. 合并图片数组 (老图 + 新图)
+      const finalImages = [...oldUrls, ...newUrls];
+      
+      // 3. 准备数据库数据
+      const dbData = {
+        name: name,
+        category: document.getElementById(isEdit ? 'eCategory' : 'fCategory').value,
+        price: parseFloat(document.getElementById(isEdit ? 'ePrice' : 'fPrice').value) || 0,
+        description: document.getElementById(isEdit ? 'eDesc' : 'fDesc').value,
+        cover: finalImages[0],
+        images: finalImages
+      };
+
+      btn.textContent = '⏳ 正在保存数据...';
+      
+      let dbError;
+      if (isEdit) {
+        // 更新模式
+        const { error } = await supabase.from('products').update(dbData).eq('id', currentEditId);
+        dbError = error;
+      } else {
+        // 添加模式
+        const { error } = await supabase.from('products').insert([dbData]);
+        dbError = error;
+      }
+
+      if (dbError) throw dbError;
+
+      showToast(isEdit ? '✅ 修改成功！' : '✅ 上传成功！');
+      
+      if (!isEdit) {
+        // 清空添加表单
+        document.getElementById('fName').value = '';
+        document.getElementById('fDesc').value = '';
+        document.getElementById('fPrice').value = '0';
+        addFiles = [];
+        renderAddPreviews();
+      } else {
+        // 返回列表
+        switchTab('manage');
+      }
+
+    } catch (err) {
+      console.error(err);
+      showToast('❌ 失败: ' + (err.message || '请检查网络'));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = isEdit ? '💾 保存修改' : '🚀 保存并上传到云端';
+    }
+  }
+
+  // --- 删除产品 ---
+  async function deleteProduct() {
+    if (!confirm('确定要彻底删除这个产品吗？此操作无法恢复！')) return;
+    
+    const btn = document.getElementById('updateBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ 正在删除...';
+
+    try {
+      const { error } = await supabase.from('products').delete().eq('id', currentEditId);
+      if (error) throw error;
+      showToast('✅ 产品已删除');
+      switchTab('manage');
+    } catch (err) {
+      showToast('❌ 删除失败: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '💾 保存修改';
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>

@@ -193,7 +193,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
     返回
   </a>
   <span class="topbar-title">✦ 管理后台 ✦</span>
-  <div class="topbar-right"><a id="logoutBtn" title="清除Token">清除密码</a></div>
+  <div class="topbar-right"><a id="logoutBtn" title="清除Token">🔑</a></div>
 </div>
 
 <!-- Toast -->
@@ -216,17 +216,17 @@ select.form-input{appearance:none;-webkit-appearance:none;
   <!-- 首次设置 -->
   <div class="setup-card" id="setupCard">
     <h2 id="setupTitle">⚙️ 首次设置</h2>
-    <p>初次进入管理后台需联系管理员要管理密码。</p>
+    <p>管理后台通过 GitHub API 更新产品数据。<br>需要创建一个有 <code>repo</code> 权限的 Token。</p>
     <ol>
-      <li>第一次登录成功后后续不需要再输入密码</li>
-      <li>点击右上角清除密码后下次登录需输入密码"</li>
-      <li>要到管理员密码后</li>
+      <li>打开 <a href="https://github.com/settings/tokens" target="_blank">GitHub Token 页面</a></li>
+      <li>点击 "Generate new token (classic)"</li>
+      <li>勾选 <code>repo</code> 权限，生成 Token</li>
       <li>粘贴到下方输入框</li>
     </ol>
     <div class="form-group">
       <input type="password" class="form-input" id="tokenInput" placeholder="粘贴 GitHub Token (ghp_xxxx...)">
       <label class="token-toggle">
-        <input type="checkbox" id="tokenShow"> 显示密码
+        <input type="checkbox" id="tokenShow"> 显示Token
       </label>
     </div>
     <button class="btn btn-primary" id="saveTokenBtn">💾 保存Token并开始</button>

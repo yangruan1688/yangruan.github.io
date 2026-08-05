@@ -215,7 +215,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
   <!-- 首次设置 -->
   <div class="setup-card" id="setupCard">
-    <h2>⚙️ 首次设置</h2>
+    <h2 id="setupTitle">⚙️ 首次设置</h2>
     <p>管理后台通过 GitHub API 更新产品数据。<br>需要创建一个有 <code>repo</code> 权限的 Token。</p>
     <ol>
       <li>打开 <a href="https://github.com/settings/tokens" target="_blank">GitHub Token 页面</a></li>
@@ -339,7 +339,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
         cancelEditBtn=$('cancelEditBtn'), productList=$('productList'), productCount=$('productCount'),
         refreshBtn=$('refreshBtn'), purgeCdnBtn=$('purgeCdnBtn'), changeTokenBtn=$('changeTokenBtn'),
         progressWrap=$('progressWrap'), progressBar=$('progressBar'), progressText=$('progressText'),
-        toastEl=$('toast'), confirmModal=$('confirmModal');
+        toastEl=$('toast'), confirmModal=$('confirmModal'), setupTitle=$('setupTitle');
 
   // ============================
   //   状态
@@ -352,6 +352,15 @@ select.form-input{appearance:none;-webkit-appearance:none;
   // ============================
   //   工具函数
   // ============================
+  
+  // 🛡️ 安全修复：增加 HTML 转义函数，防止 XSS 攻击
+  function escapeHTML(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
+
   function showToast(msg, type='info', duration=2500){
     toastEl.textContent = msg;
     toastEl.className = 'toast ' + type + ' show';
@@ -376,7 +385,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
     cancel.onclick = cleanup;
   }
 
-  // ✅ 修复：增加 .trim() 去除首尾空格
   function getToken(){ return (localStorage.getItem(TOKEN_KEY) || '').trim(); }
   function setToken(t){ localStorage.setItem(TOKEN_KEY, t.trim()); }
   function removeToken(){ localStorage.removeItem(TOKEN_KEY); }
@@ -416,7 +424,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
   async function fetchProductsFromGitHub(){
     const token = getToken();
     const res = await fetch(GITHUB_API + '?t=' + Date.now(), {
-      // ✅ 修复：使用 Bearer
       headers: { 'Authorization': 'Bearer ' + token }
     });
     if(res.status === 404) return { products: [], sha: null };
@@ -442,7 +449,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
     const res = await fetch(GITHUB_API, {
       method: 'PUT',
       headers: {
-        // ✅ 修复：使用 Bearer
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
@@ -451,7 +457,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
     if(!res.ok){
       const errData = await res.json().catch(()=>({}));
-      // ✅ 修复：增加详细错误提示
       if(res.status === 401) throw new Error('Token 无效或已过期，请点击右上角🔑重新配置');
       if(res.status === 403) throw new Error('Token 权限不足，请确保生成时勾选了 repo 权限');
       if(res.status === 404) throw new Error('找不到仓库，请检查代码顶部的仓库名配置');
@@ -478,7 +483,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
     const res = await fetch(apiUrl, {
       method: 'PUT',
       headers: {
-        // ✅ 修复：使用 Bearer
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
@@ -487,7 +491,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
     if(!res.ok){
       const err = await res.json().catch(()=>({}));
-      // ✅ 修复：增加详细错误提示
       if(res.status === 401) throw new Error('Token 无效，请重新配置');
       if(res.status === 403) throw new Error('Token 缺少 repo 权限');
       throw new Error(err.message || '图片上传失败 (HTTP ' + res.status + ')');
@@ -502,18 +505,15 @@ select.form-input{appearance:none;-webkit-appearance:none;
     const filePath = `${IMAGES_DIR}/${fileName}`;
     const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}`;
 
-    // 先获取文件 sha
     const getRes = await fetch(apiUrl, {
-      // ✅ 修复：使用 Bearer
       headers: { 'Authorization': 'Bearer ' + token }
     });
-    if(!getRes.ok) return; // 文件不存在则跳过
+    if(!getRes.ok) return; 
     const fileData = await getRes.json();
 
     const res = await fetch(apiUrl, {
       method: 'DELETE',
       headers: {
-        // ✅ 修复：使用 Bearer
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
@@ -529,7 +529,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
     }
   }
 
-  // 从 CDN URL 提取文件名
   function extractFileName(cdnUrl){
     if(!cdnUrl) return null;
     const parts = cdnUrl.split('/');
@@ -560,12 +559,14 @@ select.form-input{appearance:none;-webkit-appearance:none;
       return;
     }
     const sorted = [...products].sort((a,b) => b.id - a.id);
+    
+    // 🛡️ 安全修复：对所有用户输入的数据使用 escapeHTML 进行转义
     productList.innerHTML = sorted.map(p => `
       <div class="product-item">
-        <div class="pi-img"><img src="${p.cover}" alt="${p.name}" loading="lazy"></div>
+        <div class="pi-img"><img src="${escapeHTML(p.cover)}" alt="${escapeHTML(p.name)}" loading="lazy"></div>
         <div class="pi-info">
-          <div class="pi-name">${p.name}</div>
-          <div class="pi-meta">${p.category} · ¥${p.price.toFixed(1)} · ${p.images ? p.images.length : 0}图</div>
+          <div class="pi-name">${escapeHTML(p.name)}</div>
+          <div class="pi-meta">${escapeHTML(p.category)} · ¥${Number(p.price).toFixed(1)} · ${p.images ? p.images.length : 0}图</div>
         </div>
         <div class="pi-actions">
           <button onclick="window._admin.editProduct(${p.id})">编辑</button>
@@ -579,9 +580,10 @@ select.form-input{appearance:none;-webkit-appearance:none;
   //   图片预览
   // ============================
   function renderImagePreviews(){
+    // 🛡️ 安全修复：转义图片 src
     previewGrid.innerHTML = images.map((img, i) => `
       <div class="preview-item">
-        <img src="${img.src}" alt="图片${i+1}">
+        <img src="${escapeHTML(img.src)}" alt="图片${i+1}">
         <button class="remove-btn" onclick="window._admin.removeImage(${i})">×</button>
         ${i === 0 ? '<div class="cover-badge">封面</div>' : ''}
       </div>
@@ -631,12 +633,12 @@ select.form-input{appearance:none;-webkit-appearance:none;
       const p = products.find(x => x.id === id);
       if(!p) return;
       editId.value = id;
+      // 赋值给 value 属性是安全的，浏览器会自动处理特殊字符
       pName.value = p.name;
       pPrice.value = p.price;
       pCategory.value = p.category;
       pDesc.value = p.description || '';
       
-      // 加载已有图片（标记为旧图）
       images = (p.images || []).map(url => ({
         src: url,
         isNew: false,
@@ -659,7 +661,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
         try {
           showProgress(30, '正在删除图片...');
           
-          // 删除图片文件
           if(p.images && p.images.length > 0){
             for(let i = 0; i < p.images.length; i++){
               const fileName = extractFileName(p.images[i]);
@@ -706,15 +707,12 @@ select.form-input{appearance:none;-webkit-appearance:none;
       let uploadCount = 0;
       const newImages = images.filter(img => img.isNew);
 
-      // 上传新图片
       for(let i = 0; i < images.length; i++){
         const img = images[i];
         
         if(!img.isNew){
-          // 旧图直接用
           finalImageUrls.push(img.src);
         } else {
-          // 新图需要上传
           uploadCount++;
           showProgress(20 + (uploadCount / newImages.length * 50), 
             `上传图片 ${uploadCount}/${newImages.length}...`);
@@ -731,7 +729,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
       showProgress(80, '保存产品数据...');
 
       if(eId){
-        // 编辑模式：找出被删除的旧图
         const id = parseInt(eId);
         const idx = products.findIndex(x => x.id === id);
         if(idx < 0) throw new Error('产品不存在');
@@ -739,7 +736,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
         const oldImages = products[idx].images || [];
         const deletedImages = oldImages.filter(url => !finalImageUrls.includes(url));
         
-        // 删除不再使用的旧图
         if(deletedImages.length > 0){
           showProgress(85, '清理旧图片...');
           for(const url of deletedImages){
@@ -755,7 +751,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
         products[idx].cover = finalImageUrls[0];
         products[idx].images = [...finalImageUrls];
       } else {
-        // 新增模式
         const maxId = products.reduce((m, p) => Math.max(m, p.id || 0), 0);
         products.push({
           id: maxId + 1,
@@ -819,6 +814,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
         removeToken();
         mainPanel.style.display = 'none';
         setupCard.style.display = 'block';
+        setupTitle.textContent = '⚙️ 首次设置'; // 恢复标题
         tokenInput.value = '';
         showToast('Token 已清除', 'info');
       });
@@ -872,13 +868,17 @@ select.form-input{appearance:none;-webkit-appearance:none;
       this.textContent = '⚡ 刷新CDN缓存';
     });
 
+    // 🛡️ 体验优化：废弃难用的 prompt，改为复用顶部的设置卡片
     changeTokenBtn.addEventListener('click', function(){
-      const t = prompt('请输入新的 GitHub Token：');
-      if(t && t.trim()){
-        setToken(t.trim());
-        showToast('Token 已更新', 'success');
-        loadProducts();
-      }
+      showConfirm('更换 Token', '确定要更换 Token 吗？当前 Token 将被清除。', (ok) => {
+        if(!ok) return;
+        removeToken();
+        mainPanel.style.display = 'none';
+        setupCard.style.display = 'block';
+        setupTitle.textContent = '🔑 更换 Token';
+        tokenInput.value = '';
+        showToast('请输入新的 Token', 'info');
+      });
     });
   }
 

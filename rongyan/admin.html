@@ -3,748 +3,795 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>绒颜 · 手机管理后台</title>
+<title>管理后台 · 绒颜</title>
 <link rel="icon" href="../logo.jpg" type="image/jpeg">
-<script src="https://cdn.jsdelivr.net/npm/compressorjs@1.2.1/dist/compressor.min.js"></script>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  :root {
-    --primary: #b8860b; --bg: #f5f5f7; --card: #fff; --text: #1c1c1e;
-    --text2: #8e8e93; --border: #e5e5ea; --danger: #ff3b30; --success: #34c759;
-  }
-  body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; padding: 16px; padding-bottom: 100px; }
-  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .top-bar h2 { margin: 0; color: var(--primary); font-size: 20px; }
-  .top-bar-actions { display: flex; align-items: center; gap: 12px; }
-  .home-btn {
-    background: none; border: 1px solid var(--primary); color: var(--primary);
-    font-size: 14px; cursor: pointer; font-weight: 500; padding: 5px 12px;
-    border-radius: 6px; text-decoration: none; transition: all 0.2s;
-  }
-  .home-btn:active { opacity: 0.6; background: rgba(184,134,11,0.08); }
-  .logout-btn { background: none; border: none; color: var(--danger); font-size: 14px; cursor: pointer; font-weight: 500; }
-  .logout-btn:active { opacity: 0.6; }
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#b8860b;--primary-light:#d4a843;--bg:#faf8f5;--card-bg:#fff;
+  --text:#2c2c2c;--text-light:#888;--danger:#d9534f;--success:#5cb85c;
+  --radius:12px;--shadow:0 2px 16px rgba(0,0,0,0.07);
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',
+  'Hiragino Sans GB','Microsoft YaHei',sans-serif;
+  background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;
+  min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0)
+}
+a{color:var(--primary);text-decoration:none}
 
-  .auth-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 9999; padding: 20px;
-  }
-  .auth-box {
-    width: 100%; max-width: 350px; background: var(--card); padding: 30px 24px;
-    border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center;
-  }
-  .auth-box .lock-icon { font-size: 50px; margin-bottom: 16px; }
-  .auth-box h3 { font-size: 20px; margin-bottom: 8px; color: var(--text); }
-  .auth-box p { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
-  .auth-input {
-    width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 10px;
-    font-size: 16px; text-align: center; outline: none; margin-bottom: 12px; background: #fafafa;
-  }
-  .auth-input:focus { border-color: var(--primary); background: #fff; }
-  .auth-btn {
-    width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none;
-    border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 8px;
-  }
-  .auth-btn:active { transform: scale(0.96); }
-  .auth-btn:disabled { background: #ccc; }
+/* ===== 顶栏 ===== */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:900;height:52px;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.06);
+  display:flex;align-items:center;justify-content:space-between;padding:0 16px
+}
+.topbar a{display:flex;align-items:center;gap:6px;font-size:15px;color:var(--text);
+  padding:8px 12px 8px 4px;border-radius:8px;transition:background .2s}
+.topbar a:hover{background:rgba(0,0,0,.04)}
+.topbar a svg{width:20px;height:20px}
+.topbar-title{font-size:14px;font-weight:600;letter-spacing:2px;color:var(--primary)}
+.topbar-right{width:60px;text-align:right}
+.topbar-right a{font-size:13px;padding:6px 10px}
 
-  .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-  .tab {
-    flex: 1; padding: 12px; text-align: center; background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px; font-size: 16px; font-weight: 600; color: var(--text2); cursor: pointer; transition: all 0.2s;
-  }
-  .tab.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 10px rgba(184,134,11,0.3); }
-  
-  .form-group { margin-bottom: 18px; }
-  .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
-  .form-input, .form-select, .form-textarea {
-    width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 10px;
-    font-size: 16px; background: var(--card); outline: none; -webkit-appearance: none;
-  }
-  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--primary); }
-  .form-textarea { min-height: 80px; font-family: inherit; resize: vertical;}
-  
-  .upload-area {
-    border: 2px dashed var(--primary); border-radius: 12px; padding: 30px 10px; text-align: center;
-    background: #fffbf0; cursor: pointer; transition: all 0.2s;
-  }
-  .upload-area:active { transform: scale(0.98); background: #fff5e0;}
-  .upload-area .icon { font-size: 40px; }
-  .upload-area p { font-size: 14px; color: var(--text2); margin-top: 8px; }
-  .upload-area input { display: none; }
-  
-  .preview-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
-  .preview-item {
-    position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden;
-    background: #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-  .preview-item img { width: 100%; height: 100%; object-fit: cover; }
-  .preview-item .badge { position: absolute; top: 4px; left: 4px; background: var(--primary); color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
-  .preview-item .badge.new { background: var(--success); }
-  .preview-item .remove-btn {
-    position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; background: rgba(0,0,0,0.6);
-    color: #fff; border: none; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center;
-  }
+/* ===== 页面容器 ===== */
+.page{max-width:600px;margin:0 auto;padding:68px 16px 40px}
 
-  .btn {
-    width: 100%; padding: 16px; border: none; border-radius: 14px;
-    font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 10px;
-  }
-  .btn:active { transform: scale(0.96); }
-  .btn:disabled { background: #ccc !important; box-shadow: none !important; color: #999; }
-  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 20px rgba(184,134,11,0.4); }
-  .btn-danger { background: #fff; color: var(--danger); border: 1px solid var(--danger); }
-  .btn-back { background: #fff; color: var(--text); border: 1px solid var(--border); font-size: 16px; padding: 12px;}
+/* ===== 首次设置卡片 ===== */
+.setup-card{
+  background:var(--card-bg);border-radius:var(--radius);padding:28px 22px;
+  box-shadow:var(--shadow);margin-bottom:24px;text-align:center
+}
+.setup-card h2{font-size:18px;margin-bottom:6px}
+.setup-card p{font-size:13px;color:var(--text-light);margin-bottom:20px;line-height:1.7}
+.setup-card code{background:#f5f0e8;padding:1px 6px;border-radius:4px;font-size:12px}
+.setup-card ol{text-align:left;font-size:13px;color:#666;line-height:2;margin:0 0 20px 20px}
 
-  .product-list { display: flex; flex-direction: column; gap: 12px; }
-  .product-card {
-    display: flex; align-items: center; gap: 12px; background: var(--card); padding: 12px;
-    border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.2s;
-  }
-  .product-card:active { transform: scale(0.98); background: #fafafa; }
-  .product-card img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; background: #eee;}
-  .product-info { flex: 1; }
-  .product-info h3 { font-size: 16px; margin-bottom: 4px; }
-  .product-info p { font-size: 13px; color: var(--text2); }
+/* ===== 表单 ===== */
+.form-group{margin-bottom:18px;text-align:left}
+.form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.form-group .hint{font-size:11px;color:var(--text-light);margin-top:3px}
+.form-input{
+  width:100%;padding:10px 14px;border:1px solid rgba(0,0,0,.1);border-radius:10px;
+  font-size:14px;outline:none;transition:border-color .25s;background:#fff;
+  font-family:inherit
+}
+.form-input:focus{border-color:var(--primary)}
+textarea.form-input{min-height:80px;resize:vertical;line-height:1.6}
+select.form-input{appearance:none;-webkit-appearance:none;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;
+  padding-right:36px}
 
-  .toast {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.85); color: #fff; padding: 16px 28px; border-radius: 10px;
-    font-size: 15px; z-index: 99999; opacity: 0; transition: opacity 0.3s; pointer-events: none;
-    text-align: center; max-width: 80%;
-  }
-  .toast.show { opacity: 1; }
-  .hidden { display: none !important; }
+/* ===== 图片上传 ===== */
+.upload-area{
+  border:2px dashed rgba(0,0,0,.12);border-radius:var(--radius);padding:24px 16px;
+  text-align:center;cursor:pointer;transition:all .25s;position:relative;overflow:hidden
+}
+.upload-area:hover,.upload-area.dragover{border-color:var(--primary);background:rgba(184,134,11,.03)}
+.upload-area .upload-icon{font-size:36px;margin-bottom:8px}
+.upload-area .upload-text{font-size:13px;color:var(--text-light);line-height:1.6}
+.upload-area input[type="file"]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+
+.preview-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.preview-item{
+  position:relative;width:80px;height:80px;border-radius:8px;overflow:hidden;
+  box-shadow:0 1px 6px rgba(0,0,0,.1);flex-shrink:0
+}
+.preview-item img{width:100%;height:100%;object-fit:cover;display:block}
+.preview-item .remove-btn{
+  position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;
+  background:rgba(0,0,0,.55);color:#fff;border:none;cursor:pointer;
+  font-size:14px;display:flex;align-items:center;justify-content:center;line-height:1
+}
+.preview-item .cover-badge{
+  position:absolute;bottom:0;left:0;right:0;background:var(--primary);color:#fff;
+  font-size:10px;text-align:center;padding:2px 0;font-weight:600}
+.preview-item:first-child .cover-badge{display:block}
+
+/* ===== 按钮 ===== */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px 28px;border:none;border-radius:10px;font-size:15px;font-weight:600;
+  cursor:pointer;transition:all .25s;font-family:inherit;width:100%
+}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-light));
+  color:#fff;box-shadow:0 4px 16px rgba(184,134,11,.3)}
+.btn-primary:hover{box-shadow:0 6px 24px rgba(184,134,11,.4);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-sm{padding:8px 16px;font-size:13px;border-radius:8px;width:auto}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#c9302c}
+.btn-outline{background:transparent;border:1px solid rgba(0,0,0,.12);color:var(--text)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+
+/* ===== 产品列表 ===== */
+.section-card{
+  background:var(--card-bg);border-radius:var(--radius);padding:20px;
+  box-shadow:var(--shadow);margin-bottom:20px
+}
+.section-card h3{font-size:16px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-card h3 .count{
+  font-size:12px;background:rgba(184,134,11,.1);color:var(--primary);
+  padding:2px 10px;border-radius:20px;font-weight:500}
+
+.product-item{
+  display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05);
+  align-items:center
+}
+.product-item:last-child{border-bottom:none}
+.product-item .pi-img{
+  width:56px;height:56px;border-radius:8px;overflow:hidden;flex-shrink:0;
+  background:#f0ece6
+}
+.product-item .pi-img img{width:100%;height:100%;object-fit:cover}
+.product-item .pi-info{flex:1;min-width:0}
+.product-item .pi-name{font-size:14px;font-weight:600;margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.product-item .pi-meta{font-size:12px;color:var(--text-light)}
+.product-item .pi-actions{display:flex;gap:6px;flex-shrink:0}
+.product-item .pi-actions button{
+  padding:6px 10px;border:1px solid rgba(0,0,0,.08);border-radius:6px;
+  background:#fff;font-size:12px;cursor:pointer;transition:all .2s;
+  font-family:inherit
+}
+.product-item .pi-actions button:hover{border-color:var(--primary);color:var(--primary)}
+.product-item .pi-actions button.del-btn:hover{border-color:var(--danger);color:var(--danger)}
+
+.empty-msg{text-align:center;padding:30px;color:var(--text-light);font-size:13px}
+
+/* ===== Toast ===== */
+.toast{
+  position:fixed;top:64px;left:50%;transform:translateX(-50%) translateY(-120px);
+  z-index:9999;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:500;
+  box-shadow:0 4px 24px rgba(0,0,0,.15);transition:transform .35s cubic-bezier(.4,0,.2,1);
+  max-width:88vw;text-align:center;white-space:nowrap
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+.toast.error{background:#ffebee;color:#c62828;border:1px solid #ffcdd2}
+.toast.info{background:#fff8e1;color:#f57f17;border:1px solid #ffecb3}
+
+/* ===== 进度条 ===== */
+.progress-wrap{margin:16px 0;display:none}
+.progress-wrap.show{display:block}
+.progress-bar{height:4px;background:#eee;border-radius:2px;overflow:hidden}
+.progress-bar-inner{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-light));
+  width:0;transition:width .3s;border-radius:2px}
+.progress-text{font-size:12px;color:var(--text-light);margin-top:6px;text-align:center}
+
+/* ===== 确认弹窗 ===== */
+.modal-overlay{
+  position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.45);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;visibility:hidden;transition:all .25s
+}
+.modal-overlay.show{opacity:1;visibility:visible}
+.modal-box{
+  background:#fff;border-radius:16px;padding:28px 24px 20px;width:88%;max-width:340px;
+  box-shadow:0 12px 48px rgba(0,0,0,.15);transform:scale(.9);transition:transform .25s
+}
+.modal-overlay.show .modal-box{transform:scale(1)}
+.modal-box h3{font-size:16px;margin-bottom:8px}
+.modal-box p{font-size:13px;color:#666;margin-bottom:20px;line-height:1.6}
+.modal-actions{display:flex;gap:10px}
+.modal-actions .btn{flex:1}
+
+/* ===== 密码输入框 ===== */
+.token-toggle{
+  display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;
+  color:var(--text-light);cursor:pointer
+}
+.token-toggle input{accent-color:var(--primary)}
+
+@media(max-width:480px){
+  .page{padding:60px 12px 30px}
+  .setup-card{padding:22px 16px}
+  .section-card{padding:16px 14px}
+  .preview-item{width:68px;height:68px}
+}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#d0c8b8;border-radius:3px}
 </style>
 </head>
 <body>
 
-<!-- 1. 密码验证遮罩层 -->
-<div id="authOverlay" class="auth-overlay">
-  <div class="auth-box">
-    <div class="lock-icon">🔒</div>
-    <h3>绒颜 · 管理后台</h3>
-    <p>请输入管理员账号、密码和 GitHub Token</p>
-    <input type="text" id="emailInput" class="auth-input" placeholder="管理员账号" autocomplete="off">
-    <input type="password" id="passwordInput" class="auth-input" placeholder="请输入密码" autocomplete="off">
-    <input type="password" id="tokenInput" class="auth-input" placeholder="GitHub Token (ghp_开头)" autocomplete="off">
-    <button class="auth-btn" id="loginBtn" onclick="doLogin()">验证并进入</button>
-  </div>
+<!-- 顶栏 -->
+<div class="topbar">
+  <a href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    返回
+  </a>
+  <span class="topbar-title">✦ 管理后台 ✦</span>
+  <div class="topbar-right"><a href="#" id="logoutBtn" title="清除Token">🔑</a></div>
 </div>
 
-<!-- 2. 主应用内容 -->
-<div id="mainApp" style="display:none;">
-  <div class="top-bar">
-    <h2>📦 绒颜 · 管理后台</h2>
-    <div class="top-bar-actions">
-      <a href="index.html" class="home-btn">🏠 首页</a>
-      <button class="logout-btn" onclick="doLogout()">退出登录</button>
-    </div>
-  </div>
-
-  <div class="tabs" id="mainTabs">
-    <button class="tab active" onclick="switchTab('add')">➕ 添加产品</button>
-    <button class="tab" onclick="switchTab('manage')">✏️ 管理产品</button>
-  </div>
-
-  <!-- 视图：添加产品 -->
-  <div id="view-add">
-    <div class="form-group">
-      <label class="form-label">产品名称 *</label>
-      <input type="text" class="form-input" id="fName" placeholder="例：绒花｜紫玉">
-    </div>
-    <div class="form-group">
-      <label class="form-label">分类 *</label>
-      <select class="form-select" id="fCategory">
-        <option value="发饰">发饰</option><option value="耳饰">耳饰</option>
-        <option value="胸饰">胸饰</option><option value="头饰">头饰</option><option value="其他">其他</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">价格（元）</label>
-      <input type="number" class="form-input" id="fPrice" value="0" min="0" step="0.1">
-    </div>
-    <div class="form-group">
-      <label class="form-label">描述</label>
-      <textarea class="form-textarea" id="fDesc" placeholder="产品描述、材质、尺寸等..."></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">产品图片（可多选，第一张为封面，自动压缩）</label>
-      <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-        <div class="icon">📷</div>
-        <p>点击这里，从手机相册选图</p>
-        <input type="file" id="fileInput" multiple accept="image/*">
-      </div>
-      <div class="preview-list" id="previewList"></div>
-    </div>
-    <button class="btn btn-primary" id="submitBtn" onclick="submitProduct('add')">🚀 保存并上传到 GitHub</button>
-  </div>
-
-  <!-- 视图：管理产品列表 -->
-  <div id="view-manage" class="hidden">
-    <div class="product-list" id="productList">
-      <p style="text-align:center; color:#999; padding:40px 0;">加载中...</p>
-    </div>
-  </div>
-
-  <!-- 视图：编辑产品 -->
-  <div id="view-edit" class="hidden">
-    <button class="btn btn-back" onclick="switchTab('manage')">← 返回产品列表</button>
-    <div style="height: 16px;"></div>
-    <div class="form-group">
-      <label class="form-label">产品名称 *</label>
-      <input type="text" class="form-input" id="eName">
-    </div>
-    <div class="form-group">
-      <label class="form-label">分类 *</label>
-      <select class="form-select" id="eCategory">
-        <option value="发饰">发饰</option><option value="耳饰">耳饰</option><option value="胸饰">胸饰</option><option value="头饰">头饰</option><option value="其他">其他</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">价格（元）</label>
-      <input type="number" class="form-input" id="ePrice" min="0" step="0.1">
-    </div>
-    <div class="form-group">
-      <label class="form-label">描述</label>
-      <textarea class="form-textarea" id="eDesc"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">产品图片（点击 × 删除老图，或上传新图）</label>
-      <div class="upload-area" onclick="document.getElementById('editFileInput').click()">
-        <div class="icon">📷</div>
-        <p>点击补充新图片</p>
-        <input type="file" id="editFileInput" multiple accept="image/*">
-      </div>
-      <div class="preview-list" id="editPreviewList"></div>
-    </div>
-    <button class="btn btn-primary" id="updateBtn" onclick="submitProduct('edit')">💾 保存修改</button>
-    <button class="btn btn-danger" onclick="deleteProduct()">🗑️ 彻底删除此产品</button>
-  </div>
-</div>
-
+<!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<!-- 确认弹窗 -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <h3 id="confirmTitle">确认操作</h3>
+    <p id="confirmMsg"></p>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" id="confirmCancel">取消</button>
+      <button class="btn btn-danger btn-sm" id="confirmOk">确认</button>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ========== 首次设置 ========== -->
+  <div class="setup-card" id="setupCard">
+    <h2>⚙️ 首次设置</h2>
+    <p>管理后台通过 GitHub API 更新产品数据。<br>需要创建一个有 <code>repo</code> 权限的 Token。</p>
+    <ol>
+      <li>打开 <a href="https://github.com/settings/tokens" target="_blank">GitHub Token 页面</a></li>
+      <li>点击 "Generate new token (classic)"</li>
+      <li>勾选 <code>repo</code> 权限，生成 Token</li>
+      <li>粘贴到下方输入框</li>
+    </ol>
+    <div class="form-group">
+      <input type="password" class="form-input" id="tokenInput"
+             placeholder="粘贴 GitHub Token (ghp_xxxx...)">
+      <label class="token-toggle">
+        <input type="checkbox" id="tokenShow"> 显示Token
+      </label>
+    </div>
+    <button class="btn btn-primary" id="saveTokenBtn">💾 保存Token并开始</button>
+  </div>
+
+  <!-- ========== 主面板（Token已设置后显示） ========== -->
+  <div id="mainPanel" style="display:none">
+
+    <!-- 添加产品 -->
+    <div class="section-card">
+      <h3>📦 <span id="formTitle">添加产品</span></h3>
+
+      <input type="hidden" id="editId" value="">
+
+      <div class="form-group">
+        <label>产品名称 *</label>
+        <input type="text" class="form-input" id="pName" placeholder="如：珍珠花朵发夹">
+      </div>
+
+      <div class="form-group">
+        <label>价格 (元) *</label>
+        <input type="number" class="form-input" id="pPrice" placeholder="如：39.9" step="0.1" min="0">
+      </div>
+
+      <div class="form-group">
+        <label>分类 *</label>
+        <select class="form-input" id="pCategory">
+          <option value="发饰">💇‍♀️ 发饰</option>
+          <option value="耳饰">✨ 耳饰</option>
+          <option value="胸饰">🌸 胸饰</option>
+          <option value="其他">🎁 其他</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>产品描述</label>
+        <textarea class="form-input" id="pDesc" placeholder="描述产品的材质、工艺、适用场景等..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>产品图片 * <span style="font-weight:400;color:var(--text-light)">（第一张为封面，点击可删除）</span></label>
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="fileInput" accept="image/*" multiple>
+          <div class="upload-icon">📷</div>
+          <div class="upload-text">
+            点击或拖放图片到这里<br>
+            <span style="font-size:11px">支持 JPG / PNG / WEBP，建议正方形</span>
+          </div>
+        </div>
+        <div class="preview-grid" id="previewGrid"></div>
+      </div>
+
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-bar"><div class="progress-bar-inner" id="progressBar"></div></div>
+        <div class="progress-text" id="progressText">处理中...</div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:6px">
+        <button class="btn btn-primary" id="submitBtn">📤 添加产品</button>
+        <button class="btn btn-outline" id="cancelEditBtn" style="display:none;width:auto;padding:12px 20px">取消</button>
+      </div>
+    </div>
+
+    <!-- 产品列表 -->
+    <div class="section-card">
+      <h3>📋 产品列表 <span class="count" id="productCount">0 件</span></h3>
+      <div id="productList">
+        <div class="empty-msg">加载中...</div>
+      </div>
+    </div>
+
+    <!-- 数据管理 -->
+    <div class="section-card">
+      <h3>🔧 数据管理</h3>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn btn-outline btn-sm" id="refreshBtn">🔄 刷新产品数据</button>
+        <button class="btn btn-outline btn-sm" id="changeTokenBtn">🔑 更换Token</button>
+        <div style="font-size:11px;color:var(--text-light);text-align:center;margin-top:4px">
+          数据文件：products.json · 通过 GitHub API 更新<br>
+          CDN 缓存约 5~10 分钟自动刷新
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /mainPanel -->
+
+</div><!-- /page -->
+
 <script>
-  // ==========================================
-  // 🔐 安全配置（源码中不含任何明文密码和 Token）
-  // ==========================================
-  const GITHUB_CONFIG = {
-    owner: 'yangruan1688',
-    repo: 'yangruan.github.io',
-    branch: 'main',
-    imageDir: 'images',
-    dataFile: 'products.json'
-  };
+(function(){
+  // ============================
+  //   配 置（与 index/detail 保持一致）
+  // ============================
+  const GITHUB_OWNER  = 'yangruan1688';
+  const GITHUB_REPO   = 'yangruan.github.io';
+  const GITHUB_BRANCH = 'main';
+  const PRODUCTS_FILE = 'rongyan/products.json';  // 文件在仓库中的路径
 
-  // 管理员账号（用户名不涉及敏感信息，可保留）
-  const ADMIN_USER = 'admin';
+  const GITHUB_API    = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${PRODUCTS_FILE}`;
+  const CDN_URL       = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_FILE}`;
+  const TOKEN_KEY     = 'rongyan_admin_token';
 
-  // 管理员密码的 SHA-256 哈希值（原文不会出现在代码中）
-  // 如需修改密码，在浏览器控制台运行：
-  //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('你的新密码'))
-  //     .then(h => console.log(Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('')))
-  // 然后把输出的哈希值粘贴到下面
-  const ADMIN_PASS_HASH = '6a059d52b6c21e14875e9748a5b9d6a4496c3a6b3b4c5d6e7f8a9b0c1d2e3f4a5';
-  // ⚠️ 上面是示例哈希值！请先用下面的方法生成你真实密码的哈希再替换！
+  // ============================
+  //   DOM
+  // ============================
+  const $ = id => document.getElementById(id);
+  const setupCard     = $('setupCard');
+  const mainPanel     = $('mainPanel');
+  const tokenInput    = $('tokenInput');
+  const tokenShow     = $('tokenShow');
+  const saveTokenBtn  = $('saveTokenBtn');
+  const logoutBtn     = $('logoutBtn');
+  const formTitle     = $('formTitle');
+  const editId        = $('editId');
+  const pName         = $('pName');
+  const pPrice        = $('pPrice');
+  const pCategory     = $('pCategory');
+  const pDesc         = $('pDesc');
+  const fileInput     = $('fileInput');
+  const uploadArea    = $('uploadArea');
+  const previewGrid   = $('previewGrid');
+  const submitBtn     = $('submitBtn');
+  const cancelEditBtn = $('cancelEditBtn');
+  const productList   = $('productList');
+  const productCount  = $('productCount');
+  const refreshBtn    = $('refreshBtn');
+  const changeTokenBtn= $('changeTokenBtn');
+  const progressWrap  = $('progressWrap');
+  const progressBar   = $('progressBar');
+  const progressText  = $('progressText');
+  const toast         = $('toast');
+  const confirmModal  = $('confirmModal');
 
-  // 从 localStorage 读取 GitHub Token（登录时存入）
-  function getGithubToken() {
-    return localStorage.getItem('rongyan_github_token') || '';
+  // ============================
+  //   状态
+  // ============================
+  let products      = [];
+  let images        = [];   // 当前表单中的图片 (data URL)
+  let fileSha       = null; // products.json 在 GitHub 上的 sha
+  let isSubmitting  = false;
+
+  // ============================
+  //   工具函数
+  // ============================
+  function showToast(msg, type='info', duration=2500){
+    toast.textContent = msg;
+    toast.className = 'toast ' + type + ' show';
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=> toast.classList.remove('show'), duration);
   }
 
-  // ==========================================
-  // 🔧 GitHub API 工具函数
-  // ==========================================
-  const API_BASE = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`;
-  const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}`;
+  function showProgress(pct, text){
+    progressWrap.classList.add('show');
+    progressBar.style.width = pct + '%';
+    if(text) progressText.textContent = text;
+  }
+  function hideProgress(){ progressWrap.classList.remove('show'); progressBar.style.width='0'; }
 
-  function githubHeaders() {
-    return {
-      'Authorization': 'Bearer ' + getGithubToken(),
-      'Accept': 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json',
-      'X-GitHub-Api-Version': '2022-11-28'
-    };
+  function showConfirm(title, msg, callback){
+    $('confirmTitle').textContent = title;
+    $('confirmMsg').textContent = msg;
+    confirmModal.classList.add('show');
+    const ok = $('confirmOk'), cancel = $('confirmCancel');
+    const cleanup = ()=>{ confirmModal.classList.remove('show'); ok.onclick=null; cancel.onclick=null; };
+    ok.onclick = ()=>{ cleanup(); callback(true); };
+    cancel.onclick = cleanup;
   }
 
-  // 验证 Token 是否有效（调用 GitHub API 测试）
-  async function verifyToken(token) {
-    try {
-      const res = await fetch('https://api.github.com/user', {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
-      if (!res.ok) return false;
-      const data = await res.json();
-      return data.login || false;
-    } catch {
-      return false;
-    }
-  }
+  function getToken(){ return localStorage.getItem(TOKEN_KEY); }
+  function setToken(t){ localStorage.setItem(TOKEN_KEY, t); }
+  function removeToken(){ localStorage.removeItem(TOKEN_KEY); }
 
-  // 获取文件内容和 SHA（用于更新）
-  async function getFileFromGithub(filePath) {
-    const res = await fetch(`${API_BASE}/contents/${filePath}?ref=${GITHUB_CONFIG.branch}`, {
-      headers: githubHeaders()
-    });
-    if (res.status === 404) return null;
-    if (!res.ok) throw new Error(`GitHub API 错误: ${res.status}`);
-    const data = await res.json();
-    return {
-      content: atob(data.content.replace(/\n/g, '')),
-      sha: data.sha
-    };
-  }
-
-  // 上传/更新文件到 GitHub
-  async function uploadFileToGithub(filePath, base64Content, message, existingSha) {
-    const body = {
-      message: message,
-      content: base64Content,
-      branch: GITHUB_CONFIG.branch
-    };
-    if (existingSha) body.sha = existingSha;
-
-    const res = await fetch(`${API_BASE}/contents/${filePath}`, {
-      method: 'PUT',
-      headers: githubHeaders(),
-      body: JSON.stringify(body)
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `上传失败 (${res.status})`);
-    }
-    const data = await res.json();
-    return data.content.download_url;
-  }
-
-  // 删除 GitHub 上的文件
-  async function deleteFileFromGithub(filePath, sha, message) {
-    const res = await fetch(`${API_BASE}/contents/${filePath}`, {
-      method: 'DELETE',
-      headers: githubHeaders(),
-      body: JSON.stringify({
-        message: message,
-        sha: sha,
-        branch: GITHUB_CONFIG.branch
-      })
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      console.warn('删除文件失败:', err.message);
-    }
-  }
-
-  // 压缩图片 → base64
-  function compressImage(file) {
-    return new Promise((resolve, reject) => {
-      new Compressor(file, {
-        quality: 0.7, maxWidth: 1200, maxHeight: 1200,
-        mimeType: 'image/jpeg', convertSize: 1000000,
-        success: resolve, error: reject,
-      });
-    });
-  }
-
-  // 将 File/Blob 转为纯 base64 字符串（不含 data:image 前缀）
-  function blobToBase64(blob) {
-    return new Promise((resolve, reject) => {
+  // ============================
+  //   图片压缩（核心：手机端省流量）
+  // ============================
+  function compressImage(file, maxSize=800, quality=0.75){
+    return new Promise((resolve, reject)=>{
       const reader = new FileReader();
-      reader.onload = () => {
-        const base64 = reader.result.split(',')[1];
-        resolve(base64);
+      reader.onload = function(e){
+        const img = new Image();
+        img.onload = function(){
+          const canvas = document.createElement('canvas');
+          let w = img.width, h = img.height;
+          if(w > maxSize || h > maxSize){
+            if(w > h){ h = Math.round(h * maxSize / w); w = maxSize; }
+            else     { w = Math.round(w * maxSize / h); h = maxSize; }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
       };
       reader.onerror = reject;
-      reader.readAsDataURL(blob);
+      reader.readAsDataURL(file);
     });
   }
 
-  // ==========================================
-  // 📦 产品数据 CRUD（读写 products.json）
-  // ==========================================
-  let _productsCache = null;
-  let _productsSha = null;
+  // ============================
+  //   GitHub API
+  // ============================
+  async function fetchProductsFromGitHub(){
+    const token = getToken();
+    const res = await fetch(GITHUB_API + '?t=' + Date.now(), {
+      headers: { 'Authorization': 'token ' + token }
+    });
+    if(res.status === 404){
+      // 文件不存在
+      return { products: [], sha: null };
+    }
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    fileSha = data.sha;
+    const content = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+    return { products: Array.isArray(content) ? content : [], sha: data.sha };
+  }
 
-  async function loadProducts() {
-    const file = await getFileFromGithub(GITHUB_CONFIG.dataFile);
-    if (!file) {
-      _productsCache = [];
-      _productsSha = null;
+  async function fetchProductsFromCDN(){
+    try {
+      const res = await fetch(CDN_URL + '?t=' + Date.now());
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    } catch(e){
       return [];
     }
-    _productsCache = JSON.parse(file.content);
-    _productsSha = file.sha;
-    return _productsCache;
   }
 
-  async function saveProducts(products, commitMessage) {
-    const jsonStr = JSON.stringify(products, null, 2);
-    const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
-    await uploadFileToGithub(
-      GITHUB_CONFIG.dataFile,
-      base64,
-      commitMessage || '更新产品数据',
-      _productsSha
-    );
-    _productsCache = products;
-    const file = await getFileFromGithub(GITHUB_CONFIG.dataFile);
-    if (file) _productsSha = file.sha;
-  }
+  async function saveProductsToGitHub(updatedProducts){
+    const token = getToken();
+    const jsonStr = JSON.stringify(updatedProducts, null, 2);
+    const contentB64 = btoa(unescape(encodeURIComponent(jsonStr)));
 
-  function getNextId(products) {
-    if (products.length === 0) return 1;
-    return Math.max(...products.map(p => p.id)) + 1;
-  }
-
-  // ==========================================
-  // 🔐 登录验证（SHA-256 哈希比对 + Token 验证）
-  // ==========================================
-
-  // 计算 SHA-256 哈希
-  async function sha256(text) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(text);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
-  function checkAuth() {
-    const loggedIn = localStorage.getItem('rongyan_admin') === 'true';
-    const token = getGithubToken();
-    if (loggedIn && token) {
-      showMainApp();
-    } else {
-      document.getElementById('authOverlay').style.display = 'flex';
-      document.getElementById('mainApp').style.display = 'none';
-    }
-  }
-
-  async function doLogin() {
-    const user = document.getElementById('emailInput').value.trim();
-    const pwd = document.getElementById('passwordInput').value;
-    const token = document.getElementById('tokenInput').value.trim();
-
-    if (!user || !pwd) return showToast('⚠️ 请输入账号和密码');
-    if (!token) return showToast('⚠️ 请输入 GitHub Token');
-
-    const btn = document.getElementById('loginBtn');
-    btn.disabled = true;
-    btn.textContent = '验证中...';
-
-    try {
-      // 1. 验证密码（SHA-256 哈希比对）
-      const inputHash = await sha256(pwd);
-      if (user !== ADMIN_USER || inputHash !== ADMIN_PASS_HASH) {
-        showToast('❌ 账号或密码错误');
-        document.getElementById('passwordInput').value = '';
-        btn.disabled = false;
-        btn.textContent = '验证并进入';
-        return;
-      }
-
-      // 2. 验证 GitHub Token 是否有效
-      btn.textContent = '验证 Token 中...';
-      const githubUser = await verifyToken(token);
-      if (!githubUser) {
-        showToast('❌ GitHub Token 无效或已过期');
-        btn.disabled = false;
-        btn.textContent = '验证并进入';
-        return;
-      }
-
-      // 3. 验证通过，保存到 localStorage
-      localStorage.setItem('rongyan_admin', 'true');
-      localStorage.setItem('rongyan_github_token', token);
-      showToast('✅ 欢迎, ' + githubUser + '!');
-      showMainApp();
-    } catch (err) {
-      console.error('登录失败:', err);
-      showToast('❌ 登录异常: ' + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = '验证并进入';
-    }
-  }
-
-  function doLogout() {
-    localStorage.removeItem('rongyan_admin');
-    localStorage.removeItem('rongyan_github_token');
-    location.reload();
-  }
-
-  function showMainApp() {
-    document.getElementById('authOverlay').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-    initApp();
-  }
-
-  document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') document.getElementById('tokenInput').focus();
-  });
-  document.getElementById('emailInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') document.getElementById('passwordInput').focus();
-  });
-  document.getElementById('tokenInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') doLogin();
-  });
-
-  // ==========================================
-  // 📦 核心业务逻辑
-  // ==========================================
-  let addFiles = [], editFiles = [], existingUrls = [], currentEditId = null;
-
-  function initApp() {
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-      addFiles = addFiles.concat(Array.from(e.target.files));
-      renderAddPreviews();
-      e.target.value = '';
-    });
-
-    document.getElementById('editFileInput').addEventListener('change', function(e) {
-      editFiles = editFiles.concat(Array.from(e.target.files));
-      renderEditPreviews();
-      e.target.value = '';
-    });
-  }
-
-  function switchTab(tab) {
-    document.getElementById('view-add').classList.add('hidden');
-    document.getElementById('view-manage').classList.add('hidden');
-    document.getElementById('view-edit').classList.add('hidden');
-    document.getElementById('mainTabs').classList.remove('hidden');
-
-    if (tab === 'add') {
-      document.getElementById('view-add').classList.remove('hidden');
-      document.querySelectorAll('.tab')[0].classList.add('active');
-      document.querySelectorAll('.tab')[1].classList.remove('active');
-    } else if (tab === 'manage') {
-      document.getElementById('view-manage').classList.remove('hidden');
-      document.querySelectorAll('.tab')[0].classList.remove('active');
-      document.querySelectorAll('.tab')[1].classList.add('active');
-      loadProductList();
-    } else if (tab === 'edit') {
-      document.getElementById('view-edit').classList.remove('hidden');
-      document.getElementById('mainTabs').classList.add('hidden');
-    }
-  }
-
-  function renderAddPreviews() {
-    const list = document.getElementById('previewList');
-    list.innerHTML = '';
-    addFiles.forEach((file, i) => {
-      list.appendChild(createPreviewItem(URL.createObjectURL(file), i, 'add', i === 0));
-    });
-  }
-
-  function renderEditPreviews() {
-    const list = document.getElementById('editPreviewList');
-    list.innerHTML = '';
-    existingUrls.forEach((url, i) => {
-      list.appendChild(createPreviewItem(url, i, 'existing', i === 0 && editFiles.length === 0));
-    });
-    editFiles.forEach((file, i) => {
-      const isCover = (existingUrls.length === 0 && i === 0);
-      list.appendChild(createPreviewItem(URL.createObjectURL(file), i, 'edit', isCover));
-    });
-  }
-
-  function createPreviewItem(src, index, type, isCover) {
-    const div = document.createElement('div');
-    div.className = 'preview-item';
-    const img = document.createElement('img');
-    img.src = src;
-    div.appendChild(img);
-
-    if (isCover) {
-      const badge = document.createElement('span');
-      badge.className = 'badge';
-      badge.textContent = '封面';
-      div.appendChild(badge);
-    } else if (type === 'edit') {
-      const badge = document.createElement('span');
-      badge.className = 'badge new';
-      badge.textContent = '新增';
-      div.appendChild(badge);
-    }
-
-    const btn = document.createElement('button');
-    btn.className = 'remove-btn';
-    btn.innerHTML = '×';
-    btn.onclick = (ev) => { 
-      ev.stopPropagation(); 
-      if (type === 'add') { addFiles.splice(index, 1); renderAddPreviews(); }
-      else if (type === 'edit') { editFiles.splice(index, 1); renderEditPreviews(); }
-      else if (type === 'existing') { existingUrls.splice(index, 1); renderEditPreviews(); }
+    const body = {
+      message: 'update products via admin',
+      content: contentB64,
+      branch: GITHUB_BRANCH
     };
-    div.appendChild(btn);
-    return div;
-  }
+    if(fileSha) body.sha = fileSha;
 
-  async function loadProductList() {
-    const list = document.getElementById('productList');
-    list.innerHTML = '<p style="text-align:center; color:#999; padding:40px 0;">加载中...</p>';
-    
-    try {
-      const products = await loadProducts();
-      const sorted = [...products].sort((a, b) => b.id - a.id);
-      
-      list.innerHTML = '';
-      if (sorted.length === 0) {
-        list.innerHTML = '<p style="text-align:center; color:#999; padding:40px 0;">暂无产品，请先添加</p>';
-        return;
-      }
+    const res = await fetch(GITHUB_API, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
 
-      sorted.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.onclick = () => openEditForm(p);
-        card.innerHTML = `
-          <img src="${p.cover}" onerror="this.src='https://via.placeholder.com/60?text=No+Img'">
-          <div class="product-info">
-            <h3>${p.name}</h3>
-            <p>${p.category} · ¥${p.price} · ${p.images ? p.images.length : 0}张图</p>
-          </div>
-        `;
-        list.appendChild(card);
-      });
-    } catch (err) {
-      console.error('加载产品列表失败:', err);
-      list.innerHTML = '<p style="text-align:center; color:red;">加载失败: ' + err.message + '</p>';
+    if(!res.ok){
+      const errData = await res.json().catch(()=>({}));
+      throw new Error(errData.message || '保存失败 (HTTP ' + res.status + ')');
     }
+
+    const result = await res.json();
+    fileSha = result.content.sha;
+    return result;
   }
 
-  function openEditForm(product) {
-    currentEditId = product.id;
-    document.getElementById('eName').value = product.name;
-    document.getElementById('eCategory').value = product.category;
-    document.getElementById('ePrice').value = product.price;
-    document.getElementById('eDesc').value = product.description || '';
-    existingUrls = [...(product.images || [])];
-    editFiles = [];
-    renderEditPreviews();
-    switchTab('edit');
-  }
-
-  async function submitProduct(mode) {
-    const isEdit = mode === 'edit';
-    const name = document.getElementById(isEdit ? 'eName' : 'fName').value.trim();
-    if (!name) return showToast('⚠️ 请输入产品名称');
-    
-    const files = isEdit ? editFiles : addFiles;
-    const oldUrls = isEdit ? existingUrls : [];
-    if (files.length === 0 && oldUrls.length === 0) return showToast('⚠️ 请至少保留或上传一张图片');
-
-    const btn = document.getElementById(isEdit ? 'updateBtn' : 'submitBtn');
-    btn.disabled = true;
-
+  // ============================
+  //   加载产品列表
+  // ============================
+  async function loadProducts(){
+    productList.innerHTML = '<div class="empty-msg">加载中...</div>';
     try {
-      const newUrls = [];
-      for (let i = 0; i < files.length; i++) {
-        btn.textContent = `⏳ 上传图片 (${i + 1}/${files.length})...`;
+      // 优先从 GitHub API 获取（实时数据）
+      const result = await fetchProductsFromGitHub();
+      products = result.products;
+    } catch(e){
+      console.warn('GitHub API 加载失败，尝试 CDN:', e);
+      products = await fetchProductsFromCDN();
+      fileSha = null;
+    }
+    renderProductList();
+  }
+
+  function renderProductList(){
+    productCount.textContent = products.length + ' 件';
+    if(products.length === 0){
+      productList.innerHTML = '<div class="empty-msg">暂无产品，请添加第一个产品 ✨</div>';
+      return;
+    }
+    // 按 ID 降序（最新在前）
+    const sorted = [...products].sort((a,b) => b.id - a.id);
+    productList.innerHTML = sorted.map(p => `
+      <div class="product-item">
+        <div class="pi-img"><img src="${p.cover}" alt="${p.name}" loading="lazy"></div>
+        <div class="pi-info">
+          <div class="pi-name">${p.name}</div>
+          <div class="pi-meta">${p.category} · ¥${p.price.toFixed(1)} · ${p.images ? p.images.length : 0}图</div>
+        </div>
+        <div class="pi-actions">
+          <button onclick="window._admin.editProduct(${p.id})">编辑</button>
+          <button class="del-btn" onclick="window._admin.deleteProduct(${p.id})">删除</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ============================
+  //   图片预览管理
+  // ============================
+  function renderImagePreviews(){
+    previewGrid.innerHTML = images.map((src, i) => `
+      <div class="preview-item">
+        <img src="${src}" alt="图片${i+1}">
+        <button class="remove-btn" onclick="window._admin.removeImage(${i})">×</button>
+        ${i === 0 ? '<div class="cover-badge">封面</div>' : ''}
+      </div>
+    `).join('');
+  }
+
+  async function handleFiles(fileList){
+    const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+    if(!files.length) return;
+
+    for(let i = 0; i < files.length; i++){
+      showProgress(((i+1)/files.length*80).toFixed(0), `压缩图片 ${i+1}/${files.length}...`);
+      try {
         const compressed = await compressImage(files[i]);
-        const base64 = await blobToBase64(compressed);
-        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.jpg`;
-        const filePath = `${GITHUB_CONFIG.imageDir}/${fileName}`;
-        await uploadFileToGithub(filePath, base64, `上传图片: ${fileName}`, null);
-        const imageUrl = `https://cdn.jsdelivr.net/gh/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}@${GITHUB_CONFIG.branch}/${filePath}`;
-        newUrls.push(imageUrl);
+        images.push(compressed);
+      } catch(e){
+        console.error('图片压缩失败:', e);
+        showToast('图片压缩失败: ' + files[i].name, 'error');
       }
-
-      const finalImages = [...oldUrls, ...newUrls];
-      const productData = {
-        name: name,
-        category: document.getElementById(isEdit ? 'eCategory' : 'fCategory').value,
-        price: parseFloat(document.getElementById(isEdit ? 'ePrice' : 'fPrice').value) || 0,
-        description: document.getElementById(isEdit ? 'eDesc' : 'fDesc').value,
-        cover: finalImages[0],
-        images: finalImages
-      };
-
-      btn.textContent = '⏳ 正在保存产品数据...';
-      const products = await loadProducts();
-
-      if (isEdit) {
-        const idx = products.findIndex(p => p.id === currentEditId);
-        if (idx === -1) throw new Error('找不到要编辑的产品');
-        productData.id = currentEditId;
-        products[idx] = productData;
-        await saveProducts(products, `更新产品: ${name}`);
-      } else {
-        productData.id = getNextId(products);
-        products.push(productData);
-        await saveProducts(products, `新增产品: ${name}`);
-      }
-
-      showToast(isEdit ? '✅ 修改成功！' : '✅ 上传成功！');
-      if (!isEdit) {
-        document.getElementById('fName').value = '';
-        document.getElementById('fDesc').value = '';
-        document.getElementById('fPrice').value = '0';
-        addFiles = [];
-        renderAddPreviews();
-      } else {
-        switchTab('manage');
-      }
-    } catch (err) {
-      console.error(err);
-      showToast('❌ 失败: ' + (err.message || '请检查网络和 GitHub Token'));
-    } finally {
-      btn.disabled = false;
-      btn.textContent = isEdit ? '💾 保存修改' : '🚀 保存并上传到 GitHub';
     }
+    hideProgress();
+    renderImagePreviews();
   }
 
-  async function deleteProduct() {
-    if (!confirm('确定要彻底删除这个产品吗？此操作无法恢复！')) return;
-    const btn = document.getElementById('updateBtn');
-    btn.disabled = true;
-    btn.textContent = '⏳ 正在删除...';
-    try {
-      const products = await loadProducts();
-      const product = products.find(p => p.id === currentEditId);
-      const newProducts = products.filter(p => p.id !== currentEditId);
-      await saveProducts(newProducts, `删除产品: ${product ? product.name : currentEditId}`);
+  // ============================
+  //   表单操作
+  // ============================
+  function resetForm(){
+    editId.value = '';
+    pName.value = '';
+    pPrice.value = '';
+    pCategory.value = '发饰';
+    pDesc.value = '';
+    images = [];
+    renderImagePreviews();
+    formTitle.textContent = '添加产品';
+    submitBtn.innerHTML = '📤 添加产品';
+    cancelEditBtn.style.display = 'none';
+  }
 
-      if (product && product.images) {
-        for (const imgUrl of product.images) {
-          try {
-            const marker = `${GITHUB_CONFIG.repo}@${GITHUB_CONFIG.branch}/`;
-            const idx = imgUrl.indexOf(marker);
-            if (idx === -1) continue;
-            const filePath = imgUrl.substring(idx + marker.length);
-            const file = await getFileFromGithub(filePath);
-            if (file) {
-              await deleteFileFromGithub(filePath, file.sha, `删除图片: ${filePath}`);
-            }
-          } catch (e) {
-            console.warn('删除图片失败，跳过:', e.message);
-          }
+  window._admin = {
+    removeImage(idx){
+      images.splice(idx, 1);
+      renderImagePreviews();
+    },
+
+    editProduct(id){
+      const p = products.find(x => x.id === id);
+      if(!p) return;
+      editId.value = id;
+      pName.value = p.name;
+      pPrice.value = p.price;
+      pCategory.value = p.category;
+      pDesc.value = p.description || '';
+      images = [...(p.images || [])];
+      renderImagePreviews();
+      formTitle.textContent = '编辑产品 #' + id;
+      submitBtn.innerHTML = '💾 保存修改';
+      cancelEditBtn.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+
+    deleteProduct(id){
+      const p = products.find(x => x.id === id);
+      if(!p) return;
+      showConfirm('删除产品', `确定要删除「${p.name}」吗？此操作不可撤销。`, async(confirmed)=>{
+        if(!confirmed) return;
+        try {
+          showProgress(50, '正在删除...');
+          products = products.filter(x => x.id !== id);
+          await saveProductsToGitHub(products);
+          hideProgress();
+          showToast('已删除「' + p.name + '」', 'success');
+          renderProductList();
+        } catch(e){
+          hideProgress();
+          showToast('删除失败: ' + e.message, 'error');
         }
+      });
+    }
+  };
+
+  // ============================
+  //   提交（添加 / 编辑）
+  // ============================
+  async function handleSubmit(){
+    if(isSubmitting) return;
+
+    const name     = pName.value.trim();
+    const price    = parseFloat(pPrice.value);
+    const category = pCategory.value;
+    const desc     = pDesc.value.trim();
+    const eId      = editId.value;
+
+    // 验证
+    if(!name)     { showToast('请输入产品名称', 'error'); pName.focus(); return; }
+    if(isNaN(price) || price < 0) { showToast('请输入有效价格', 'error'); pPrice.focus(); return; }
+    if(images.length === 0) { showToast('请至少上传一张图片', 'error'); return; }
+
+    isSubmitting = true;
+    submitBtn.disabled = true;
+
+    try {
+      showProgress(30, '正在保存...');
+
+      if(eId){
+        // 编辑模式
+        const id = parseInt(eId);
+        const idx = products.findIndex(x => x.id === id);
+        if(idx < 0) throw new Error('产品不存在');
+        products[idx].name = name;
+        products[idx].price = price;
+        products[idx].category = category;
+        products[idx].description = desc;
+        products[idx].cover = images[0];
+        products[idx].images = [...images];
+      } else {
+        // 新增模式
+        const maxId = products.reduce((m, p) => Math.max(m, p.id || 0), 0);
+        const newProduct = {
+          id: maxId + 1,
+          name,
+          price,
+          category,
+          description: desc,
+          cover: images[0],
+          images: [...images]
+        };
+        products.push(newProduct);
       }
 
-      showToast('✅ 产品已删除');
-      switchTab('manage');
-    } catch (err) {
-      showToast('❌ 删除失败: ' + err.message);
+      showProgress(60, '正在上传到 GitHub...');
+      await saveProductsToGitHub(products);
+
+      showProgress(100, '完成！');
+      setTimeout(hideProgress, 800);
+
+      showToast(eId ? '产品已更新 ✅' : '产品已添加 ✅', 'success');
+      resetForm();
+      renderProductList();
+
+    } catch(e){
+      hideProgress();
+      showToast('保存失败: ' + e.message, 'error', 4000);
     } finally {
-      btn.disabled = false;
-      btn.textContent = '💾 保存修改';
+      isSubmitting = false;
+      submitBtn.disabled = false;
     }
   }
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
+  // ============================
+  //   初始化
+  // ============================
+  function init(){
+    // 检查 Token
+    const token = getToken();
+    if(token){
+      setupCard.style.display = 'none';
+      mainPanel.style.display = 'block';
+      loadProducts();
+    }
+
+    // Token 显示/隐藏
+    tokenShow.addEventListener('change', function(){
+      tokenInput.type = this.checked ? 'text' : 'password';
+    });
+
+    // 保存 Token
+    saveTokenBtn.addEventListener('click', function(){
+      const t = tokenInput.value.trim();
+      if(!t){ showToast('请输入 Token', 'error'); return; }
+      setToken(t);
+      setupCard.style.display = 'none';
+      mainPanel.style.display = 'block';
+      showToast('Token 已保存', 'success');
+      loadProducts();
+    });
+
+    // 退出（清除Token）
+    logoutBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      showConfirm('清除Token', '清除后需要重新输入 Token 才能使用管理功能。', (ok)=>{
+        if(!ok) return;
+        removeToken();
+        mainPanel.style.display = 'none';
+        setupCard.style.display = 'block';
+        tokenInput.value = '';
+        showToast('Token 已清除', 'info');
+      });
+    });
+
+    // 文件选择
+    fileInput.addEventListener('change', function(){
+      if(this.files.length) handleFiles(this.files);
+      this.value = ''; // 允许重复选择同一文件
+    });
+
+    // 拖放支持
+    uploadArea.addEventListener('dragover', function(e){
+      e.preventDefault();
+      this.classList.add('dragover');
+    });
+    uploadArea.addEventListener('dragleave', function(){
+      this.classList.remove('dragover');
+    });
+    uploadArea.addEventListener('drop', function(e){
+      e.preventDefault();
+      this.classList.remove('dragover');
+      if(e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+    });
+
+    // 提交
+    submitBtn.addEventListener('click', handleSubmit);
+
+    // 取消编辑
+    cancelEditBtn.addEventListener('click', resetForm);
+
+    // 刷新
+    refreshBtn.addEventListener('click', async function(){
+      this.disabled = true;
+      this.textContent = '⏳ 刷新中...';
+      await loadProducts();
+      this.disabled = false;
+      this.textContent = '🔄 刷新产品数据';
+      showToast('数据已刷新', 'success');
+    });
+
+    // 更换Token
+    changeTokenBtn.addEventListener('click', function(){
+      const t = prompt('请输入新的 GitHub Token：');
+      if(t && t.trim()){
+        setToken(t.trim());
+        showToast('Token 已更新', 'success');
+        loadProducts();
+      }
+    });
   }
 
-  checkAuth();
+  init();
+})();
 </script>
 </body>
 </html>

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>绒颜</title>
 <link rel="icon" href="../logo.jpg" type="image/jpeg">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -31,7 +30,6 @@
     overflow-x: hidden;
   }
 
-  /* ========== 顶部导航栏 ========== */
   .navbar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -57,11 +55,7 @@
     margin-bottom: 6px;
     text-transform: uppercase;
   }
-  .navbar-brand .brand-text {
-    flex: 1;
-    text-align: center;
-  }
-  /* ========== 左右按钮统一样式（三等分） ========== */
+  .navbar-brand .brand-text { flex: 1; text-align: center; }
   .nav-side-btn {
     flex: 1;
     display: inline-flex;
@@ -112,7 +106,6 @@
   .nav-btn.active { background: var(--primary); color: #fff; box-shadow: 0 2px 12px rgba(184,134,11,0.3); }
   .nav-btn .nav-icon { margin-right: 4px; font-size: 14px; }
 
-  /* ========== 排序搜索工具栏 ========== */
   .toolbar {
     position: fixed;
     top: 0;
@@ -148,7 +141,6 @@
   .toolbar-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(184,134,11,0.06); }
   .toolbar-btn .btn-icon { font-size: 14px; }
 
-  /* 排序下拉 */
   .sort-dropdown {
     position: absolute;
     top: calc(100% + 6px);
@@ -180,7 +172,6 @@
   .sort-dropdown .sort-option:hover { background: rgba(184,134,11,0.08); }
   .sort-dropdown .sort-option.active { color: var(--primary); font-weight: 600; }
 
-  /* 搜索框 */
   .search-container {
     flex: 1;
     display: flex;
@@ -228,7 +219,6 @@
   .search-clear.show { display: block; }
   .search-clear:hover { color: var(--text); }
 
-  /* ========== 手机小屏适配 ========== */
   @media (max-width: 480px) {
     .navbar { padding: 8px 8px 0; }
     .navbar-brand { font-size: 12px; letter-spacing: 4px; margin-bottom: 4px; }
@@ -237,15 +227,12 @@
     .navbar-categories { justify-content: flex-start; gap: 4px; }
     .nav-btn { padding: 4px 12px; font-size: 12px; }
     .nav-btn .nav-icon { font-size: 13px; margin-right: 2px; }
-    
     .toolbar { padding: 6px 10px; gap: 8px; }
     .toolbar-btn { padding: 5px 10px; font-size: 12px; }
-    
     .search-container.show { max-width: none; }
     .search-input { padding: 6px 32px 6px 12px; font-size: 12px; }
   }
 
-  /* ========== 产品展示区 ========== */
   .main-container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 60px; }
   .section-title { text-align: center; margin-bottom: 28px; font-size: 15px; color: var(--text-light); letter-spacing: 2px; }
   .section-title span { color: var(--primary); font-weight: 600; }
@@ -308,7 +295,6 @@
   </div>
 </nav>
 
-<!-- 排序搜索工具栏 -->
 <div class="toolbar" id="toolbar">
   <div style="position:relative; flex-shrink: 0;">
     <button class="toolbar-btn" id="sortBtn">
@@ -348,10 +334,13 @@
 
 <script>
 (function () {
-  // ⚠️⚠️⚠️ 这里也要填你的 Supabase 配置（和管理后台一样）⚠️⚠️⚠️
-  const SUPABASE_URL = 'https://nafoqfrghouuivgdngqz.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hZm9xZnJnaG91dWl2Z2RuZ3F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4OTgzODEsImV4cCI6MjEwMTQ3NDM4MX0.CgUylzQbItStoPhu2QmgBSCVy3WpCX7KNK_Gh6fpzLo';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // ⚠️⚠️⚠️ 修改为你自己的 GitHub 配置（只需要 owner、repo、branch）⚠️⚠️⚠️
+  const GITHUB_OWNER = 'yangruan1688';
+  const GITHUB_REPO  = 'yangruan.github.io';
+  const GITHUB_BRANCH = 'main';
+
+  // 产品数据的 CDN 地址（公开仓库无需 Token）
+  const PRODUCTS_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/products.json`;
 
   let allProducts = [];
   let currentCategory = '全部';
@@ -362,7 +351,6 @@
   const navContainer = document.getElementById('navCategories');
   const sectionTitle = document.getElementById('sectionTitle');
   const navbar = document.getElementById('navbar');
-
   const sortBtn = document.getElementById('sortBtn');
   const sortDropdown = document.getElementById('sortDropdown');
   const searchBtn = document.getElementById('searchBtn');
@@ -371,42 +359,44 @@
   const searchClear = document.getElementById('searchClear');
   const toolbar = document.getElementById('toolbar');
 
-  // ========== 动态计算工具栏位置 ==========
   function updateToolbarPosition() {
     const navH = navbar.offsetHeight;
     const toolH = toolbar.offsetHeight;
     toolbar.style.top = navH + 'px';
     document.body.style.paddingTop = (navH + toolH + 8) + 'px';
   }
-  
   updateToolbarPosition();
   window.addEventListener('resize', updateToolbarPosition);
   window.addEventListener('load', updateToolbarPosition);
 
-  // ========== 从 Supabase 云端加载数据 ==========
+  // ========== 从 GitHub 加载产品数据 ==========
   async function loadProducts() {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .order('id', { ascending: false });
-
-    if (error) {
-      grid.innerHTML = `
-        <div class="empty-state" style="grid-column:1/-1">
-          <div class="empty-icon">😢</div>
-          <p>产品加载失败，请检查网络连接</p>
-        </div>`;
-      return;
+    try {
+      // 加时间戳防缓存
+      const res = await fetch(PRODUCTS_URL + '?t=' + Date.now());
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      allProducts = data || [];
+      updateView();
+      updateToolbarPosition();
+    } catch (err) {
+      console.error('加载产品失败:', err);
+      // 如果 products.json 还不存在（首次使用），显示空状态
+      if (err.message.includes('404')) {
+        allProducts = [];
+        updateView();
+      } else {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1">
+            <div class="empty-icon">😢</div>
+            <p>产品加载失败，请检查网络连接</p>
+          </div>`;
+      }
     }
-
-    allProducts = data || [];
-    updateView();
-    updateToolbarPosition();
   }
 
   loadProducts();
 
-  // ========== 导航分类点击 ==========
   navContainer.addEventListener('click', function (e) {
     const btn = e.target.closest('.nav-btn');
     if (!btn) return;
@@ -417,7 +407,6 @@
     btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   });
 
-  // ========== 排序按钮 ==========
   sortBtn.addEventListener('click', function (e) {
     e.stopPropagation();
     sortDropdown.classList.toggle('show');
@@ -437,7 +426,6 @@
     updateToolbarPosition();
   });
 
-  // ========== 搜索按钮 ==========
   searchBtn.addEventListener('click', function (e) {
     e.stopPropagation();
     const isShowing = searchContainer.classList.contains('show');
@@ -453,7 +441,6 @@
     }
   });
 
-  // ========== 搜索输入（300ms 防抖） ==========
   let searchTimer = null;
   searchInput.addEventListener('input', function () {
     const val = this.value.trim();
@@ -465,7 +452,6 @@
     }, 300);
   });
 
-  // ========== 搜索清空按钮 ==========
   searchClear.addEventListener('click', function () {
     searchInput.value = '';
     currentSearch = '';
@@ -474,7 +460,6 @@
     updateView();
   });
 
-  // ========== 点击页面空白处关闭 ==========
   document.addEventListener('click', function (e) {
     if (!sortBtn.contains(e.target) && !sortDropdown.contains(e.target)) {
       sortDropdown.classList.remove('show');
@@ -486,7 +471,6 @@
     }
   });
 
-  // ========== Escape 键关闭 ==========
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
       if (searchContainer.classList.contains('show')) {
@@ -501,7 +485,6 @@
     }
   });
 
-  // ========== 核心：更新视图 ==========
   function updateView() {
     let products = currentCategory === '全部'
       ? [...allProducts]

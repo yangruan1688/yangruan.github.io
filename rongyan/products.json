@@ -13,7 +13,7 @@
       "id": 2,
       "name": "绒花｜彼岸花",
       "category": "发饰",
-      "price": "/"
+      "price": "/",
       "description": "彼岸花",
       "cover": "../img/dxh.webp",
       "images": ["../img/dxh.webp","../img/dp.webp"]

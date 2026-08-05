@@ -29,7 +29,6 @@
     padding-top: 130px;
     overflow-x: hidden;
   }
-
   .navbar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -75,7 +74,6 @@
   .nav-side-btn:hover { background: rgba(184,134,11,0.08); color: var(--primary-light); }
   .nav-side-btn .back-icon { margin-right: 3px; font-size: 16px; line-height: 1; }
   .nav-side-btn.right { justify-content: flex-end; }
-
   .navbar-categories {
     display: flex;
     justify-content: center;
@@ -105,7 +103,6 @@
   .nav-btn:hover { color: var(--primary); background: rgba(184,134,11,0.06); }
   .nav-btn.active { background: var(--primary); color: #fff; box-shadow: 0 2px 12px rgba(184,134,11,0.3); }
   .nav-btn .nav-icon { margin-right: 4px; font-size: 14px; }
-
   .toolbar {
     position: fixed;
     top: 0;
@@ -140,7 +137,6 @@
   .toolbar-btn:hover { border-color: var(--primary); color: var(--primary); }
   .toolbar-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(184,134,11,0.06); }
   .toolbar-btn .btn-icon { font-size: 14px; }
-
   .sort-dropdown {
     position: absolute;
     top: calc(100% + 6px);
@@ -171,7 +167,6 @@
   }
   .sort-dropdown .sort-option:hover { background: rgba(184,134,11,0.08); }
   .sort-dropdown .sort-option.active { color: var(--primary); font-weight: 600; }
-
   .search-container {
     flex: 1;
     display: flex;
@@ -218,7 +213,6 @@
   }
   .search-clear.show { display: block; }
   .search-clear:hover { color: var(--text); }
-
   @media (max-width: 480px) {
     .navbar { padding: 8px 8px 0; }
     .navbar-brand { font-size: 12px; letter-spacing: 4px; margin-bottom: 4px; }
@@ -232,7 +226,6 @@
     .search-container.show { max-width: none; }
     .search-input { padding: 6px 32px 6px 12px; font-size: 12px; }
   }
-
   .main-container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 60px; }
   .section-title { text-align: center; margin-bottom: 28px; font-size: 15px; color: var(--text-light); letter-spacing: 2px; }
   .section-title span { color: var(--primary); font-weight: 600; }
@@ -334,12 +327,10 @@
 
 <script>
 (function () {
-  // ⚠️⚠️⚠️ 修改为你自己的 GitHub 配置（只需要 owner、repo、branch）⚠️⚠️⚠️
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
 
-  // ✅ 修改：CDN 地址 + GitHub Raw 备用地址
   const PRODUCTS_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
   const PRODUCTS_FALLBACK_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
 
@@ -360,6 +351,14 @@
   const searchClear = document.getElementById('searchClear');
   const toolbar = document.getElementById('toolbar');
 
+  // ✅ 安全修复：HTML 转义函数，防止 XSS 攻击
+  function escapeHTML(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
+
   function updateToolbarPosition() {
     const navH = navbar.offsetHeight;
     const toolH = toolbar.offsetHeight;
@@ -370,18 +369,12 @@
   window.addEventListener('resize', updateToolbarPosition);
   window.addEventListener('load', updateToolbarPosition);
 
-  // ✅ 修改：加载产品数据，增加 GitHub Raw 回退机制
   async function loadProducts() {
     try {
-      // 优先从 CDN 加载（速度快）
       let res = await fetch(PRODUCTS_URL + '?_=' + Date.now());
-      
-      // ✅ 修改：CDN 失败时回退到 GitHub Raw（无缓存，数据最新）
       if (!res.ok) {
-        console.warn('CDN 加载失败，回退到 GitHub Raw...');
         res = await fetch(PRODUCTS_FALLBACK_URL + '?_=' + Date.now());
       }
-      
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       allProducts = data || [];
@@ -393,7 +386,6 @@
         allProducts = [];
         updateView();
       } else {
-        // ✅ 修改：CDN 出错时再试一次 GitHub Raw
         try {
           const res = await fetch(PRODUCTS_FALLBACK_URL + '?_=' + Date.now());
           if (res.ok) {
@@ -406,7 +398,6 @@
         } catch (e2) {
           console.error('备用加载也失败:', e2);
         }
-        
         grid.innerHTML = `
           <div class="empty-state" style="grid-column:1/-1">
             <div class="empty-icon">😢</div>
@@ -440,7 +431,7 @@
     sortDropdown.querySelectorAll('.sort-option').forEach(o => o.classList.remove('active'));
     option.classList.add('active');
     currentSort = option.dataset.sort;
-    sortBtn.innerHTML = `<span class="btn-icon">↕</span>${option.textContent}`;
+    sortBtn.innerHTML = '<span class="btn-icon">↕</span>' + escapeHTML(option.textContent);
     sortDropdown.classList.remove('show');
     sortBtn.classList.remove('active');
     updateView();
@@ -524,9 +515,10 @@
     }
 
     if (currentSearch) {
-      sectionTitle.innerHTML = `—— 搜索 "<span>${currentSearch}</span>" 的结果 (${products.length}) ——`;
+      // ✅ 安全修复：搜索词使用 escapeHTML 转义
+      sectionTitle.innerHTML = '—— 搜索 "<span>' + escapeHTML(currentSearch) + '</span>" 的结果 (' + products.length + ') ——';
     } else {
-      sectionTitle.innerHTML = `—— 为你精选 <span>${currentCategory}</span> 饰品 ——`;
+      sectionTitle.innerHTML = '—— 为你精选 <span>' + escapeHTML(currentCategory) + '</span> 饰品 ——';
     }
 
     renderProducts(products);
@@ -541,16 +533,17 @@
         </div>`;
       return;
     }
+    // ✅ 安全修复：所有产品数据使用 escapeHTML 转义，防止 XSS
     grid.innerHTML = products.map((p, i) => `
-      <a class="product-card" href="detail.html?id=${p.id}"
+      <a class="product-card" href="detail.html?id=${encodeURIComponent(p.id)}"
          style="animation-delay:${i * 0.06}s">
         <div class="card-img-wrap">
-          <img src="${p.cover}" alt="${p.name}" loading="lazy">
-          <span class="card-tag">${p.category}</span>
+          <img src="${escapeHTML(p.cover)}" alt="${escapeHTML(p.name)}" loading="lazy">
+          <span class="card-tag">${escapeHTML(p.category)}</span>
         </div>
         <div class="card-info">
-          <div class="card-name">${p.name}</div>
-          <div class="card-price">${p.price.toFixed(1)}</div>
+          <div class="card-name">${escapeHTML(p.name)}</div>
+          <div class="card-price">${Number(p.price).toFixed(1)}</div>
         </div>
       </a>
     `).join('');

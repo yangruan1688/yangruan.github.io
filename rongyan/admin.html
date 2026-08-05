@@ -302,7 +302,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
         <div style="font-size:11px;color:var(--text-light);text-align:center;margin-top:4px">
           图片存放在 rongyan/images/ 文件夹<br>
           产品数据存放在 rongyan/products.json<br>
-          CDN 缓存约 5~10 分钟刷新
+          CDN 缓存约 1~3 分钟刷新
         </div>
       </div>
     </div>
@@ -324,8 +324,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
   const GITHUB_API    = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${PRODUCTS_FILE}`;
   const CDN_BASE      = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
   const TOKEN_KEY     = 'rongyan_admin_token';
-
-  // ✅ 修改：新增 CDN 清除基础 URL
   const PURGE_BASE    = `https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
 
   // ============================
@@ -346,14 +344,13 @@ select.form-input{appearance:none;-webkit-appearance:none;
   //   状态
   // ============================
   let products = [];
-  let images = []; // {src: string, isNew: boolean, fileName: string}
+  let images = []; 
   let fileSha = null;
   let isSubmitting = false;
 
   // ============================
   //   工具函数
   // ============================
-  
   function escapeHTML(str) {
     if (!str) return '';
     const div = document.createElement('div');
@@ -389,18 +386,14 @@ select.form-input{appearance:none;-webkit-appearance:none;
   function setToken(t){ localStorage.setItem(TOKEN_KEY, t.trim()); }
   function removeToken(){ localStorage.removeItem(TOKEN_KEY); }
 
-  // ✅ 修改：新增通用 CDN 缓存清除函数
+  // ✅ 优化：通用 CDN 缓存清除函数
   async function purgeCdn(path) {
     try {
       const purgeUrl = `${PURGE_BASE}/${path}`;
-      const res = await fetch(purgeUrl);
-      if (res.ok) {
-        console.log('CDN 缓存已清除:', path);
-      } else {
-        console.warn('CDN 缓存清除响应异常:', path, res.status);
-      }
+      await fetch(purgeUrl);
+      console.log('CDN Purge 请求已发送:', path);
     } catch (e) {
-      console.warn('CDN 缓存清除失败:', path, e);
+      console.warn('CDN Purge 失败:', path, e);
     }
   }
 
@@ -438,6 +431,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
   // ============================
   async function fetchProductsFromGitHub(){
     const token = getToken();
+    // ✅ 优化：加上时间戳防止浏览器缓存旧数据
     const res = await fetch(GITHUB_API + '?t=' + Date.now(), {
       headers: { 'Authorization': 'Bearer ' + token }
     });
@@ -472,16 +466,16 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
     if(!res.ok){
       const errData = await res.json().catch(()=>({}));
-      if(res.status === 401) throw new Error('Token 无效或已过期，请点击右上角🔑重新配置');
-      if(res.status === 403) throw new Error('Token 权限不足，请确保生成时勾选了 repo 权限');
-      if(res.status === 404) throw new Error('找不到仓库，请检查代码顶部的仓库名配置');
+      if(res.status === 401) throw new Error('Token 无效或已过期');
+      if(res.status === 403) throw new Error('Token 权限不足');
+      if(res.status === 404) throw new Error('找不到仓库');
       throw new Error(errData.message || '保存失败 (HTTP ' + res.status + ')');
     }
 
     const result = await res.json();
     fileSha = result.content.sha;
 
-    // ✅ 修改：保存成功后自动清除 products.json 的 CDN 缓存
+    // ✅ 优化：保存成功后立即清除 products.json 的 CDN 缓存
     await purgeCdn(PRODUCTS_FILE);
 
     return result;
@@ -510,14 +504,11 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
     if(!res.ok){
       const err = await res.json().catch(()=>({}));
-      if(res.status === 401) throw new Error('Token 无效，请重新配置');
-      if(res.status === 403) throw new Error('Token 缺少 repo 权限');
       throw new Error(err.message || '图片上传失败 (HTTP ' + res.status + ')');
     }
 
     const cdnUrl = `${CDN_BASE}/${filePath}`;
-
-    // ✅ 修改：上传图片后自动清除该图片的 CDN 缓存
+    // ✅ 优化：上传图片后清除该图片的 CDN 缓存
     await purgeCdn(filePath);
 
     return cdnUrl;
@@ -534,7 +525,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
     if(!getRes.ok) return; 
     const fileData = await getRes.json();
 
-    const res = await fetch(apiUrl, {
+    await fetch(apiUrl, {
       method: 'DELETE',
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -546,16 +537,12 @@ select.form-input{appearance:none;-webkit-appearance:none;
         branch: GITHUB_BRANCH
       })
     });
-
-    if(!res.ok){
-      console.warn('删除图片失败:', fileName);
-    }
   }
 
   function extractFileName(cdnUrl){
     if(!cdnUrl) return null;
     const parts = cdnUrl.split('/');
-    return parts[parts.length - 1];
+    return parts[parts.length - 1].split('?')[0]; // ✅ 优化：防止带参数导致文件名错误
   }
 
   // ============================
@@ -680,7 +667,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
         if(!confirmed) return;
         try {
           showProgress(30, '正在删除图片...');
-          
           if(p.images && p.images.length > 0){
             for(let i = 0; i < p.images.length; i++){
               const fileName = extractFileName(p.images[i]);
@@ -729,7 +715,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
       for(let i = 0; i < images.length; i++){
         const img = images[i];
-        
         if(!img.isNew){
           finalImageUrls.push(img.src);
         } else {
@@ -786,14 +771,15 @@ select.form-input{appearance:none;-webkit-appearance:none;
       showProgress(90, '更新 products.json...');
       await saveProductsToGitHub(products);
 
-      // ✅ 修改：提交完成后再次确认刷新 CDN 缓存（双重保障）
+      // ✅ 优化：双重 Purge 保障
       showProgress(95, '刷新CDN缓存，确保前台可见...');
       await purgeCdn(PRODUCTS_FILE);
 
       showProgress(100, '完成！');
       setTimeout(hideProgress, 800);
 
-      showToast(eId ? '产品已更新 ✅' : '产品已添加 ✅', 'success');
+      // ✅ 优化：提示用户 CDN 同步需要一点时间
+      showToast(eId ? '✅ 已更新！前台约需1~2分钟同步' : '✅ 已添加！前台约需1~2分钟同步', 'success', 4000);
       resetForm();
       renderProductList();
 
@@ -878,9 +864,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
       this.disabled = true;
       this.textContent = '⏳ 刷新中...';
       try {
-        // ✅ 修改：使用统一的 purgeCdn 函数
         await purgeCdn(PRODUCTS_FILE);
-        showToast('CDN 缓存已刷新，前台刷新页面即可看到最新数据', 'success', 4000);
+        showToast('✅ CDN 缓存已刷新，前台刷新页面即可看到最新数据', 'success', 4000);
       } catch(e){
         showToast('CDN 刷新失败', 'error');
       }

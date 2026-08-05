@@ -96,8 +96,8 @@
       "category": "其他",
       "price": 0,
       "description": "复古款",
-      "cover": "../img/fh01.webp",
-      "images": ["../img/fh01.webp","../img/fh02.webp","../img/dp.webp"]
+      "cover": "../img/fg01.webp",
+      "images": ["../img/fg01.webp","../img/fg02.webp","../img/dp.webp"]
     },
     {
       "id": 12,

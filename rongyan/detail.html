@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>绒颜</title>
- <!-- 新增的网站图标代码 -->
-    <link rel="icon" href="../logo.jpg" type="image/jpeg">
+<link rel="icon" href="../logo.jpg" type="image/jpeg">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -72,8 +72,6 @@
     position: relative;
     background: #f0ece6;
   }
-
-  /* 主图容器 */
   .gallery-main {
     position: relative;
     width: 100%;
@@ -100,7 +98,6 @@
     -webkit-user-drag: none;
   }
 
-  /* 移动端固定正方形比例 */
   @media (max-width: 767px) {
     .gallery-slide {
       padding-top: 100%;
@@ -125,7 +122,6 @@
     }
   }
 
-  /* 图片序号指示 */
   .slide-counter {
     position: absolute;
     bottom: 14px;
@@ -141,7 +137,6 @@
     pointer-events: none;
   }
 
-  /* 左右箭头（桌面端） */
   .gallery-arrow {
     position: absolute;
     top: 50%;
@@ -175,7 +170,6 @@
     }
   }
 
-  /* 缩略图条 */
   .thumb-strip {
     display: flex;
     gap: 8px;
@@ -302,7 +296,6 @@
   }
   .lightbox-close:hover { background: rgba(255,255,255,0.3); }
   .lightbox-close svg { width: 20px; height: 20px; color: #fff; }
-
   .lightbox-counter {
     position: absolute;
     bottom: 20px;
@@ -312,8 +305,6 @@
     font-size: 13px;
     letter-spacing: 3px;
   }
-
-  /* 灯箱左右箭头 */
   .lightbox-arrow {
     position: absolute;
     top: 50%;
@@ -352,7 +343,6 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ========== 底部安全区 ========== */
   .bottom-safe { height: env(safe-area-inset-bottom, 0px); }
 
   ::-webkit-scrollbar { width: 6px; }
@@ -431,6 +421,11 @@
 
 <script>
 (function () {
+  // ⚠️⚠️⚠️ 填入你的 Supabase 配置（和 index.html、admin.html 一样）⚠️⚠️⚠️
+  const SUPABASE_URL = 'https://nafoqfrghouuivgdngqz.supabase.co/rest/v1/L';
+  const SUPABASE_KEY = 'sb_publishable_eIT55sO2vRLAon28ESMgsA_Ht2Hx4nR';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
   // ========== 获取产品ID ==========
   const params = new URLSearchParams(window.location.search);
   const productId = parseInt(params.get('id'));
@@ -457,12 +452,16 @@
   let currentSlide = 0;
   let lightboxIndex = 0;
 
-  // ========== 加载数据 ==========
-  fetch('products.json')
-    .then(r => r.json())
-    .then(data => {
-      const product = data.products.find(p => p.id === productId);
-      if (!product) throw new Error('产品不存在');
+  // ========== 从 Supabase 加载数据 ==========
+  async function loadProduct() {
+    try {
+      const { data: product, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', productId)
+        .single();
+
+      if (error || !product) throw new Error('产品不存在');
 
       images = product.images;
       document.title = product.name + ' · 绒颜';
@@ -495,29 +494,28 @@
       mainContent.style.display = 'block';
 
       initGallery();
-    })
-    .catch(err => {
+    } catch (err) {
       pageLoading.innerHTML = `
         <div class="page-error">
           <p style="font-size:36px">😢</p>
           <p>${err.message || '加载失败'}</p>
           <a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a>
         </div>`;
-    });
+    }
+  }
+
+  loadProduct();
 
   // ========== 轮播逻辑 ==========
   function initGallery() {
-    // 桌面端箭头
     arrowLeft.addEventListener('click', () => goToSlide(currentSlide - 1));
     arrowRight.addEventListener('click', () => goToSlide(currentSlide + 1));
 
-    // 缩略图点击
     thumbStrip.addEventListener('click', (e) => {
       const thumb = e.target.closest('.thumb-item');
       if (thumb) goToSlide(parseInt(thumb.dataset.index));
     });
 
-    // 点击主图 → 打开灯箱
     galleryTrack.addEventListener('click', (e) => {
       if (e.target.tagName === 'IMG' && !isDragging) {
         openLightbox(parseInt(e.target.dataset.index));
@@ -540,7 +538,6 @@
       const dx = e.touches[0].clientX - startX;
       const dy = e.touches[0].clientY - startY;
 
-      // 判断滑动方向
       if (isHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
         isHorizontal = Math.abs(dx) > Math.abs(dy);
       }
@@ -621,12 +618,10 @@
     galleryTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
     slideCounter.textContent = `${currentSlide + 1} / ${images.length}`;
 
-    // 更新缩略图
     thumbStrip.querySelectorAll('.thumb-item').forEach((t, i) => {
       t.classList.toggle('active', i === currentSlide);
     });
 
-    // 滚动缩略图到可见
     const activeThumb = thumbStrip.children[currentSlide];
     if (activeThumb) {
       activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });

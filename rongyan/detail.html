@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>绒颜</title>
 <link rel="icon" href="../logo.jpg" type="image/jpeg">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -27,7 +26,6 @@
     min-height: 100vh;
   }
 
-  /* ========== 顶部栏 ========== */
   .top-bar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -58,265 +56,108 @@
   }
   .back-btn:hover { background: rgba(0,0,0,0.04); }
   .back-btn svg { width: 20px; height: 20px; }
-  .top-bar-title {
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    color: var(--primary);
-  }
+  .top-bar-title { font-size: 14px; font-weight: 600; letter-spacing: 2px; color: var(--primary); }
   .top-bar-placeholder { width: 60px; }
 
-  /* ========== 图片轮播区 ========== */
-  .gallery-section {
-    margin-top: 52px;
-    position: relative;
-    background: #f0ece6;
-  }
-  .gallery-main {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    touch-action: pan-y;
-  }
-  .gallery-track {
-    display: flex;
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    will-change: transform;
-  }
-  .gallery-slide {
-    flex: 0 0 100%;
-    width: 100%;
-    position: relative;
-  }
+  .gallery-section { margin-top: 52px; position: relative; background: #f0ece6; }
+  .gallery-main { position: relative; width: 100%; overflow: hidden; touch-action: pan-y; }
+  .gallery-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); will-change: transform; }
+  .gallery-slide { flex: 0 0 100%; width: 100%; position: relative; }
   .gallery-slide img {
-    width: 100%;
-    height: auto;
-    display: block;
-    cursor: zoom-in;
-    transition: transform 0.35s ease;
-    user-select: none;
-    -webkit-user-drag: none;
+    width: 100%; height: auto; display: block; cursor: zoom-in;
+    transition: transform 0.35s ease; user-select: none; -webkit-user-drag: none;
   }
 
   @media (max-width: 767px) {
-    .gallery-slide {
-      padding-top: 100%;
-      position: relative;
-    }
-    .gallery-slide img {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    .gallery-slide { padding-top: 100%; position: relative; }
+    .gallery-slide img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
   }
   @media (min-width: 768px) {
     .gallery-section {
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-      margin-top: 52px;
-      border-radius: 0 0 var(--radius) var(--radius);
-      overflow: hidden;
+      max-width: 700px; margin-left: auto; margin-right: auto; margin-top: 52px;
+      border-radius: 0 0 var(--radius) var(--radius); overflow: hidden;
     }
   }
 
   .slide-counter {
-    position: absolute;
-    bottom: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.45);
-    backdrop-filter: blur(8px);
-    color: #fff;
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    pointer-events: none;
+    position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.45); backdrop-filter: blur(8px); color: #fff;
+    padding: 4px 14px; border-radius: 20px; font-size: 12px; letter-spacing: 2px; pointer-events: none;
   }
 
   .gallery-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(6px);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-    transition: all 0.25s;
-    z-index: 10;
-    opacity: 0;
-    pointer-events: none;
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255,255,255,0.85); backdrop-filter: blur(6px);
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1); transition: all 0.25s; z-index: 10;
+    opacity: 0; pointer-events: none;
   }
-  .gallery-arrow:hover {
-    background: #fff;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  }
+  .gallery-arrow:hover { background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
   .gallery-arrow svg { width: 18px; height: 18px; color: var(--text); }
   .gallery-arrow.arrow-left { left: 12px; }
   .gallery-arrow.arrow-right { right: 12px; }
   @media (min-width: 768px) {
-    .gallery-section:hover .gallery-arrow {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .gallery-section:hover .gallery-arrow { opacity: 1; pointer-events: auto; }
   }
 
   .thumb-strip {
-    display: flex;
-    gap: 8px;
-    padding: 14px 16px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    background: #fff;
+    display: flex; gap: 8px; padding: 14px 16px; overflow-x: auto;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none; background: #fff;
   }
   .thumb-strip::-webkit-scrollbar { display: none; }
   .thumb-item {
-    flex-shrink: 0;
-    width: 56px; height: 56px;
-    border-radius: 8px;
-    overflow: hidden;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: all 0.25s;
-    opacity: 0.55;
+    flex-shrink: 0; width: 56px; height: 56px; border-radius: 8px; overflow: hidden;
+    cursor: pointer; border: 2px solid transparent; transition: all 0.25s; opacity: 0.55;
   }
   .thumb-item:hover { opacity: 0.8; }
-  .thumb-item.active {
-    border-color: var(--primary);
-    opacity: 1;
-    box-shadow: 0 2px 8px rgba(184,134,11,0.25);
-  }
-  .thumb-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  .thumb-item.active { border-color: var(--primary); opacity: 1; box-shadow: 0 2px 8px rgba(184,134,11,0.25); }
+  .thumb-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-  /* ========== 产品信息区 ========== */
-  .product-detail {
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 28px 20px 60px;
-  }
+  .product-detail { max-width: 700px; margin: 0 auto; padding: 28px 20px 60px; }
   .detail-category {
     display: inline-block;
     background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: #fff;
-    padding: 3px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    margin-bottom: 14px;
+    color: #fff; padding: 3px 14px; border-radius: 20px; font-size: 12px;
+    font-weight: 600; letter-spacing: 1px; margin-bottom: 14px;
   }
-  .detail-name {
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 1.4;
-    margin-bottom: 12px;
-  }
-  .detail-price {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--primary);
-    margin-bottom: 20px;
-  }
-  .detail-price::before {
-    content: '¥';
-    font-size: 16px;
-    margin-right: 2px;
-  }
+  .detail-name { font-size: 22px; font-weight: 700; line-height: 1.4; margin-bottom: 12px; }
+  .detail-price { font-size: 28px; font-weight: 800; color: var(--primary); margin-bottom: 20px; }
+  .detail-price::before { content: '¥'; font-size: 16px; margin-right: 2px; }
   .detail-divider {
-    width: 40px;
-    height: 3px;
+    width: 40px; height: 3px;
     background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    border-radius: 2px;
-    margin-bottom: 20px;
+    border-radius: 2px; margin-bottom: 20px;
   }
-  .detail-desc {
-    font-size: 15px;
-    line-height: 1.8;
-    color: #555;
-  }
+  .detail-desc { font-size: 15px; line-height: 1.8; color: #555; }
 
-  /* ========== 全屏查看（灯箱） ========== */
   .lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 2000;
-    background: rgba(0,0,0,0.94);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.35s ease;
+    position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.94);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden; transition: all 0.35s ease;
   }
-  .lightbox.open {
-    opacity: 1;
-    visibility: visible;
-  }
+  .lightbox.open { opacity: 1; visibility: visible; }
   .lightbox-img {
-    max-width: 92vw;
-    max-height: 90vh;
-    object-fit: contain;
-    border-radius: 4px;
-    transform: scale(0.85);
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    cursor: zoom-out;
-    user-select: none;
-    -webkit-user-drag: none;
+    max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 4px;
+    transform: scale(0.85); transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: zoom-out; user-select: none; -webkit-user-drag: none;
   }
-  .lightbox.open .lightbox-img {
-    transform: scale(1);
-  }
+  .lightbox.open .lightbox-img { transform: scale(1); }
   .lightbox-close {
-    position: absolute;
-    top: 16px; right: 16px;
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.15);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
+    position: absolute; top: 16px; right: 16px; width: 40px; height: 40px;
+    border-radius: 50%; background: rgba(255,255,255,0.15); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: background 0.2s;
   }
   .lightbox-close:hover { background: rgba(255,255,255,0.3); }
   .lightbox-close svg { width: 20px; height: 20px; color: #fff; }
   .lightbox-counter {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255,255,255,0.7);
-    font-size: 13px;
-    letter-spacing: 3px;
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    color: rgba(255,255,255,0.7); font-size: 13px; letter-spacing: 3px;
   }
   .lightbox-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.12);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.12);
+    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
     transition: background 0.2s;
   }
   .lightbox-arrow:hover { background: rgba(255,255,255,0.25); }
@@ -324,27 +165,16 @@
   .lightbox-arrow.lb-left { left: 16px; }
   .lightbox-arrow.lb-right { right: 16px; }
 
-  /* ========== 加载/错误 ========== */
   .page-loading, .page-error {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 80vh;
-    color: var(--text-light);
-    gap: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 80vh; color: var(--text-light); gap: 12px;
   }
   .page-loading .spinner {
-    width: 36px; height: 36px;
-    border: 3px solid #eee;
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    width: 36px; height: 36px; border: 3px solid #eee; border-top-color: var(--primary);
+    border-radius: 50%; animation: spin 0.8s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-
   .bottom-safe { height: env(safe-area-inset-bottom, 0px); }
-
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #d0c8b8; border-radius: 3px; }
@@ -352,7 +182,6 @@
 </head>
 <body>
 
-<!-- 顶部栏 -->
 <div class="top-bar">
   <a class="back-btn" href="index.html">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -365,15 +194,12 @@
   <div class="top-bar-placeholder"></div>
 </div>
 
-<!-- 加载中 -->
 <div class="page-loading" id="pageLoading">
   <div class="spinner"></div>
   <p>加载中...</p>
 </div>
 
-<!-- 主内容（默认隐藏） -->
 <div id="mainContent" style="display:none">
-  <!-- 图片轮播 -->
   <div class="gallery-section">
     <div class="gallery-main" id="galleryMain">
       <div class="gallery-track" id="galleryTrack"></div>
@@ -390,7 +216,6 @@
     <div class="thumb-strip" id="thumbStrip"></div>
   </div>
 
-  <!-- 产品信息 -->
   <div class="product-detail">
     <span class="detail-category" id="detailCategory"></span>
     <h1 class="detail-name" id="detailName"></h1>
@@ -401,7 +226,6 @@
   <div class="bottom-safe"></div>
 </div>
 
-<!-- 灯箱（全屏查看） -->
 <div class="lightbox" id="lightbox">
   <button class="lightbox-close" id="lbClose">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -421,26 +245,24 @@
 
 <script>
 (function () {
-  // ⚠️⚠️⚠️ 填入你的 Supabase 配置（和 index.html、admin.html 一样）⚠️⚠️⚠️
-  const SUPABASE_URL = 'https://nafoqfrghouuivgdngqz.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hZm9xZnJnaG91dWl2Z2RuZ3F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4OTgzODEsImV4cCI6MjEwMTQ3NDM4MX0.CgUylzQbItStoPhu2QmgBSCVy3WpCX7KNK_Gh6fpzLo';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // ⚠️⚠️⚠️ 修改为你自己的 GitHub 配置（只需 owner、repo、branch）⚠️⚠️⚠️
+  const GITHUB_OWNER = 'yangruan1688';
+  const GITHUB_REPO  = 'yangruan.github.io';
+  const GITHUB_BRANCH = 'main';
 
-  // ========== 获取产品ID ==========
+  const PRODUCTS_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/products.json`;
+
   const params = new URLSearchParams(window.location.search);
   const productId = parseInt(params.get('id'));
 
   const pageLoading = document.getElementById('pageLoading');
   const mainContent = document.getElementById('mainContent');
-
-  // DOM引用
   const galleryTrack = document.getElementById('galleryTrack');
   const galleryMain = document.getElementById('galleryMain');
   const thumbStrip = document.getElementById('thumbStrip');
   const slideCounter = document.getElementById('slideCounter');
   const arrowLeft = document.getElementById('arrowLeft');
   const arrowRight = document.getElementById('arrowRight');
-
   const lightbox = document.getElementById('lightbox');
   const lbImg = document.getElementById('lbImg');
   const lbClose = document.getElementById('lbClose');
@@ -452,27 +274,24 @@
   let currentSlide = 0;
   let lightboxIndex = 0;
 
-  // ========== 从 Supabase 加载数据 ==========
+  // ========== 从 GitHub 加载产品数据 ==========
   async function loadProduct() {
     try {
-      const { data: product, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', productId)
-        .single();
-
-      if (error || !product) throw new Error('产品不存在');
+      const res = await fetch(PRODUCTS_URL + '?t=' + Date.now());
+      if (!res.ok) throw new Error('数据加载失败 (HTTP ' + res.status + ')');
+      const products = await res.json();
+      
+      const product = products.find(p => p.id === productId);
+      if (!product) throw new Error('产品不存在');
 
       images = product.images;
       document.title = product.name + ' · 绒颜';
 
-      // 填充产品信息
       document.getElementById('detailCategory').textContent = product.category;
       document.getElementById('detailName').textContent = product.name;
       document.getElementById('detailPrice').textContent = product.price.toFixed(1);
-      document.getElementById('detailDesc').textContent = product.description;
+      document.getElementById('detailDesc').textContent = product.description || '';
 
-      // 生成轮播幻灯片
       galleryTrack.innerHTML = images.map((src, i) => `
         <div class="gallery-slide">
           <img src="${src}" alt="${product.name} - 图${i + 1}"
@@ -480,7 +299,6 @@
         </div>
       `).join('');
 
-      // 生成缩略图
       thumbStrip.innerHTML = images.map((src, i) => `
         <div class="thumb-item${i === 0 ? ' active' : ''}" data-index="${i}">
           <img src="${src}" alt="缩略图${i + 1}" draggable="false">
@@ -489,7 +307,6 @@
 
       slideCounter.textContent = `1 / ${images.length}`;
 
-      // 显示页面
       pageLoading.style.display = 'none';
       mainContent.style.display = 'block';
 
@@ -506,7 +323,6 @@
 
   loadProduct();
 
-  // ========== 轮播逻辑 ==========
   function initGallery() {
     arrowLeft.addEventListener('click', () => goToSlide(currentSlide - 1));
     arrowRight.addEventListener('click', () => goToSlide(currentSlide + 1));
@@ -522,7 +338,6 @@
       }
     });
 
-    // 触摸滑动
     let startX = 0, startY = 0, moveX = 0, isDragging = false, isHorizontal = null;
 
     galleryMain.addEventListener('touchstart', (e) => {
@@ -537,12 +352,10 @@
       if (!isDragging) return;
       const dx = e.touches[0].clientX - startX;
       const dy = e.touches[0].clientY - startY;
-
       if (isHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
         isHorizontal = Math.abs(dx) > Math.abs(dy);
       }
       if (!isHorizontal) return;
-
       e.preventDefault();
       moveX = dx;
       const offset = -(currentSlide * galleryMain.offsetWidth) + moveX;
@@ -553,7 +366,6 @@
       if (!isDragging) return;
       isDragging = false;
       galleryTrack.style.transition = '';
-
       const threshold = galleryMain.offsetWidth * 0.2;
       if (isHorizontal) {
         if (moveX < -threshold) goToSlide(currentSlide + 1);
@@ -563,7 +375,6 @@
       moveX = 0;
     });
 
-    // 鼠标拖拽（桌面端）
     let mouseStartX = 0, mouseMoveX = 0, mouseDown = false;
 
     galleryMain.addEventListener('mousedown', (e) => {
@@ -588,7 +399,6 @@
       if (!mouseDown) return;
       mouseDown = false;
       galleryTrack.style.transition = '';
-
       const threshold = galleryMain.offsetWidth * 0.15;
       if (mouseMoveX < -threshold) goToSlide(currentSlide + 1);
       else if (mouseMoveX > threshold) goToSlide(currentSlide - 1);
@@ -596,7 +406,6 @@
       mouseMoveX = 0;
     });
 
-    // 键盘
     document.addEventListener('keydown', (e) => {
       if (lightbox.classList.contains('open')) {
         if (e.key === 'Escape') closeLightbox();
@@ -613,22 +422,18 @@
     if (index < 0) index = 0;
     if (index >= images.length) index = images.length - 1;
     currentSlide = index;
-
     galleryTrack.style.transition = '';
     galleryTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
     slideCounter.textContent = `${currentSlide + 1} / ${images.length}`;
-
     thumbStrip.querySelectorAll('.thumb-item').forEach((t, i) => {
       t.classList.toggle('active', i === currentSlide);
     });
-
     const activeThumb = thumbStrip.children[currentSlide];
     if (activeThumb) {
       activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }
   }
 
-  // ========== 灯箱逻辑 ==========
   function openLightbox(index) {
     lightboxIndex = index;
     lbImg.src = images[index];
@@ -659,7 +464,6 @@
     if (e.target === lightbox) closeLightbox();
   });
 
-  // 灯箱触摸滑动
   let lbStartX = 0, lbMoveX = 0, lbDragging = false;
   lightbox.addEventListener('touchstart', (e) => {
     lbStartX = e.touches[0].clientX;

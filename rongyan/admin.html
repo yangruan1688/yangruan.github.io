@@ -163,7 +163,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
 }
 .modal-overlay.show .modal-box{transform:scale(1)}
 .modal-box h3{font-size:16px;margin-bottom:8px}
-.modal-box p{font-size:13px;color:#666;margin-bottom:20px;line-height:1.6}
+.modal-box p{font-size:13px;color:#666;margin-bottom:20px;line-height:1.6;white-space:pre-line}
 .modal-actions{display:flex;gap:10px}
 .modal-actions .btn{flex:1}
 
@@ -324,9 +324,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
   const IMAGES_DIR    = 'rongyan/images';
 
   const GITHUB_API    = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${PRODUCTS_FILE}`;
-  const IMAGES_API    = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${IMAGES_DIR}`;
   const CDN_BASE      = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
-  const CDN_URL       = `${CDN_BASE}/${PRODUCTS_FILE}`;
   const TOKEN_KEY     = 'rongyan_admin_token';
 
   // ============================
@@ -378,8 +376,9 @@ select.form-input{appearance:none;-webkit-appearance:none;
     cancel.onclick = cleanup;
   }
 
-  function getToken(){ return localStorage.getItem(TOKEN_KEY); }
-  function setToken(t){ localStorage.setItem(TOKEN_KEY, t); }
+  // ✅ 修复：增加 .trim() 去除首尾空格
+  function getToken(){ return (localStorage.getItem(TOKEN_KEY) || '').trim(); }
+  function setToken(t){ localStorage.setItem(TOKEN_KEY, t.trim()); }
   function removeToken(){ localStorage.removeItem(TOKEN_KEY); }
 
   // ============================
@@ -417,7 +416,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
   async function fetchProductsFromGitHub(){
     const token = getToken();
     const res = await fetch(GITHUB_API + '?t=' + Date.now(), {
-      headers: { 'Authorization': 'token ' + token }
+      // ✅ 修复：使用 Bearer
+      headers: { 'Authorization': 'Bearer ' + token }
     });
     if(res.status === 404) return { products: [], sha: null };
     if(!res.ok) throw new Error('HTTP ' + res.status);
@@ -442,7 +442,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
     const res = await fetch(GITHUB_API, {
       method: 'PUT',
       headers: {
-        'Authorization': 'token ' + token,
+        // ✅ 修复：使用 Bearer
+        'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body)
@@ -450,7 +451,11 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
     if(!res.ok){
       const errData = await res.json().catch(()=>({}));
-      throw new Error(errData.message || '保存失败');
+      // ✅ 修复：增加详细错误提示
+      if(res.status === 401) throw new Error('Token 无效或已过期，请点击右上角🔑重新配置');
+      if(res.status === 403) throw new Error('Token 权限不足，请确保生成时勾选了 repo 权限');
+      if(res.status === 404) throw new Error('找不到仓库，请检查代码顶部的仓库名配置');
+      throw new Error(errData.message || '保存失败 (HTTP ' + res.status + ')');
     }
 
     const result = await res.json();
@@ -473,7 +478,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
     const res = await fetch(apiUrl, {
       method: 'PUT',
       headers: {
-        'Authorization': 'token ' + token,
+        // ✅ 修复：使用 Bearer
+        'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body)
@@ -481,7 +487,10 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
     if(!res.ok){
       const err = await res.json().catch(()=>({}));
-      throw new Error(err.message || '图片上传失败');
+      // ✅ 修复：增加详细错误提示
+      if(res.status === 401) throw new Error('Token 无效，请重新配置');
+      if(res.status === 403) throw new Error('Token 缺少 repo 权限');
+      throw new Error(err.message || '图片上传失败 (HTTP ' + res.status + ')');
     }
 
     const cdnUrl = `${CDN_BASE}/${filePath}`;
@@ -495,7 +504,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
     // 先获取文件 sha
     const getRes = await fetch(apiUrl, {
-      headers: { 'Authorization': 'token ' + token }
+      // ✅ 修复：使用 Bearer
+      headers: { 'Authorization': 'Bearer ' + token }
     });
     if(!getRes.ok) return; // 文件不存在则跳过
     const fileData = await getRes.json();
@@ -503,7 +513,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
     const res = await fetch(apiUrl, {
       method: 'DELETE',
       headers: {
-        'Authorization': 'token ' + token,
+        // ✅ 修复：使用 Bearer
+        'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -535,6 +546,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
       products = result.products;
     } catch(e){
       console.warn('GitHub API 加载失败:', e);
+      showToast('加载失败: ' + e.message, 'error', 4000);
       products = [];
       fileSha = null;
     }
@@ -664,7 +676,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
           renderProductList();
         } catch(e){
           hideProgress();
-          showToast('删除失败: ' + e.message, 'error');
+          showToast('删除失败: ' + e.message, 'error', 4000);
         }
       });
     }

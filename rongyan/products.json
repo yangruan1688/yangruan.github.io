@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "name": "1",
+    "price": 1,
+    "category": "发饰",
+    "description": "",
+    "cover": "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/1785937044093_munbpw.jpg",
+    "images": [
+      "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/1785937044093_munbpw.jpg"
+    ]
+  }
+]

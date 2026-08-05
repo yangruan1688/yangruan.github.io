@@ -14,9 +14,18 @@
   }
   body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; padding: 16px; padding-bottom: 100px; }
   
-  /* 顶部导航与退出按钮 */
+  /* 顶部导航与按钮组 */
   .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .top-bar h2 { margin: 0; color: var(--primary); font-size: 20px; }
+  /* ✅ 新增：按钮组容器，让两个按钮并排 */
+  .top-bar-actions { display: flex; align-items: center; gap: 12px; }
+  /* ✅ 新增：返回首页按钮样式 */
+  .home-btn {
+    background: none; border: 1px solid var(--primary); color: var(--primary);
+    font-size: 14px; cursor: pointer; font-weight: 500; padding: 5px 12px;
+    border-radius: 6px; text-decoration: none; transition: all 0.2s;
+  }
+  .home-btn:active { opacity: 0.6; background: rgba(184,134,11,0.08); }
   .logout-btn { background: none; border: none; color: var(--danger); font-size: 14px; cursor: pointer; font-weight: 500; }
   .logout-btn:active { opacity: 0.6; }
 
@@ -138,7 +147,11 @@
 <div id="mainApp" style="display:none;">
   <div class="top-bar">
     <h2>📦 绒颜 · 管理后台</h2>
-    <button class="logout-btn" onclick="doLogout()">退出登录</button>
+    <!-- ✅ 修改：用 actions 容器包裹两个按钮 -->
+    <div class="top-bar-actions">
+      <a href="index.html" class="home-btn">🏠 首页</a>
+      <button class="logout-btn" onclick="doLogout()">退出登录</button>
+    </div>
   </div>
 
   <div class="tabs" id="mainTabs">
@@ -230,7 +243,6 @@
   const SUPABASE_URL = 'https://nafoqfrghouuivgdngqz.supabase.co'; 
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hZm9xZnJnaG91dWl2Z2RuZ3F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4OTgzODEsImV4cCI6MjEwMTQ3NDM4MX0.CgUylzQbItStoPhu2QmgBSCVy3WpCX7KNK_Gh6fpzLo';
 
-  // 🛠️ 修复冲突：将实例重命名为 db，避免和全局的 supabase 对象冲突
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // ==========================================
@@ -264,7 +276,6 @@
     btn.disabled = true;
     btn.textContent = '验证中...';
 
-    // 🛠️ 修复：使用 db 代替 supabase
     const { data, error } = await db.auth.signInWithPassword({ email: email, password: pwd });
     
     console.log('🔍 doLogin - data:', data, 'error:', error); 
@@ -405,7 +416,6 @@
     const list = document.getElementById('productList');
     list.innerHTML = '<p style="text-align:center; color:#999; padding:40px 0;">加载中...</p>';
     
-    // 🛠️ 修复：使用 db 代替 supabase
     const { data, error } = await db.from('products').select('*').order('id', { ascending: false });
     if (error) { 
       console.error('加载产品列表失败:', error);
@@ -465,7 +475,6 @@
         const compressed = await compressImage(files[i]);
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.jpg`; 
         
-        // 🛠️ 修复：使用 db 代替 supabase
         const { error } = await db.storage.from('product-images').upload(fileName, compressed, {
           cacheControl: '3600', upsert: false, contentType: 'image/jpeg'
         });
@@ -487,7 +496,6 @@
       btn.textContent = '⏳ 正在保存数据...';
       let dbError;
       if (isEdit) {
-        // 🛠️ 修复：使用 db 代替 supabase
         const { error } = await db.from('products').update(dbData).eq('id', currentEditId);
         dbError = error;
       } else {
@@ -521,7 +529,6 @@
     btn.disabled = true;
     btn.textContent = '⏳ 正在删除...';
     try {
-      // 🛠️ 修复：使用 db 代替 supabase
       const { error } = await db.from('products').delete().eq('id', currentEditId);
       if (error) throw error;
       showToast('✅ 产品已删除');

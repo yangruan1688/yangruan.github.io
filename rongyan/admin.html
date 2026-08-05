@@ -216,13 +216,13 @@ select.form-input{appearance:none;-webkit-appearance:none;
   <!-- 首次设置 -->
   <div class="setup-card" id="setupCard">
     <h2 id="setupTitle">⚙️ 首次设置</h2>
-    <p>管理后台通过 GitHub API 更新产品数据。<br>需要创建一个有 <code>repo</code> 权限的 Token。</p>
+    <p>初次登录管理后台需要输入一次管理密码，后续不需要。</p>
     <ol>
-      <li>联系管理员索要token</li>
+      <li>联系管理员索要密码</li>
       <li>粘贴到下方输入框</li>
     </ol>
     <div class="form-group">
-      <input type="password" class="form-input" id="tokenInput" placeholder="粘贴 GitHub Token (ghp_xxxx...)">
+      <input type="password" class="form-input" id="tokenInput" placeholder="粘贴 密码 (ghp_xxxx...)">
       <label class="token-toggle">
         <input type="checkbox" id="tokenShow"> 显示Token
       </label>

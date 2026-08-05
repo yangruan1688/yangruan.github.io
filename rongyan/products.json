@@ -33,17 +33,5 @@
     "images": [
       "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/1785948933533_jsqaxm.webp"
     ]
-  },
-  {
-    "id": 4,
-    "name": "玫瑰",
-    "price": 168,
-    "category": "其他",
-    "description": "",
-    "cover": "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/1785948274820_yjzwcz.webp",
-    "images": [
-      "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/1785948274820_yjzwcz.webp",
-      "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/1785948279159_kcgufh.webp"
-    ]
   }
 ]

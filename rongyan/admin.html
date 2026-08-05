@@ -145,7 +145,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
 .modal-actions .btn{flex:1}
 .token-toggle{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--text-light);cursor:pointer}
 .token-toggle input{accent-color:var(--primary)}
-/* ✅ 新增：安全提示样式 */
 .security-badge{
   display:inline-flex;align-items:center;gap:4px;padding:4px 12px;
   border-radius:20px;font-size:11px;font-weight:600;margin-bottom:16px
@@ -159,7 +158,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
 }
 .security-tip strong{color:#c0392b}
 .security-tip code{background:#e8eef5;padding:1px 5px;border-radius:3px;font-size:11px}
-/* ✅ 新增：密码解锁弹窗 */
 .unlock-section{
   background:var(--card-bg);border-radius:var(--radius);padding:24px 20px;
   box-shadow:var(--shadow);margin-bottom:24px;text-align:center
@@ -211,7 +209,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
 <div class="page">
 
-  <!-- 首次设置：输入 Token + 设置本地密码 -->
   <div class="setup-card" id="setupCard">
     <h2 id="setupTitle">⚙️ 首次设置</h2>
     <p>为保护你的 Token 安全，系统会将其加密存储在浏览器中。<br>每次使用管理后台需输入本地密码解锁。</p>
@@ -229,14 +226,15 @@ select.form-input{appearance:none;-webkit-appearance:none;
     </div>
     <div class="form-group">
       <label>设置本地解锁密码 *</label>
-      <input type="password" class="form-input" id="passwordInput" placeholder="设置一个密码（至少4位）">
+      <!-- ✅ 修复：增加 maxlength="32" 防止超长密码 DoS -->
+      <input type="password" class="form-input" id="passwordInput" placeholder="设置一个密码（4~32位）" maxlength="32">
     </div>
     <div class="form-group">
       <label>确认密码 *</label>
-      <input type="password" class="form-input" id="passwordConfirm" placeholder="再次输入密码">
+      <!-- ✅ 修复：增加 maxlength="32" -->
+      <input type="password" class="form-input" id="passwordConfirm" placeholder="再次输入密码" maxlength="32">
     </div>
     <button class="btn btn-primary" id="saveTokenBtn">🔐 加密保存并开始</button>
-    
     <div class="security-tip">
       <strong>🛡️ 安全说明：</strong><br>
       • Token 使用 AES-256 加密后存储，F12 无法直接查看<br>
@@ -246,14 +244,16 @@ select.form-input{appearance:none;-webkit-appearance:none;
     </div>
   </div>
 
-  <!-- 密码解锁界面（已有加密 Token） -->
   <div class="unlock-section" id="unlockCard" style="display:none">
     <h2>🔓 解锁管理后台</h2>
     <p>请输入本地密码以解锁管理功能</p>
     <div class="form-group">
-      <input type="password" class="form-input" id="unlockPassword" placeholder="输入解锁密码">
+      <input type="password" class="form-input" id="unlockPassword" placeholder="输入解锁密码" maxlength="32">
     </div>
     <button class="btn btn-primary" id="unlockBtn">🔓 解锁</button>
+    <!-- ✅ 修复：增加解锁失败提示区域 -->
+    <div id="unlockFailTip" style="display:none;margin-top:12px;font-size:12px;color:var(--danger)">
+    </div>
     <div style="margin-top:14px">
       <button class="btn btn-outline btn-sm" id="resetAllBtn" style="width:auto;padding:8px 20px;font-size:12px;color:var(--text-light);border-color:rgba(0,0,0,.08)">
         忘记密码？清除所有数据重来
@@ -261,10 +261,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
     </div>
   </div>
 
-  <!-- 主面板 -->
   <div id="mainPanel" style="display:none">
-    
-    <!-- ✅ 新增：安全状态指示 -->
     <div style="text-align:center;margin-bottom:16px">
       <span class="security-badge secure">🔒 Token 已加密 · 会话已解锁</span>
     </div>
@@ -359,11 +356,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
   const CDN_BASE      = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
   const PURGE_BASE    = `https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
 
-  // ✅ 安全修复：加密存储相关 Key
-  const ENC_TOKEN_KEY    = 'rongyan_enc_token';      // 加密后的 Token
-  const SALT_KEY         = 'rongyan_salt';           // 加密盐值
-  const VERIFY_KEY       = 'rongyan_verify';         // 密码验证哈希
-  const SESSION_KEY      = 'rongyan_session_token';   // 会话 Token（内存级别，关闭页面即失效）
+  const ENC_TOKEN_KEY  = 'rongyan_enc_token';
+  const VERIFY_KEY     = 'rongyan_verify';
 
   // ============================
   //   DOM
@@ -380,7 +374,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
         toastEl=$('toast'), confirmModal=$('confirmModal'), setupTitle=$('setupTitle'),
         unlockCard=$('unlockCard'), unlockPassword=$('unlockPassword'), unlockBtn=$('unlockBtn'),
         resetAllBtn=$('resetAllBtn'), passwordInput=$('passwordInput'),
-        passwordConfirm=$('passwordConfirm'), lockBtn=$('lockBtn');
+        passwordConfirm=$('passwordConfirm'), lockBtn=$('lockBtn'),
+        unlockFailTip=$('unlockFailTip'); // ✅ 修复：新增 DOM 引用
 
   // ============================
   //   状态
@@ -389,23 +384,22 @@ select.form-input{appearance:none;-webkit-appearance:none;
   let images = [];
   let fileSha = null;
   let isSubmitting = false;
-  let currentToken = null; // ✅ 当前会话中的明文 Token（仅内存中）
+  let currentToken = null;
+  // ✅ 修复：新增解锁失败计数器
+  let unlockFailCount = 0;
+  let unlockLocked = false;
 
   // ============================
-  //   ✅ 安全模块：AES 加密/解密
+  //   安全模块：AES 加密/解密
   // ============================
-
-  // 将字符串转为 ArrayBuffer
   function strToBuf(str) {
     return new TextEncoder().encode(str);
   }
 
-  // 将 ArrayBuffer 转为 Base64
   function bufToB64(buf) {
     return btoa(String.fromCharCode(...new Uint8Array(buf)));
   }
 
-  // 将 Base64 转为 ArrayBuffer
   function b64ToBuf(b64) {
     const bin = atob(b64);
     const buf = new Uint8Array(bin.length);
@@ -413,12 +407,10 @@ select.form-input{appearance:none;-webkit-appearance:none;
     return buf;
   }
 
-  // 生成随机盐值
   function generateSalt() {
     return bufToB64(crypto.getRandomValues(new Uint8Array(16)));
   }
 
-  // 通过密码 + 盐值派生 AES 密钥
   async function deriveKey(password, salt) {
     const keyMaterial = await crypto.subtle.importKey(
       'raw', strToBuf(password), 'PBKDF2', false, ['deriveKey']
@@ -432,7 +424,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
     );
   }
 
-  // AES-GCM 加密
   async function encrypt(plainText, password) {
     const salt = generateSalt();
     const key = await deriveKey(password, salt);
@@ -442,11 +433,9 @@ select.form-input{appearance:none;-webkit-appearance:none;
       key,
       strToBuf(plainText)
     );
-    // 格式：salt:iv:ciphertext（全部 base64）
     return salt + ':' + bufToB64(iv) + ':' + bufToB64(encrypted);
   }
 
-  // AES-GCM 解密
   async function decrypt(encryptedStr, password) {
     const parts = encryptedStr.split(':');
     if (parts.length !== 3) throw new Error('加密数据格式错误');
@@ -460,7 +449,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
     return new TextDecoder().decode(decrypted);
   }
 
-  // 密码哈希（用于验证密码是否正确）
   async function hashPassword(password) {
     const hash = await crypto.subtle.digest('SHA-256', strToBuf(password + '_rongyan_verify'));
     return bufToB64(hash);
@@ -500,14 +488,12 @@ select.form-input{appearance:none;-webkit-appearance:none;
     cancel.onclick = cleanup;
   }
 
-  // ✅ 安全修复：Token 只在内存中，不直接读取 localStorage
   function getToken(){
     return currentToken || '';
   }
 
   function clearSession() {
     currentToken = null;
-    try { sessionStorage.removeItem(SESSION_KEY); } catch(e) {}
   }
 
   async function purgeCdn(path) {
@@ -891,7 +877,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
   }
 
   // ============================
-  //   ✅ 安全模块：界面切换
+  //   界面切换
   // ============================
   function showSetup() {
     setupCard.style.display = 'block';
@@ -905,6 +891,12 @@ select.form-input{appearance:none;-webkit-appearance:none;
     unlockCard.style.display = 'block';
     mainPanel.style.display = 'none';
     clearSession();
+    // ✅ 修复：重置失败计数
+    unlockFailCount = 0;
+    unlockLocked = false;
+    unlockBtn.disabled = false;
+    unlockBtn.textContent = '🔓 解锁';
+    unlockFailTip.style.display = 'none';
   }
 
   function showMain() {
@@ -922,7 +914,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
   function resetAll() {
     localStorage.removeItem(ENC_TOKEN_KEY);
-    localStorage.removeItem(SALT_KEY);
     localStorage.removeItem(VERIFY_KEY);
     clearSession();
     showSetup();
@@ -930,20 +921,35 @@ select.form-input{appearance:none;-webkit-appearance:none;
   }
 
   // ============================
-  //   ✅ 安全模块：初始化
+  //   初始化
   // ============================
   function init(){
+
+    // ✅ 修复 Bug 3：检测 crypto.subtle 是否可用（仅 HTTPS/localhost 可用）
+    if (!window.crypto || !window.crypto.subtle) {
+      setupCard.innerHTML = `
+        <h2>⚠️ 安全环境要求</h2>
+        <p style="color:var(--danger);margin:16px 0;line-height:1.8">
+          管理后台需要通过以下方式访问：<br>
+          • <strong>HTTPS</strong>（如 GitHub Pages：https://xxx.github.io）<br>
+          • <strong>localhost</strong>（本地开发服务器）<br><br>
+          请勿直接用 <code>file://</code> 协议双击打开此文件。<br>
+          如需本地测试，请运行：<br>
+          <code style="background:#f5f0e8;padding:4px 8px;border-radius:4px;font-size:12px">python3 -m http.server 8080</code><br>
+          然后访问 <code>http://localhost:8080/admin.html</code>
+        </p>`;
+      setupCard.style.display = 'block';
+      return;
+    }
+
     const hasEncryptedToken = localStorage.getItem(ENC_TOKEN_KEY);
 
     if (hasEncryptedToken) {
-      // 已有加密 Token，显示解锁界面
       showUnlock();
     } else {
-      // 首次使用，显示设置界面
       showSetup();
     }
 
-    // --- Token 显示切换 ---
     tokenShow.addEventListener('change', function(){
       tokenInput.type = this.checked ? 'text' : 'password';
     });
@@ -956,24 +962,21 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
       if(!token){ showToast('请输入 Token', 'error'); return; }
       if(!pwd || pwd.length < 4){ showToast('密码至少4位', 'error'); passwordInput.focus(); return; }
+      if(pwd.length > 32){ showToast('密码最长32位', 'error'); passwordInput.focus(); return; }
       if(pwd !== pwd2){ showToast('两次密码不一致', 'error'); passwordConfirm.focus(); return; }
 
       try {
         this.disabled = true;
         this.textContent = '⏳ 加密中...';
 
-        // 1. 加密 Token
         const encrypted = await encrypt(token, pwd);
         localStorage.setItem(ENC_TOKEN_KEY, encrypted);
 
-        // 2. 保存密码验证哈希
         const verifyHash = await hashPassword(pwd);
         localStorage.setItem(VERIFY_KEY, verifyHash);
 
-        // 3. 将明文 Token 放入内存
         currentToken = token;
 
-        // 4. 清空输入框
         tokenInput.value = '';
         passwordInput.value = '';
         passwordConfirm.value = '';
@@ -990,71 +993,137 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
     // --- 解锁 ---
     unlockBtn.addEventListener('click', async function(){
+      // ✅ 修复：检查是否被锁定
+      if (unlockLocked) return;
+
       const pwd = unlockPassword.value;
       if(!pwd){ showToast('请输入密码', 'error'); return; }
 
       try {
         this.disabled = true;
         this.textContent = '⏳ 解密中...';
+        unlockFailTip.style.display = 'none';
 
-        // 1. 验证密码
         const storedHash = localStorage.getItem(VERIFY_KEY);
         const inputHash = await hashPassword(pwd);
         if (storedHash && inputHash !== storedHash) {
-          showToast('密码错误', 'error', 3000);
+          // ✅ 修复：密码错误时增加失败计数
+          unlockFailCount++;
+          const remaining = 5 - unlockFailCount;
+
+          if (unlockFailCount >= 5) {
+            // 锁定 60 秒
+            unlockLocked = true;
+            unlockBtn.disabled = true;
+            unlockBtn.textContent = '🔒 已锁定 (60s)';
+            unlockFailTip.style.display = 'block';
+            unlockFailTip.textContent = '失败次数过多，已锁定 60 秒。请稍后重试。';
+
+            let countdown = 60;
+            const timer = setInterval(() => {
+              countdown--;
+              if (countdown <= 0) {
+                clearInterval(timer);
+                unlockLocked = false;
+                unlockFailCount = 0;
+                unlockBtn.disabled = false;
+                unlockBtn.textContent = '🔓 解锁';
+                unlockFailTip.textContent = '已解除锁定，请重新输入密码。';
+                unlockFailTip.style.color = 'var(--primary)';
+              } else {
+                unlockBtn.textContent = '🔒 已锁定 (' + countdown + 's)';
+              }
+            }, 1000);
+
+            return;
+          }
+
+          unlockFailTip.style.display = 'block';
+          unlockFailTip.style.color = 'var(--danger)';
+          unlockFailTip.textContent = '密码错误，还剩 ' + remaining + ' 次尝试机会。';
+          unlockPassword.value = '';
+          unlockPassword.focus();
           return;
         }
 
-        // 2. 解密 Token
         const encrypted = localStorage.getItem(ENC_TOKEN_KEY);
         const token = await decrypt(encrypted, pwd);
 
-        // 3. 验证 Token 格式
-        if (!token || (!token.startsWith('ghp_') && !token.startsWith('github_pat_'))) {
+        // ✅ 修复 Bug 2：放宽 Token 格式校验（只检查最小长度）
+        if (!token || token.length < 20) {
           showToast('Token 解密结果异常，请重置', 'error');
           return;
         }
 
-        // 4. 放入内存
         currentToken = token;
-
         unlockPassword.value = '';
+        unlockFailCount = 0; // 成功后重置计数
         showToast('解锁成功 ✅', 'success');
         showMain();
       } catch(e) {
-        showToast('密码错误或数据已损坏', 'error', 3000);
+        // 解密失败也算一次失败
+        unlockFailCount++;
+        const remaining = 5 - unlockFailCount;
+
+        if (unlockFailCount >= 5) {
+          unlockLocked = true;
+          unlockBtn.disabled = true;
+          unlockBtn.textContent = '🔒 已锁定 (60s)';
+          unlockFailTip.style.display = 'block';
+          unlockFailTip.textContent = '失败次数过多，已锁定 60 秒。请稍后重试。';
+
+          let countdown = 60;
+          const timer = setInterval(() => {
+            countdown--;
+            if (countdown <= 0) {
+              clearInterval(timer);
+              unlockLocked = false;
+              unlockFailCount = 0;
+              unlockBtn.disabled = false;
+              unlockBtn.textContent = '🔓 解锁';
+              unlockFailTip.textContent = '已解除锁定，请重新输入密码。';
+              unlockFailTip.style.color = 'var(--primary)';
+            } else {
+              unlockBtn.textContent = '🔒 已锁定 (' + countdown + 's)';
+            }
+          }, 1000);
+        } else {
+          unlockFailTip.style.display = 'block';
+          unlockFailTip.style.color = 'var(--danger)';
+          unlockFailTip.textContent = '解密失败，还剩 ' + remaining + ' 次尝试机会。可能是密码错误。';
+        }
       } finally {
-        this.disabled = false;
-        this.textContent = '🔓 解锁';
+        if (!unlockLocked) {
+          this.disabled = false;
+          this.textContent = '🔓 解锁';
+        }
       }
     });
 
-    // 回车解锁
+    // ✅ 修复 Bug 1：解锁界面回车键提交
     unlockPassword.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') unlockBtn.click();
+      if (e.key === 'Enter' && !unlockLocked) {
+        unlockBtn.click();
+      }
     });
 
-    // --- 重置所有数据 ---
     resetAllBtn.addEventListener('click', function(){
       showConfirm('清除所有数据', '这将清除加密的 Token 和所有本地数据。\n你需要重新输入 Token 和设置密码。', (ok) => {
         if(ok) resetAll();
       });
     });
 
-    // --- 锁定 ---
     lockBtn.addEventListener('click', function(){
       showConfirm('锁定后台', '锁定后需重新输入密码才能继续使用。', (ok) => {
         if(ok) lockPanel();
       });
     });
 
-    // --- 退出（锁定） ---
     logoutBtn.addEventListener('click', function(e){
       e.preventDefault();
       lockPanel();
     });
 
-    // --- 更换 Token ---
     changeTokenBtn.addEventListener('click', function(){
       showConfirm('更换 Token', '当前加密的 Token 将被清除，需重新设置。', (ok) => {
         if(!ok) return;
@@ -1064,7 +1133,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
       });
     });
 
-    // --- 文件上传 ---
     fileInput.addEventListener('change', function(){
       if(this.files.length) handleFiles(this.files);
       this.value = '';
@@ -1102,19 +1170,16 @@ select.form-input{appearance:none;-webkit-appearance:none;
       this.textContent = '⚡ 刷新CDN缓存';
     });
 
-    // ✅ 安全修复：页面关闭/离开时清除内存中的 Token
     window.addEventListener('beforeunload', function() {
       clearSession();
     });
 
-    // ✅ 安全修复：页面隐藏（切标签页）超过30秒自动锁定
     let hiddenTime = null;
     document.addEventListener('visibilitychange', function() {
       if (document.hidden) {
         hiddenTime = Date.now();
       } else {
         if (hiddenTime && (Date.now() - hiddenTime > 30000) && currentToken) {
-          // 离开超过 30 秒，自动锁定
           lockPanel();
         }
         hiddenTime = null;

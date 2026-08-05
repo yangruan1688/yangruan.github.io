@@ -2,123 +2,111 @@
   "products": [
     {
       "id": 1,
-      "name": "复古发夹",
+      "name": "绒花｜彼岸花",
       "category": "发饰",
-      "price": 68,
-      "createdAt": "2025-01-15",
-      "description": "法式复古风发夹，优雅大方，适合日常和宴会佩戴，轻盈舒适不夹发。",
-      "cover": "../img/c4.webp",
-      "images": ["../img/c4.webp","../img/c4.webp","../img/c4.webp","../img/c4.webp","../img/c4.webp"]
+      "price": "/",
+      "description": "彼岸花",
+      "cover": "../img/bah.webp",
+      "images": ["../img/bah.webp","../img/dp.webp"]
     },
     {
       "id": 2,
-      "name": "蝴蝶结发箍",
+      "name": "绒花｜彼岸花",
       "category": "发饰",
-      "price": 168,
-      "createdAt": "2025-03-10",
-      "description": "精致蝴蝶结发箍，闪耀迷人，让您成为派对焦点。弹性设计，适合各种头围。",
-      "cover": "../img/c4.webp",
-      "images": ["../img/c4.webp","../img/c4.webp","../img/c4.webp","../img/c4.webp"]
+      "price": "/"
+      "description": "彼岸花",
+      "cover": "../img/dxh.webp",
+      "images": ["../img/dxh.webp","../img/dp.webp"]
     },
     {
       "id": 3,
-      "name": "丝绒套装",
-      "category": "发饰",
-      "price": 398,
-      "createdAt": "2025-05-20",
-      "description": "多色丝绒发圈5件套，触感柔软丝滑，高弹力不松垮，轻松打造慵懒法式发型。",
-      "cover": "../img/c4.webp",
-      "images": ["../img/c4.webp","../img/c4.webp","../img/c4.webp"]
+      "name": "绒花｜郁金香",
+      "category": "其他",
+      "price": "/",
+      "description": "郁金香",
+      "cover": "../img/yjx01.webp",
+      "images": ["../img/yjx01.webp","../img/yjx02.webp","../img/yjx03.webp","../img/dp.webp"]
     },
     {
       "id": 4,
-      "name": "极简耳钉",
-      "category": "耳饰",
-      "price": 68,
-      "createdAt": "2025-02-08",
-      "description": "北欧极简风几何耳钉，简约百搭，通勤日常两相宜。",
-      "cover": "../img/c4.webp",
-      "images": ["../img/c4.webp","../img/c4.webp","../img/c4.webp","../img/c4.webp"]
+      "name": "绒花｜蓝芍",
+      "category": "其他",
+      "price": "/",
+      "description": "蓝芍",
+      "cover": "../img/ls01.webp",
+      "images": ["../img/ls01.webp","../img/ls02.webp","../img/ls03.webp","../img/dp.webp"]
     },
     {
       "id": 5,
-      "name": "复古耳坠",
+      "name": "绒花｜小樱花",
       "category": "耳饰",
-      "price": 68,
-      "createdAt": "2025-04-12",
-      "description": "法式复古流苏耳坠，优雅灵动，走路时轻轻摇曳，尽显女性柔美气质。",
-      "cover": "../img/c4.webp",
-      "images": ["../img/c4.webp","../img/c4.webp","../img/c4.webp","../img/c4.webp","../img/c4.webp"]
+      "price": "/",
+      "description": "小樱花",
+      "cover": "../img/yh01.webp",
+      "images": ["../img/yh01.webp","../img/yh02.webp","../img/yh03.webp","../img/yh04.webp","../img/dp.webp"]
     },
     {
       "id": 6,
-      "name": "花朵耳环",
-      "category": "耳饰",
-      "price": 68,
-      "createdAt": "2025-06-01",
-      "description": "手工花朵耳环，色彩通透晶莹，春夏季节的完美搭配单品。",
-      "cover": "../img/c4.webp",
-      "images": ["../img/c4.webp","../img/c4.webp","../img/c4.webp"]
+      "name": "绒花｜青提",
+      "category": "胸饰",
+      "price": "/",
+      "description": "青提",
+      "cover": "../img/qt01.webp",
+      "images": ["../img/qt01.webp","../img/qt02.webp","../img/qt03.webp","../img/dp.webp"]
     },
     {
       "id": 7,
-      "name": "花卉胸针",
-      "category": "胸针",
-      "price": 298,
-      "createdAt": "2025-03-25",
-      "description": "复古工艺花卉胸针，色彩浓郁饱满，可别在西装、围巾、帽子上，提升整体穿搭质感。",
-      "cover": "../img/c4.webp",
-      "images": ["../img/c4.webp","../img/c4.webp","../img/c4.webp","../img/c4.webp"]
+      "name": "绒花｜荷烬",
+      "category": "头饰",
+      "price": "/",
+      "description": "荷烬",
+      "cover": "../img/hh01.webp",
+      "images": ["../img/hh01.webp","../img/hh02.webp","../img/dp.webp"]
     },
     {
       "id": 8,
-      "name": "新婚胸针",
-      "category": "胸针",
-      "price": 198,
-      "createdAt": "2025-07-01",
-      "description": "新婚必备配饰。",
-      "cover": "../img/c4.webp",
-      "images": ["../img/c4.webp","../img/c4.webp","../img/c4.webp"]
+      "name": "绒花｜婆婆纳",
+      "category": "发饰",
+      "price": "/",
+      "description": "婆婆纳",
+      "cover": "../img/ppn01.webp",
+      "images": ["../img/ppn01.webp","../img/ppn02.webp","../img/dp.webp"]
     },
     {
       "id": 9,
-      "name": "定制款",
+      "name": "缠花｜玫瑰",
       "category": "其他",
-      "price": 1098,
-      "createdAt": "2025-06-15",
-      "description": "定制款。",
-      "cover": "../img/c4.webp",
-      "images": ["../img/c4.webp","../img/c4.webp","../img/c4.webp"]
+      "price": "/",
+      "description": "玫瑰",
+      "cover": "../img/mg01.webp",
+      "images": ["../img/mg01.webp","../img/mg02.webp","../img/dp.webp"]
     },
     {
       "id": 10,
-      "name": "手捧花",
-      "category": "其他",
-      "price": 298,
-      "createdAt": "2025-05-10",
-      "description": "100%桑蚕丝，触感细腻柔滑。",
-      "cover": "../img/c4.webp",
-      "images": ["../img/c4.webp","../img/c4.webp","../img/c4.webp","../img/c4.webp"]
+      "name": "绒花｜紫玉",
+      "category": "胸饰",
+      "price": "/",
+      "description": "紫玉",
+      "cover": "../img/zy01.webp",
+      "images": ["../img/zy01.webp","../img/zy02.webp","../img/dp.webp"]
     },
     {
       "id": 11,
-      "name": "绒花发夹",
-      "category": "发饰",
-      "price": 298,
-      "createdAt": "2025-07-10",
-      "description": "酷飒与柔美并存，轻松打造时尚造型。",
-      "cover": "../img/c4.webp",
-      "images": ["../img/c4.webp","../img/c4.webp","../img/c4.webp"]
+      "name": "绒花｜复古款",
+      "category": "其他",
+      "price": "/",
+      "description": "复古款",
+      "cover": "../img/fh01.webp",
+      "images": ["../img/fh01.webp","../img/fh02.webp","../img/dp.webp"]
     },
     {
       "id": 12,
-      "name": "星月吊坠耳环",
-      "category": "耳饰",
-      "price": 198,
-      "createdAt": "2025-07-20",
-      "description": "浪漫星月造型吊坠耳环，约会必备心动单品。",
-      "cover": "../img/c4.webp",
-      "images": ["../img/c4.webp","../img/c4.webp","../img/c4.webp","../img/c4.webp"]
+      "name": "绒花｜海棠",
+      "category": "发饰",
+      "price": "/",
+      "description": "海棠",
+      "cover": "../img/ht01.webp",
+      "images": ["../img/ht01.webp","../img/ht02.webp","../img/dp.webp"]
     }
   ]
 }

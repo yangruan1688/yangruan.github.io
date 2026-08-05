@@ -20,7 +20,7 @@ body{
 }
 a{color:var(--primary);text-decoration:none}
 
-/* ===== 顶栏 ===== */
+/* 顶栏 */
 .topbar{
   position:fixed;top:0;left:0;right:0;z-index:900;height:52px;
   background:rgba(255,255,255,.92);backdrop-filter:blur(20px);
@@ -33,12 +33,12 @@ a{color:var(--primary);text-decoration:none}
 .topbar a svg{width:20px;height:20px}
 .topbar-title{font-size:14px;font-weight:600;letter-spacing:2px;color:var(--primary)}
 .topbar-right{width:60px;text-align:right}
-.topbar-right a{font-size:13px;padding:6px 10px}
+.topbar-right a{font-size:13px;padding:6px 10px;cursor:pointer}
 
-/* ===== 页面容器 ===== */
+/* 页面容器 */
 .page{max-width:600px;margin:0 auto;padding:68px 16px 40px}
 
-/* ===== 首次设置卡片 ===== */
+/* 设置卡片 */
 .setup-card{
   background:var(--card-bg);border-radius:var(--radius);padding:28px 22px;
   box-shadow:var(--shadow);margin-bottom:24px;text-align:center
@@ -48,14 +48,12 @@ a{color:var(--primary);text-decoration:none}
 .setup-card code{background:#f5f0e8;padding:1px 6px;border-radius:4px;font-size:12px}
 .setup-card ol{text-align:left;font-size:13px;color:#666;line-height:2;margin:0 0 20px 20px}
 
-/* ===== 表单 ===== */
+/* 表单 */
 .form-group{margin-bottom:18px;text-align:left}
 .form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)}
-.form-group .hint{font-size:11px;color:var(--text-light);margin-top:3px}
 .form-input{
   width:100%;padding:10px 14px;border:1px solid rgba(0,0,0,.1);border-radius:10px;
-  font-size:14px;outline:none;transition:border-color .25s;background:#fff;
-  font-family:inherit
+  font-size:14px;outline:none;transition:border-color .25s;background:#fff;font-family:inherit
 }
 .form-input:focus{border-color:var(--primary)}
 textarea.form-input{min-height:80px;resize:vertical;line-height:1.6}
@@ -63,7 +61,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
   background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;
   padding-right:36px}
 
-/* ===== 图片上传 ===== */
+/* 图片上传 */
 .upload-area{
   border:2px dashed rgba(0,0,0,.12);border-radius:var(--radius);padding:24px 16px;
   text-align:center;cursor:pointer;transition:all .25s;position:relative;overflow:hidden
@@ -71,8 +69,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
 .upload-area:hover,.upload-area.dragover{border-color:var(--primary);background:rgba(184,134,11,.03)}
 .upload-area .upload-icon{font-size:36px;margin-bottom:8px}
 .upload-area .upload-text{font-size:13px;color:var(--text-light);line-height:1.6}
-.upload-area input[type="file"]{
-  position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+.upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
 
 .preview-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .preview-item{
@@ -88,9 +85,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
 .preview-item .cover-badge{
   position:absolute;bottom:0;left:0;right:0;background:var(--primary);color:#fff;
   font-size:10px;text-align:center;padding:2px 0;font-weight:600}
-.preview-item:first-child .cover-badge{display:block}
 
-/* ===== 按钮 ===== */
+/* 按钮 */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   padding:12px 28px;border:none;border-radius:10px;font-size:15px;font-weight:600;
@@ -102,11 +98,10 @@ select.form-input{appearance:none;-webkit-appearance:none;
 .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 .btn-sm{padding:8px 16px;font-size:13px;border-radius:8px;width:auto}
 .btn-danger{background:var(--danger);color:#fff}
-.btn-danger:hover{background:#c9302c}
 .btn-outline{background:transparent;border:1px solid rgba(0,0,0,.12);color:var(--text)}
 .btn-outline:hover{border-color:var(--primary);color:var(--primary)}
 
-/* ===== 产品列表 ===== */
+/* 产品列表 */
 .section-card{
   background:var(--card-bg);border-radius:var(--radius);padding:20px;
   box-shadow:var(--shadow);margin-bottom:20px
@@ -117,43 +112,37 @@ select.form-input{appearance:none;-webkit-appearance:none;
   padding:2px 10px;border-radius:20px;font-weight:500}
 
 .product-item{
-  display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05);
-  align-items:center
+  display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05);align-items:center
 }
 .product-item:last-child{border-bottom:none}
-.product-item .pi-img{
-  width:56px;height:56px;border-radius:8px;overflow:hidden;flex-shrink:0;
-  background:#f0ece6
-}
+.product-item .pi-img{width:56px;height:56px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#f0ece6}
 .product-item .pi-img img{width:100%;height:100%;object-fit:cover}
 .product-item .pi-info{flex:1;min-width:0}
-.product-item .pi-name{font-size:14px;font-weight:600;margin-bottom:3px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.product-item .pi-name{font-size:14px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .product-item .pi-meta{font-size:12px;color:var(--text-light)}
 .product-item .pi-actions{display:flex;gap:6px;flex-shrink:0}
 .product-item .pi-actions button{
   padding:6px 10px;border:1px solid rgba(0,0,0,.08);border-radius:6px;
-  background:#fff;font-size:12px;cursor:pointer;transition:all .2s;
-  font-family:inherit
+  background:#fff;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit
 }
 .product-item .pi-actions button:hover{border-color:var(--primary);color:var(--primary)}
 .product-item .pi-actions button.del-btn:hover{border-color:var(--danger);color:var(--danger)}
 
 .empty-msg{text-align:center;padding:30px;color:var(--text-light);font-size:13px}
 
-/* ===== Toast ===== */
+/* Toast */
 .toast{
   position:fixed;top:64px;left:50%;transform:translateX(-50%) translateY(-120px);
   z-index:9999;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:500;
   box-shadow:0 4px 24px rgba(0,0,0,.15);transition:transform .35s cubic-bezier(.4,0,.2,1);
-  max-width:88vw;text-align:center;white-space:nowrap
+  max-width:88vw;text-align:center
 }
 .toast.show{transform:translateX(-50%) translateY(0)}
 .toast.success{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
 .toast.error{background:#ffebee;color:#c62828;border:1px solid #ffcdd2}
 .toast.info{background:#fff8e1;color:#f57f17;border:1px solid #ffecb3}
 
-/* ===== 进度条 ===== */
+/* 进度条 */
 .progress-wrap{margin:16px 0;display:none}
 .progress-wrap.show{display:block}
 .progress-bar{height:4px;background:#eee;border-radius:2px;overflow:hidden}
@@ -161,7 +150,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
   width:0;transition:width .3s;border-radius:2px}
 .progress-text{font-size:12px;color:var(--text-light);margin-top:6px;text-align:center}
 
-/* ===== 确认弹窗 ===== */
+/* 确认弹窗 */
 .modal-overlay{
   position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.45);
   display:flex;align-items:center;justify-content:center;
@@ -178,11 +167,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
 .modal-actions{display:flex;gap:10px}
 .modal-actions .btn{flex:1}
 
-/* ===== 密码输入框 ===== */
-.token-toggle{
-  display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;
-  color:var(--text-light);cursor:pointer
-}
+.token-toggle{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--text-light);cursor:pointer}
 .token-toggle input{accent-color:var(--primary)}
 
 @media(max-width:480px){
@@ -208,7 +193,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
     返回
   </a>
   <span class="topbar-title">✦ 管理后台 ✦</span>
-  <div class="topbar-right"><a href="#" id="logoutBtn" title="清除Token">🔑</a></div>
+  <div class="topbar-right"><a id="logoutBtn" title="清除Token">🔑</a></div>
 </div>
 
 <!-- Toast -->
@@ -228,7 +213,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
 <div class="page">
 
-  <!-- ========== 首次设置 ========== -->
+  <!-- 首次设置 -->
   <div class="setup-card" id="setupCard">
     <h2>⚙️ 首次设置</h2>
     <p>管理后台通过 GitHub API 更新产品数据。<br>需要创建一个有 <code>repo</code> 权限的 Token。</p>
@@ -239,8 +224,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
       <li>粘贴到下方输入框</li>
     </ol>
     <div class="form-group">
-      <input type="password" class="form-input" id="tokenInput"
-             placeholder="粘贴 GitHub Token (ghp_xxxx...)">
+      <input type="password" class="form-input" id="tokenInput" placeholder="粘贴 GitHub Token (ghp_xxxx...)">
       <label class="token-toggle">
         <input type="checkbox" id="tokenShow"> 显示Token
       </label>
@@ -248,13 +232,12 @@ select.form-input{appearance:none;-webkit-appearance:none;
     <button class="btn btn-primary" id="saveTokenBtn">💾 保存Token并开始</button>
   </div>
 
-  <!-- ========== 主面板（Token已设置后显示） ========== -->
+  <!-- 主面板 -->
   <div id="mainPanel" style="display:none">
 
-    <!-- 添加产品 -->
+    <!-- 添加/编辑产品 -->
     <div class="section-card">
       <h3>📦 <span id="formTitle">添加产品</span></h3>
-
       <input type="hidden" id="editId" value="">
 
       <div class="form-group">
@@ -283,14 +266,11 @@ select.form-input{appearance:none;-webkit-appearance:none;
       </div>
 
       <div class="form-group">
-        <label>产品图片 * <span style="font-weight:400;color:var(--text-light)">（第一张为封面，点击可删除）</span></label>
+        <label>产品图片 * <span style="font-weight:400;color:var(--text-light)">（第一张为封面）</span></label>
         <div class="upload-area" id="uploadArea">
           <input type="file" id="fileInput" accept="image/*" multiple>
           <div class="upload-icon">📷</div>
-          <div class="upload-text">
-            点击或拖放图片到这里<br>
-            <span style="font-size:11px">支持 JPG / PNG / WEBP，建议正方形</span>
-          </div>
+          <div class="upload-text">点击或拖放图片到这里<br><span style="font-size:11px">支持 JPG / PNG / WEBP</span></div>
         </div>
         <div class="preview-grid" id="previewGrid"></div>
       </div>
@@ -319,79 +299,66 @@ select.form-input{appearance:none;-webkit-appearance:none;
       <h3>🔧 数据管理</h3>
       <div style="display:flex;flex-direction:column;gap:10px">
         <button class="btn btn-outline btn-sm" id="refreshBtn">🔄 刷新产品数据</button>
+        <button class="btn btn-outline btn-sm" id="purgeCdnBtn">⚡ 刷新CDN缓存</button>
         <button class="btn btn-outline btn-sm" id="changeTokenBtn">🔑 更换Token</button>
         <div style="font-size:11px;color:var(--text-light);text-align:center;margin-top:4px">
-          数据文件：products.json · 通过 GitHub API 更新<br>
-          CDN 缓存约 5~10 分钟自动刷新
+          图片存放在 rongyan/images/ 文件夹<br>
+          产品数据存放在 rongyan/products.json<br>
+          CDN 缓存约 5~10 分钟刷新
         </div>
       </div>
     </div>
 
-  </div><!-- /mainPanel -->
-
-</div><!-- /page -->
+  </div>
+</div>
 
 <script>
 (function(){
   // ============================
-  //   配 置（与 index/detail 保持一致）
+  //   配置
   // ============================
   const GITHUB_OWNER  = 'yangruan1688';
   const GITHUB_REPO   = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
-  const PRODUCTS_FILE = 'rongyan/products.json';  // 文件在仓库中的路径
+  const PRODUCTS_FILE = 'rongyan/products.json';
+  const IMAGES_DIR    = 'rongyan/images';
 
   const GITHUB_API    = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${PRODUCTS_FILE}`;
-  const CDN_URL       = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_FILE}`;
+  const IMAGES_API    = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${IMAGES_DIR}`;
+  const CDN_BASE      = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
+  const CDN_URL       = `${CDN_BASE}/${PRODUCTS_FILE}`;
   const TOKEN_KEY     = 'rongyan_admin_token';
 
   // ============================
   //   DOM
   // ============================
   const $ = id => document.getElementById(id);
-  const setupCard     = $('setupCard');
-  const mainPanel     = $('mainPanel');
-  const tokenInput    = $('tokenInput');
-  const tokenShow     = $('tokenShow');
-  const saveTokenBtn  = $('saveTokenBtn');
-  const logoutBtn     = $('logoutBtn');
-  const formTitle     = $('formTitle');
-  const editId        = $('editId');
-  const pName         = $('pName');
-  const pPrice        = $('pPrice');
-  const pCategory     = $('pCategory');
-  const pDesc         = $('pDesc');
-  const fileInput     = $('fileInput');
-  const uploadArea    = $('uploadArea');
-  const previewGrid   = $('previewGrid');
-  const submitBtn     = $('submitBtn');
-  const cancelEditBtn = $('cancelEditBtn');
-  const productList   = $('productList');
-  const productCount  = $('productCount');
-  const refreshBtn    = $('refreshBtn');
-  const changeTokenBtn= $('changeTokenBtn');
-  const progressWrap  = $('progressWrap');
-  const progressBar   = $('progressBar');
-  const progressText  = $('progressText');
-  const toast         = $('toast');
-  const confirmModal  = $('confirmModal');
+  const setupCard=$('setupCard'), mainPanel=$('mainPanel'), tokenInput=$('tokenInput'),
+        tokenShow=$('tokenShow'), saveTokenBtn=$('saveTokenBtn'), logoutBtn=$('logoutBtn'),
+        formTitle=$('formTitle'), editId=$('editId'), pName=$('pName'), pPrice=$('pPrice'),
+        pCategory=$('pCategory'), pDesc=$('pDesc'), fileInput=$('fileInput'),
+        uploadArea=$('uploadArea'), previewGrid=$('previewGrid'), submitBtn=$('submitBtn'),
+        cancelEditBtn=$('cancelEditBtn'), productList=$('productList'), productCount=$('productCount'),
+        refreshBtn=$('refreshBtn'), purgeCdnBtn=$('purgeCdnBtn'), changeTokenBtn=$('changeTokenBtn'),
+        progressWrap=$('progressWrap'), progressBar=$('progressBar'), progressText=$('progressText'),
+        toastEl=$('toast'), confirmModal=$('confirmModal');
 
   // ============================
   //   状态
   // ============================
-  let products      = [];
-  let images        = [];   // 当前表单中的图片 (data URL)
-  let fileSha       = null; // products.json 在 GitHub 上的 sha
-  let isSubmitting  = false;
+  let products = [];
+  let images = []; // {src: string, isNew: boolean, fileName: string}
+  let fileSha = null;
+  let isSubmitting = false;
 
   // ============================
   //   工具函数
   // ============================
   function showToast(msg, type='info', duration=2500){
-    toast.textContent = msg;
-    toast.className = 'toast ' + type + ' show';
+    toastEl.textContent = msg;
+    toastEl.className = 'toast ' + type + ' show';
     clearTimeout(showToast._t);
-    showToast._t = setTimeout(()=> toast.classList.remove('show'), duration);
+    showToast._t = setTimeout(()=> toastEl.classList.remove('show'), duration);
   }
 
   function showProgress(pct, text){
@@ -416,7 +383,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
   function removeToken(){ localStorage.removeItem(TOKEN_KEY); }
 
   // ============================
-  //   图片压缩（核心：手机端省流量）
+  //   图片压缩
   // ============================
   function compressImage(file, maxSize=800, quality=0.75){
     return new Promise((resolve, reject)=>{
@@ -452,26 +419,12 @@ select.form-input{appearance:none;-webkit-appearance:none;
     const res = await fetch(GITHUB_API + '?t=' + Date.now(), {
       headers: { 'Authorization': 'token ' + token }
     });
-    if(res.status === 404){
-      // 文件不存在
-      return { products: [], sha: null };
-    }
+    if(res.status === 404) return { products: [], sha: null };
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     fileSha = data.sha;
     const content = JSON.parse(decodeURIComponent(escape(atob(data.content))));
     return { products: Array.isArray(content) ? content : [], sha: data.sha };
-  }
-
-  async function fetchProductsFromCDN(){
-    try {
-      const res = await fetch(CDN_URL + '?t=' + Date.now());
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      return Array.isArray(data) ? data : [];
-    } catch(e){
-      return [];
-    }
   }
 
   async function saveProductsToGitHub(updatedProducts){
@@ -497,7 +450,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
     if(!res.ok){
       const errData = await res.json().catch(()=>({}));
-      throw new Error(errData.message || '保存失败 (HTTP ' + res.status + ')');
+      throw new Error(errData.message || '保存失败');
     }
 
     const result = await res.json();
@@ -505,18 +458,84 @@ select.form-input{appearance:none;-webkit-appearance:none;
     return result;
   }
 
+  async function uploadImageToGitHub(dataUrl, fileName){
+    const token = getToken();
+    const base64Content = dataUrl.split(',')[1];
+    const filePath = `${IMAGES_DIR}/${fileName}`;
+    const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}`;
+
+    const body = {
+      message: `upload image: ${fileName}`,
+      content: base64Content,
+      branch: GITHUB_BRANCH
+    };
+
+    const res = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if(!res.ok){
+      const err = await res.json().catch(()=>({}));
+      throw new Error(err.message || '图片上传失败');
+    }
+
+    const cdnUrl = `${CDN_BASE}/${filePath}`;
+    return cdnUrl;
+  }
+
+  async function deleteImageFromGitHub(fileName){
+    const token = getToken();
+    const filePath = `${IMAGES_DIR}/${fileName}`;
+    const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}`;
+
+    // 先获取文件 sha
+    const getRes = await fetch(apiUrl, {
+      headers: { 'Authorization': 'token ' + token }
+    });
+    if(!getRes.ok) return; // 文件不存在则跳过
+    const fileData = await getRes.json();
+
+    const res = await fetch(apiUrl, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': 'token ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `delete image: ${fileName}`,
+        sha: fileData.sha,
+        branch: GITHUB_BRANCH
+      })
+    });
+
+    if(!res.ok){
+      console.warn('删除图片失败:', fileName);
+    }
+  }
+
+  // 从 CDN URL 提取文件名
+  function extractFileName(cdnUrl){
+    if(!cdnUrl) return null;
+    const parts = cdnUrl.split('/');
+    return parts[parts.length - 1];
+  }
+
   // ============================
-  //   加载产品列表
+  //   加载产品
   // ============================
   async function loadProducts(){
     productList.innerHTML = '<div class="empty-msg">加载中...</div>';
     try {
-      // 优先从 GitHub API 获取（实时数据）
       const result = await fetchProductsFromGitHub();
       products = result.products;
     } catch(e){
-      console.warn('GitHub API 加载失败，尝试 CDN:', e);
-      products = await fetchProductsFromCDN();
+      console.warn('GitHub API 加载失败:', e);
+      products = [];
       fileSha = null;
     }
     renderProductList();
@@ -528,7 +547,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
       productList.innerHTML = '<div class="empty-msg">暂无产品，请添加第一个产品 ✨</div>';
       return;
     }
-    // 按 ID 降序（最新在前）
     const sorted = [...products].sort((a,b) => b.id - a.id);
     productList.innerHTML = sorted.map(p => `
       <div class="product-item">
@@ -546,12 +564,12 @@ select.form-input{appearance:none;-webkit-appearance:none;
   }
 
   // ============================
-  //   图片预览管理
+  //   图片预览
   // ============================
   function renderImagePreviews(){
-    previewGrid.innerHTML = images.map((src, i) => `
+    previewGrid.innerHTML = images.map((img, i) => `
       <div class="preview-item">
-        <img src="${src}" alt="图片${i+1}">
+        <img src="${img.src}" alt="图片${i+1}">
         <button class="remove-btn" onclick="window._admin.removeImage(${i})">×</button>
         ${i === 0 ? '<div class="cover-badge">封面</div>' : ''}
       </div>
@@ -566,9 +584,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
       showProgress(((i+1)/files.length*80).toFixed(0), `压缩图片 ${i+1}/${files.length}...`);
       try {
         const compressed = await compressImage(files[i]);
-        images.push(compressed);
+        images.push({ src: compressed, isNew: true, fileName: null });
       } catch(e){
-        console.error('图片压缩失败:', e);
         showToast('图片压缩失败: ' + files[i].name, 'error');
       }
     }
@@ -577,7 +594,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
   }
 
   // ============================
-  //   表单操作
+  //   表单
   // ============================
   function resetForm(){
     editId.value = '';
@@ -606,7 +623,14 @@ select.form-input{appearance:none;-webkit-appearance:none;
       pPrice.value = p.price;
       pCategory.value = p.category;
       pDesc.value = p.description || '';
-      images = [...(p.images || [])];
+      
+      // 加载已有图片（标记为旧图）
+      images = (p.images || []).map(url => ({
+        src: url,
+        isNew: false,
+        fileName: extractFileName(url)
+      }));
+      
       renderImagePreviews();
       formTitle.textContent = '编辑产品 #' + id;
       submitBtn.innerHTML = '💾 保存修改';
@@ -614,15 +638,27 @@ select.form-input{appearance:none;-webkit-appearance:none;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 
-    deleteProduct(id){
+    async deleteProduct(id){
       const p = products.find(x => x.id === id);
       if(!p) return;
-      showConfirm('删除产品', `确定要删除「${p.name}」吗？此操作不可撤销。`, async(confirmed)=>{
+      
+      showConfirm('删除产品', `确定要删除「${p.name}」吗？\n同时会删除该产品的所有图片。`, async(confirmed)=>{
         if(!confirmed) return;
         try {
-          showProgress(50, '正在删除...');
+          showProgress(30, '正在删除图片...');
+          
+          // 删除图片文件
+          if(p.images && p.images.length > 0){
+            for(let i = 0; i < p.images.length; i++){
+              const fileName = extractFileName(p.images[i]);
+              if(fileName) await deleteImageFromGitHub(fileName);
+            }
+          }
+
+          showProgress(70, '正在更新产品数据...');
           products = products.filter(x => x.id !== id);
           await saveProductsToGitHub(products);
+          
           hideProgress();
           showToast('已删除「' + p.name + '」', 'success');
           renderProductList();
@@ -635,7 +671,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
   };
 
   // ============================
-  //   提交（添加 / 编辑）
+  //   提交
   // ============================
   async function handleSubmit(){
     if(isSubmitting) return;
@@ -646,7 +682,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
     const desc     = pDesc.value.trim();
     const eId      = editId.value;
 
-    // 验证
     if(!name)     { showToast('请输入产品名称', 'error'); pName.focus(); return; }
     if(isNaN(price) || price < 0) { showToast('请输入有效价格', 'error'); pPrice.focus(); return; }
     if(images.length === 0) { showToast('请至少上传一张图片', 'error'); return; }
@@ -655,35 +690,73 @@ select.form-input{appearance:none;-webkit-appearance:none;
     submitBtn.disabled = true;
 
     try {
-      showProgress(30, '正在保存...');
+      const finalImageUrls = [];
+      let uploadCount = 0;
+      const newImages = images.filter(img => img.isNew);
+
+      // 上传新图片
+      for(let i = 0; i < images.length; i++){
+        const img = images[i];
+        
+        if(!img.isNew){
+          // 旧图直接用
+          finalImageUrls.push(img.src);
+        } else {
+          // 新图需要上传
+          uploadCount++;
+          showProgress(20 + (uploadCount / newImages.length * 50), 
+            `上传图片 ${uploadCount}/${newImages.length}...`);
+          
+          const timestamp = Date.now();
+          const randomStr = Math.random().toString(36).substring(2, 8);
+          const fileName = `${timestamp}_${randomStr}.jpg`;
+          
+          const cdnUrl = await uploadImageToGitHub(img.src, fileName);
+          finalImageUrls.push(cdnUrl);
+        }
+      }
+
+      showProgress(80, '保存产品数据...');
 
       if(eId){
-        // 编辑模式
+        // 编辑模式：找出被删除的旧图
         const id = parseInt(eId);
         const idx = products.findIndex(x => x.id === id);
         if(idx < 0) throw new Error('产品不存在');
+        
+        const oldImages = products[idx].images || [];
+        const deletedImages = oldImages.filter(url => !finalImageUrls.includes(url));
+        
+        // 删除不再使用的旧图
+        if(deletedImages.length > 0){
+          showProgress(85, '清理旧图片...');
+          for(const url of deletedImages){
+            const fileName = extractFileName(url);
+            if(fileName) await deleteImageFromGitHub(fileName);
+          }
+        }
+
         products[idx].name = name;
         products[idx].price = price;
         products[idx].category = category;
         products[idx].description = desc;
-        products[idx].cover = images[0];
-        products[idx].images = [...images];
+        products[idx].cover = finalImageUrls[0];
+        products[idx].images = [...finalImageUrls];
       } else {
         // 新增模式
         const maxId = products.reduce((m, p) => Math.max(m, p.id || 0), 0);
-        const newProduct = {
+        products.push({
           id: maxId + 1,
           name,
           price,
           category,
           description: desc,
-          cover: images[0],
-          images: [...images]
-        };
-        products.push(newProduct);
+          cover: finalImageUrls[0],
+          images: [...finalImageUrls]
+        });
       }
 
-      showProgress(60, '正在上传到 GitHub...');
+      showProgress(90, '更新 products.json...');
       await saveProductsToGitHub(products);
 
       showProgress(100, '完成！');
@@ -706,7 +779,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
   //   初始化
   // ============================
   function init(){
-    // 检查 Token
     const token = getToken();
     if(token){
       setupCard.style.display = 'none';
@@ -714,12 +786,10 @@ select.form-input{appearance:none;-webkit-appearance:none;
       loadProducts();
     }
 
-    // Token 显示/隐藏
     tokenShow.addEventListener('change', function(){
       tokenInput.type = this.checked ? 'text' : 'password';
     });
 
-    // 保存 Token
     saveTokenBtn.addEventListener('click', function(){
       const t = tokenInput.value.trim();
       if(!t){ showToast('请输入 Token', 'error'); return; }
@@ -730,10 +800,9 @@ select.form-input{appearance:none;-webkit-appearance:none;
       loadProducts();
     });
 
-    // 退出（清除Token）
     logoutBtn.addEventListener('click', function(e){
       e.preventDefault();
-      showConfirm('清除Token', '清除后需要重新输入 Token 才能使用管理功能。', (ok)=>{
+      showConfirm('清除Token', '清除后需要重新输入 Token。', (ok)=>{
         if(!ok) return;
         removeToken();
         mainPanel.style.display = 'none';
@@ -743,13 +812,11 @@ select.form-input{appearance:none;-webkit-appearance:none;
       });
     });
 
-    // 文件选择
     fileInput.addEventListener('change', function(){
       if(this.files.length) handleFiles(this.files);
-      this.value = ''; // 允许重复选择同一文件
+      this.value = '';
     });
 
-    // 拖放支持
     uploadArea.addEventListener('dragover', function(e){
       e.preventDefault();
       this.classList.add('dragover');
@@ -763,13 +830,9 @@ select.form-input{appearance:none;-webkit-appearance:none;
       if(e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
     });
 
-    // 提交
     submitBtn.addEventListener('click', handleSubmit);
-
-    // 取消编辑
     cancelEditBtn.addEventListener('click', resetForm);
 
-    // 刷新
     refreshBtn.addEventListener('click', async function(){
       this.disabled = true;
       this.textContent = '⏳ 刷新中...';
@@ -779,7 +842,24 @@ select.form-input{appearance:none;-webkit-appearance:none;
       showToast('数据已刷新', 'success');
     });
 
-    // 更换Token
+    purgeCdnBtn.addEventListener('click', async function(){
+      this.disabled = true;
+      this.textContent = '⏳ 刷新中...';
+      try {
+        const purgeUrl = `https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_FILE}`;
+        const res = await fetch(purgeUrl);
+        if(res.ok){
+          showToast('CDN 缓存已刷新', 'success', 4000);
+        } else {
+          showToast('CDN 刷新请求已发送', 'info', 3000);
+        }
+      } catch(e){
+        showToast('CDN 刷新失败', 'error');
+      }
+      this.disabled = false;
+      this.textContent = '⚡ 刷新CDN缓存';
+    });
+
     changeTokenBtn.addEventListener('click', function(){
       const t = prompt('请输入新的 GitHub Token：');
       if(t && t.trim()){

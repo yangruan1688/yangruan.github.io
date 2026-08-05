@@ -19,6 +19,8 @@ body{
   min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0)
 }
 a{color:var(--primary);text-decoration:none}
+
+/* 顶栏 */
 .topbar{
   position:fixed;top:0;left:0;right:0;z-index:900;height:52px;
   background:rgba(255,255,255,.92);backdrop-filter:blur(20px);
@@ -32,7 +34,11 @@ a{color:var(--primary);text-decoration:none}
 .topbar-title{font-size:14px;font-weight:600;letter-spacing:2px;color:var(--primary)}
 .topbar-right{width:60px;text-align:right}
 .topbar-right a{font-size:13px;padding:6px 10px;cursor:pointer}
+
+/* 页面容器 */
 .page{max-width:600px;margin:0 auto;padding:68px 16px 40px}
+
+/* 设置卡片 */
 .setup-card{
   background:var(--card-bg);border-radius:var(--radius);padding:28px 22px;
   box-shadow:var(--shadow);margin-bottom:24px;text-align:center
@@ -41,6 +47,8 @@ a{color:var(--primary);text-decoration:none}
 .setup-card p{font-size:13px;color:var(--text-light);margin-bottom:20px;line-height:1.7}
 .setup-card code{background:#f5f0e8;padding:1px 6px;border-radius:4px;font-size:12px}
 .setup-card ol{text-align:left;font-size:13px;color:#666;line-height:2;margin:0 0 20px 20px}
+
+/* 表单 */
 .form-group{margin-bottom:18px;text-align:left}
 .form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)}
 .form-input{
@@ -52,6 +60,8 @@ textarea.form-input{min-height:80px;resize:vertical;line-height:1.6}
 select.form-input{appearance:none;-webkit-appearance:none;
   background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;
   padding-right:36px}
+
+/* 图片上传 */
 .upload-area{
   border:2px dashed rgba(0,0,0,.12);border-radius:var(--radius);padding:24px 16px;
   text-align:center;cursor:pointer;transition:all .25s;position:relative;overflow:hidden
@@ -60,6 +70,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
 .upload-area .upload-icon{font-size:36px;margin-bottom:8px}
 .upload-area .upload-text{font-size:13px;color:var(--text-light);line-height:1.6}
 .upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+
 .preview-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .preview-item{
   position:relative;width:80px;height:80px;border-radius:8px;overflow:hidden;
@@ -74,6 +85,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
 .preview-item .cover-badge{
   position:absolute;bottom:0;left:0;right:0;background:var(--primary);color:#fff;
   font-size:10px;text-align:center;padding:2px 0;font-weight:600}
+
+/* 按钮 */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   padding:12px 28px;border:none;border-radius:10px;font-size:15px;font-weight:600;
@@ -87,6 +100,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
 .btn-danger{background:var(--danger);color:#fff}
 .btn-outline{background:transparent;border:1px solid rgba(0,0,0,.12);color:var(--text)}
 .btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+
+/* 产品列表 */
 .section-card{
   background:var(--card-bg);border-radius:var(--radius);padding:20px;
   box-shadow:var(--shadow);margin-bottom:20px
@@ -95,6 +110,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
 .section-card h3 .count{
   font-size:12px;background:rgba(184,134,11,.1);color:var(--primary);
   padding:2px 10px;border-radius:20px;font-weight:500}
+
 .product-item{
   display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05);align-items:center
 }
@@ -111,7 +127,10 @@ select.form-input{appearance:none;-webkit-appearance:none;
 }
 .product-item .pi-actions button:hover{border-color:var(--primary);color:var(--primary)}
 .product-item .pi-actions button.del-btn:hover{border-color:var(--danger);color:var(--danger)}
+
 .empty-msg{text-align:center;padding:30px;color:var(--text-light);font-size:13px}
+
+/* Toast */
 .toast{
   position:fixed;top:64px;left:50%;transform:translateX(-50%) translateY(-120px);
   z-index:9999;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:500;
@@ -122,12 +141,16 @@ select.form-input{appearance:none;-webkit-appearance:none;
 .toast.success{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
 .toast.error{background:#ffebee;color:#c62828;border:1px solid #ffcdd2}
 .toast.info{background:#fff8e1;color:#f57f17;border:1px solid #ffecb3}
+
+/* 进度条 */
 .progress-wrap{margin:16px 0;display:none}
 .progress-wrap.show{display:block}
 .progress-bar{height:4px;background:#eee;border-radius:2px;overflow:hidden}
 .progress-bar-inner{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-light));
   width:0;transition:width .3s;border-radius:2px}
 .progress-text{font-size:12px;color:var(--text-light);margin-top:6px;text-align:center}
+
+/* 确认弹窗 */
 .modal-overlay{
   position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.45);
   display:flex;align-items:center;justify-content:center;
@@ -143,32 +166,10 @@ select.form-input{appearance:none;-webkit-appearance:none;
 .modal-box p{font-size:13px;color:#666;margin-bottom:20px;line-height:1.6;white-space:pre-line}
 .modal-actions{display:flex;gap:10px}
 .modal-actions .btn{flex:1}
+
 .token-toggle{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--text-light);cursor:pointer}
 .token-toggle input{accent-color:var(--primary)}
-.security-badge{
-  display:inline-flex;align-items:center;gap:4px;padding:4px 12px;
-  border-radius:20px;font-size:11px;font-weight:600;margin-bottom:16px
-}
-.security-badge.secure{background:#e8f5e9;color:#2e7d32}
-.security-badge.warning{background:#fff8e1;color:#f57f17}
-.security-tip{
-  background:#f0f7ff;border:1px solid #d0e3f7;border-radius:10px;
-  padding:14px 16px;margin-top:16px;text-align:left;font-size:12px;
-  color:#1a5276;line-height:1.8
-}
-.security-tip strong{color:#c0392b}
-.security-tip code{background:#e8eef5;padding:1px 5px;border-radius:3px;font-size:11px}
-.unlock-section{
-  background:var(--card-bg);border-radius:var(--radius);padding:24px 20px;
-  box-shadow:var(--shadow);margin-bottom:24px;text-align:center
-}
-.unlock-section h2{font-size:17px;margin-bottom:6px;color:var(--primary)}
-.unlock-section p{font-size:13px;color:var(--text-light);margin-bottom:18px}
-.session-info{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  font-size:11px;color:var(--text-light);margin-top:12px
-}
-.session-info .dot{width:8px;height:8px;border-radius:50%;background:var(--success)}
+
 @media(max-width:480px){
   .page{padding:60px 12px 30px}
   .setup-card{padding:22px 16px}
@@ -182,6 +183,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
 </head>
 <body>
 
+<!-- 顶栏 -->
 <div class="topbar">
   <a href="index.html">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -191,11 +193,13 @@ select.form-input{appearance:none;-webkit-appearance:none;
     返回
   </a>
   <span class="topbar-title">✦ 管理后台 ✦</span>
-  <div class="topbar-right"><a id="logoutBtn" title="退出登录">🔒</a></div>
+  <div class="topbar-right"><a id="logoutBtn" title="清除Token">🔑</a></div>
 </div>
 
+<!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<!-- 确认弹窗 -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal-box">
     <h3 id="confirmTitle">确认操作</h3>
@@ -209,63 +213,27 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
 <div class="page">
 
+  <!-- 首次设置 -->
   <div class="setup-card" id="setupCard">
     <h2 id="setupTitle">⚙️ 首次设置</h2>
-    <p>为保护你的 Token 安全，系统会将其加密存储在浏览器中。<br>每次使用管理后台需输入本地密码解锁。</p>
+    <p>初次登录管理后台需要输入一次管理密码，后续不需要。</p>
     <ol>
-      <li>联系管理员索要 GitHub Token</li>
-      <li>粘贴 Token 并设置一个本地解锁密码</li>
-      <li>后续每次打开只需输入密码即可</li>
+      <li>联系管理员索要密码</li>
+      <li>粘贴到下方输入框</li>
     </ol>
     <div class="form-group">
-      <label>GitHub Token *</label>
-      <input type="password" class="form-input" id="tokenInput" placeholder="粘贴 Token (ghp_xxxx...)">
+      <input type="password" class="form-input" id="tokenInput" placeholder="粘贴 密码 (ghp_xxxx...)">
       <label class="token-toggle">
         <input type="checkbox" id="tokenShow"> 显示Token
       </label>
     </div>
-    <div class="form-group">
-      <label>设置本地解锁密码 *</label>
-      <!-- ✅ 修复：增加 maxlength="32" 防止超长密码 DoS -->
-      <input type="password" class="form-input" id="passwordInput" placeholder="设置一个密码（4~32位）" maxlength="32">
-    </div>
-    <div class="form-group">
-      <label>确认密码 *</label>
-      <!-- ✅ 修复：增加 maxlength="32" -->
-      <input type="password" class="form-input" id="passwordConfirm" placeholder="再次输入密码" maxlength="32">
-    </div>
-    <button class="btn btn-primary" id="saveTokenBtn">🔐 加密保存并开始</button>
-    <div class="security-tip">
-      <strong>🛡️ 安全说明：</strong><br>
-      • Token 使用 AES-256 加密后存储，F12 无法直接查看<br>
-      • 每次打开需输入密码解密，关闭页面后自动锁定<br>
-      • <strong>请创建最小权限 Token</strong>：只勾选 <code>repo</code> 权限<br>
-      • 建议在 GitHub 设置 Token 过期时间为 90 天
-    </div>
+    <button class="btn btn-primary" id="saveTokenBtn">💾 保存Token并开始</button>
   </div>
 
-  <div class="unlock-section" id="unlockCard" style="display:none">
-    <h2>🔓 解锁管理后台</h2>
-    <p>请输入本地密码以解锁管理功能</p>
-    <div class="form-group">
-      <input type="password" class="form-input" id="unlockPassword" placeholder="输入解锁密码" maxlength="32">
-    </div>
-    <button class="btn btn-primary" id="unlockBtn">🔓 解锁</button>
-    <!-- ✅ 修复：增加解锁失败提示区域 -->
-    <div id="unlockFailTip" style="display:none;margin-top:12px;font-size:12px;color:var(--danger)">
-    </div>
-    <div style="margin-top:14px">
-      <button class="btn btn-outline btn-sm" id="resetAllBtn" style="width:auto;padding:8px 20px;font-size:12px;color:var(--text-light);border-color:rgba(0,0,0,.08)">
-        忘记密码？清除所有数据重来
-      </button>
-    </div>
-  </div>
-
+  <!-- 主面板 -->
   <div id="mainPanel" style="display:none">
-    <div style="text-align:center;margin-bottom:16px">
-      <span class="security-badge secure">🔒 Token 已加密 · 会话已解锁</span>
-    </div>
 
+    <!-- 添加/编辑产品 -->
     <div class="section-card">
       <h3>📦 <span id="formTitle">添加产品</span></h3>
       <input type="hidden" id="editId" value="">
@@ -296,11 +264,11 @@ select.form-input{appearance:none;-webkit-appearance:none;
       </div>
 
       <div class="form-group">
-        <label>产品图片 * <span style="font-weight:400;color:var(--text-light)">（第一张为封面，自动转为WebP）</span></label>
+        <label>产品图片 * <span style="font-weight:400;color:var(--text-light)">（第一张为封面，自动转为WebP）</span></label> <!-- ✅ 修改：提示文字 -->
         <div class="upload-area" id="uploadArea">
           <input type="file" id="fileInput" accept="image/*" multiple>
           <div class="upload-icon">📷</div>
-          <div class="upload-text">点击或拖放图片到这里<br><span style="font-size:11px">支持 JPG / PNG / WEBP，上传自动压缩转换</span></div>
+          <div class="upload-text">点击或拖放图片到这里<br><span style="font-size:11px">支持 JPG / PNG / WEBP，上传自动压缩转换</span></div> <!-- ✅ 修改：提示文字 -->
         </div>
         <div class="preview-grid" id="previewGrid"></div>
       </div>
@@ -316,6 +284,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
       </div>
     </div>
 
+    <!-- 产品列表 -->
     <div class="section-card">
       <h3>📋 产品列表 <span class="count" id="productCount">0 件</span></h3>
       <div id="productList">
@@ -323,13 +292,13 @@ select.form-input{appearance:none;-webkit-appearance:none;
       </div>
     </div>
 
+    <!-- 数据管理 -->
     <div class="section-card">
       <h3>🔧 数据管理</h3>
       <div style="display:flex;flex-direction:column;gap:10px">
         <button class="btn btn-outline btn-sm" id="refreshBtn">🔄 刷新产品数据</button>
         <button class="btn btn-outline btn-sm" id="purgeCdnBtn">⚡ 刷新CDN缓存</button>
         <button class="btn btn-outline btn-sm" id="changeTokenBtn">🔑 更换Token</button>
-        <button class="btn btn-outline btn-sm" id="lockBtn">🔒 锁定后台（离开时请锁定）</button>
         <div style="font-size:11px;color:var(--text-light);text-align:center;margin-top:4px">
           图片存放在 rongyan/images/ 文件夹<br>
           产品数据存放在 rongyan/products.json<br>
@@ -354,10 +323,8 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
   const GITHUB_API    = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${PRODUCTS_FILE}`;
   const CDN_BASE      = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
+  const TOKEN_KEY     = 'rongyan_admin_token';
   const PURGE_BASE    = `https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
-
-  const ENC_TOKEN_KEY  = 'rongyan_enc_token';
-  const VERIFY_KEY     = 'rongyan_verify';
 
   // ============================
   //   DOM
@@ -371,11 +338,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
         cancelEditBtn=$('cancelEditBtn'), productList=$('productList'), productCount=$('productCount'),
         refreshBtn=$('refreshBtn'), purgeCdnBtn=$('purgeCdnBtn'), changeTokenBtn=$('changeTokenBtn'),
         progressWrap=$('progressWrap'), progressBar=$('progressBar'), progressText=$('progressText'),
-        toastEl=$('toast'), confirmModal=$('confirmModal'), setupTitle=$('setupTitle'),
-        unlockCard=$('unlockCard'), unlockPassword=$('unlockPassword'), unlockBtn=$('unlockBtn'),
-        resetAllBtn=$('resetAllBtn'), passwordInput=$('passwordInput'),
-        passwordConfirm=$('passwordConfirm'), lockBtn=$('lockBtn'),
-        unlockFailTip=$('unlockFailTip'); // ✅ 修复：新增 DOM 引用
+        toastEl=$('toast'), confirmModal=$('confirmModal'), setupTitle=$('setupTitle');
 
   // ============================
   //   状态
@@ -384,75 +347,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
   let images = [];
   let fileSha = null;
   let isSubmitting = false;
-  let currentToken = null;
-  // ✅ 修复：新增解锁失败计数器
-  let unlockFailCount = 0;
-  let unlockLocked = false;
-
-  // ============================
-  //   安全模块：AES 加密/解密
-  // ============================
-  function strToBuf(str) {
-    return new TextEncoder().encode(str);
-  }
-
-  function bufToB64(buf) {
-    return btoa(String.fromCharCode(...new Uint8Array(buf)));
-  }
-
-  function b64ToBuf(b64) {
-    const bin = atob(b64);
-    const buf = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
-    return buf;
-  }
-
-  function generateSalt() {
-    return bufToB64(crypto.getRandomValues(new Uint8Array(16)));
-  }
-
-  async function deriveKey(password, salt) {
-    const keyMaterial = await crypto.subtle.importKey(
-      'raw', strToBuf(password), 'PBKDF2', false, ['deriveKey']
-    );
-    return crypto.subtle.deriveKey(
-      { name: 'PBKDF2', salt: strToBuf(salt), iterations: 100000, hash: 'SHA-256' },
-      keyMaterial,
-      { name: 'AES-GCM', length: 256 },
-      false,
-      ['encrypt', 'decrypt']
-    );
-  }
-
-  async function encrypt(plainText, password) {
-    const salt = generateSalt();
-    const key = await deriveKey(password, salt);
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const encrypted = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: iv },
-      key,
-      strToBuf(plainText)
-    );
-    return salt + ':' + bufToB64(iv) + ':' + bufToB64(encrypted);
-  }
-
-  async function decrypt(encryptedStr, password) {
-    const parts = encryptedStr.split(':');
-    if (parts.length !== 3) throw new Error('加密数据格式错误');
-    const [salt, ivB64, ctB64] = parts;
-    const key = await deriveKey(password, salt);
-    const decrypted = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: b64ToBuf(ivB64) },
-      key,
-      b64ToBuf(ctB64)
-    );
-    return new TextDecoder().decode(decrypted);
-  }
-
-  async function hashPassword(password) {
-    const hash = await crypto.subtle.digest('SHA-256', strToBuf(password + '_rongyan_verify'));
-    return bufToB64(hash);
-  }
 
   // ============================
   //   工具函数
@@ -488,25 +382,26 @@ select.form-input{appearance:none;-webkit-appearance:none;
     cancel.onclick = cleanup;
   }
 
-  function getToken(){
-    return currentToken || '';
-  }
-
-  function clearSession() {
-    currentToken = null;
-  }
+  function getToken(){ return (localStorage.getItem(TOKEN_KEY) || '').trim(); }
+  function setToken(t){ localStorage.setItem(TOKEN_KEY, t.trim()); }
+  function removeToken(){ localStorage.removeItem(TOKEN_KEY); }
 
   async function purgeCdn(path) {
     try {
-      const res = await fetch(`${PURGE_BASE}/${path}`);
-      if (res.ok) console.log('CDN 缓存已清除:', path);
+      const purgeUrl = `${PURGE_BASE}/${path}`;
+      const res = await fetch(purgeUrl);
+      if (res.ok) {
+        console.log('CDN 缓存已清除:', path);
+      } else {
+        console.warn('CDN 缓存清除响应异常:', path, res.status);
+      }
     } catch (e) {
       console.warn('CDN 缓存清除失败:', path, e);
     }
   }
 
   // ============================
-  //   图片压缩（WEBP 格式）
+  //   ✅ 修改：图片压缩（转换为 WEBP 格式）
   // ============================
   function compressImage(file, maxSize=800, quality=0.75){
     return new Promise((resolve, reject)=>{
@@ -524,10 +419,15 @@ select.form-input{appearance:none;-webkit-appearance:none;
           canvas.height = h;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, w, h);
+          
+          // ✅ 修改：优先转换为 WEBP 格式，体积比 JPEG 小 25%~35%
           let dataUrl = canvas.toDataURL('image/webp', quality);
+          
+          // 兼容处理：极少数老旧浏览器不支持 webp 导出（会回退为 png），此时改用 jpeg
           if (dataUrl.indexOf('data:image/webp') !== 0) {
             dataUrl = canvas.toDataURL('image/jpeg', quality);
           }
+          
           resolve(dataUrl);
         };
         img.onerror = reject;
@@ -543,7 +443,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
   // ============================
   async function fetchProductsFromGitHub(){
     const token = getToken();
-    if (!token) throw new Error('未登录或会话已过期，请重新解锁');
     const res = await fetch(GITHUB_API + '?t=' + Date.now(), {
       headers: { 'Authorization': 'Bearer ' + token }
     });
@@ -557,7 +456,6 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
   async function saveProductsToGitHub(updatedProducts){
     const token = getToken();
-    if (!token) throw new Error('未登录或会话已过期，请重新解锁');
     const jsonStr = JSON.stringify(updatedProducts, null, 2);
     const contentB64 = btoa(unescape(encodeURIComponent(jsonStr)));
 
@@ -579,21 +477,22 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
     if(!res.ok){
       const errData = await res.json().catch(()=>({}));
-      if(res.status === 401) throw new Error('Token 无效或已过期，请更换 Token');
+      if(res.status === 401) throw new Error('Token 无效或已过期，请点击右上角🔑重新配置');
       if(res.status === 403) throw new Error('Token 权限不足，请确保生成时勾选了 repo 权限');
-      if(res.status === 404) throw new Error('找不到仓库，请检查仓库名配置');
+      if(res.status === 404) throw new Error('找不到仓库，请检查代码顶部的仓库名配置');
       throw new Error(errData.message || '保存失败 (HTTP ' + res.status + ')');
     }
 
     const result = await res.json();
     fileSha = result.content.sha;
+
     await purgeCdn(PRODUCTS_FILE);
+
     return result;
   }
 
   async function uploadImageToGitHub(dataUrl, fileName){
     const token = getToken();
-    if (!token) throw new Error('未登录或会话已过期');
     const base64Content = dataUrl.split(',')[1];
     const filePath = `${IMAGES_DIR}/${fileName}`;
     const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}`;
@@ -615,29 +514,29 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
     if(!res.ok){
       const err = await res.json().catch(()=>({}));
-      if(res.status === 401) throw new Error('Token 无效，请更换');
+      if(res.status === 401) throw new Error('Token 无效，请重新配置');
       if(res.status === 403) throw new Error('Token 缺少 repo 权限');
       throw new Error(err.message || '图片上传失败 (HTTP ' + res.status + ')');
     }
 
     const cdnUrl = `${CDN_BASE}/${filePath}`;
     await purgeCdn(filePath);
+
     return cdnUrl;
   }
 
   async function deleteImageFromGitHub(fileName){
     const token = getToken();
-    if (!token) return;
     const filePath = `${IMAGES_DIR}/${fileName}`;
     const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}`;
 
     const getRes = await fetch(apiUrl, {
       headers: { 'Authorization': 'Bearer ' + token }
     });
-    if(!getRes.ok) return;
+    if(!getRes.ok) return; 
     const fileData = await getRes.json();
 
-    await fetch(apiUrl, {
+    const res = await fetch(apiUrl, {
       method: 'DELETE',
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -649,6 +548,10 @@ select.form-input{appearance:none;-webkit-appearance:none;
         branch: GITHUB_BRANCH
       })
     });
+
+    if(!res.ok){
+      console.warn('删除图片失败:', fileName);
+    }
   }
 
   function extractFileName(cdnUrl){
@@ -666,7 +569,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
       const result = await fetchProductsFromGitHub();
       products = result.products;
     } catch(e){
-      console.warn('加载失败:', e);
+      console.warn('GitHub API 加载失败:', e);
       showToast('加载失败: ' + e.message, 'error', 4000);
       products = [];
       fileSha = null;
@@ -681,6 +584,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
       return;
     }
     const sorted = [...products].sort((a,b) => b.id - a.id);
+    
     productList.innerHTML = sorted.map(p => `
       <div class="product-item">
         <div class="pi-img"><img src="${escapeHTML(p.cover)}" alt="${escapeHTML(p.name)}" loading="lazy"></div>
@@ -696,6 +600,9 @@ select.form-input{appearance:none;-webkit-appearance:none;
     `).join('');
   }
 
+  // ============================
+  //   图片预览
+  // ============================
   function renderImagePreviews(){
     previewGrid.innerHTML = images.map((img, i) => `
       <div class="preview-item">
@@ -709,8 +616,9 @@ select.form-input{appearance:none;-webkit-appearance:none;
   async function handleFiles(fileList){
     const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
     if(!files.length) return;
+
     for(let i = 0; i < files.length; i++){
-      showProgress(((i+1)/files.length*80).toFixed(0), `压缩并转换图片 ${i+1}/${files.length}...`);
+      showProgress(((i+1)/files.length*80).toFixed(0), `压缩并转换图片 ${i+1}/${files.length}...`); // ✅ 修改：提示文字
       try {
         const compressed = await compressImage(files[i]);
         images.push({ src: compressed, isNew: true, fileName: null });
@@ -743,6 +651,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
       images.splice(idx, 1);
       renderImagePreviews();
     },
+
     editProduct(id){
       const p = products.find(x => x.id === id);
       if(!p) return;
@@ -751,31 +660,40 @@ select.form-input{appearance:none;-webkit-appearance:none;
       pPrice.value = p.price;
       pCategory.value = p.category;
       pDesc.value = p.description || '';
+      
       images = (p.images || []).map(url => ({
-        src: url, isNew: false, fileName: extractFileName(url)
+        src: url,
+        isNew: false,
+        fileName: extractFileName(url)
       }));
+      
       renderImagePreviews();
       formTitle.textContent = '编辑产品 #' + id;
       submitBtn.innerHTML = '💾 保存修改';
       cancelEditBtn.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
+
     async deleteProduct(id){
       const p = products.find(x => x.id === id);
       if(!p) return;
+      
       showConfirm('删除产品', `确定要删除「${p.name}」吗？\n同时会删除该产品的所有图片。`, async(confirmed)=>{
         if(!confirmed) return;
         try {
           showProgress(30, '正在删除图片...');
+          
           if(p.images && p.images.length > 0){
             for(let i = 0; i < p.images.length; i++){
-              const fn = extractFileName(p.images[i]);
-              if(fn) await deleteImageFromGitHub(fn);
+              const fileName = extractFileName(p.images[i]);
+              if(fileName) await deleteImageFromGitHub(fileName);
             }
           }
+
           showProgress(70, '正在更新产品数据...');
           products = products.filter(x => x.id !== id);
           await saveProductsToGitHub(products);
+          
           hideProgress();
           showToast('已删除「' + p.name + '」', 'success');
           renderProductList();
@@ -792,15 +710,16 @@ select.form-input{appearance:none;-webkit-appearance:none;
   // ============================
   async function handleSubmit(){
     if(isSubmitting) return;
-    const name = pName.value.trim();
-    const price = parseFloat(pPrice.value);
-    const category = pCategory.value;
-    const desc = pDesc.value.trim();
-    const eId = editId.value;
 
-    if(!name){ showToast('请输入产品名称', 'error'); pName.focus(); return; }
-    if(isNaN(price) || price < 0){ showToast('请输入有效价格', 'error'); pPrice.focus(); return; }
-    if(images.length === 0){ showToast('请至少上传一张图片', 'error'); return; }
+    const name     = pName.value.trim();
+    const price    = parseFloat(pPrice.value);
+    const category = pCategory.value;
+    const desc     = pDesc.value.trim();
+    const eId      = editId.value;
+
+    if(!name)     { showToast('请输入产品名称', 'error'); pName.focus(); return; }
+    if(isNaN(price) || price < 0) { showToast('请输入有效价格', 'error'); pPrice.focus(); return; }
+    if(images.length === 0) { showToast('请至少上传一张图片', 'error'); return; }
 
     isSubmitting = true;
     submitBtn.disabled = true;
@@ -812,15 +731,21 @@ select.form-input{appearance:none;-webkit-appearance:none;
 
       for(let i = 0; i < images.length; i++){
         const img = images[i];
+        
         if(!img.isNew){
           finalImageUrls.push(img.src);
         } else {
           uploadCount++;
-          showProgress(20 + (uploadCount / newImages.length * 50), `上传图片 ${uploadCount}/${newImages.length}...`);
+          showProgress(20 + (uploadCount / newImages.length * 50), 
+            `上传图片 ${uploadCount}/${newImages.length}...`);
+          
           const timestamp = Date.now();
           const randomStr = Math.random().toString(36).substring(2, 8);
+          
+          // ✅ 修改：根据 dataUrl 的实际格式动态决定文件后缀名（webp 或 jpg）
           const ext = img.src.indexOf('data:image/webp') === 0 ? 'webp' : 'jpg';
           const fileName = `${timestamp}_${randomStr}.${ext}`;
+          
           const cdnUrl = await uploadImageToGitHub(img.src, fileName);
           finalImageUrls.push(cdnUrl);
         }
@@ -832,15 +757,18 @@ select.form-input{appearance:none;-webkit-appearance:none;
         const id = parseInt(eId);
         const idx = products.findIndex(x => x.id === id);
         if(idx < 0) throw new Error('产品不存在');
+        
         const oldImages = products[idx].images || [];
         const deletedImages = oldImages.filter(url => !finalImageUrls.includes(url));
+        
         if(deletedImages.length > 0){
           showProgress(85, '清理旧图片...');
           for(const url of deletedImages){
-            const fn = extractFileName(url);
-            if(fn) await deleteImageFromGitHub(fn);
+            const fileName = extractFileName(url);
+            if(fileName) await deleteImageFromGitHub(fileName);
           }
         }
+
         products[idx].name = name;
         products[idx].price = price;
         products[idx].category = category;
@@ -850,15 +778,20 @@ select.form-input{appearance:none;-webkit-appearance:none;
       } else {
         const maxId = products.reduce((m, p) => Math.max(m, p.id || 0), 0);
         products.push({
-          id: maxId + 1, name, price, category,
-          description: desc, cover: finalImageUrls[0], images: [...finalImageUrls]
+          id: maxId + 1,
+          name,
+          price,
+          category,
+          description: desc,
+          cover: finalImageUrls[0],
+          images: [...finalImageUrls]
         });
       }
 
       showProgress(90, '更新 products.json...');
       await saveProductsToGitHub(products);
 
-      showProgress(95, '刷新CDN缓存...');
+      showProgress(95, '刷新CDN缓存，确保前台可见...');
       await purgeCdn(PRODUCTS_FILE);
 
       showProgress(100, '完成！');
@@ -867,6 +800,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
       showToast(eId ? '产品已更新 ✅' : '产品已添加 ✅', 'success');
       resetForm();
       renderProductList();
+
     } catch(e){
       hideProgress();
       showToast('保存失败: ' + e.message, 'error', 4000);
@@ -877,259 +811,40 @@ select.form-input{appearance:none;-webkit-appearance:none;
   }
 
   // ============================
-  //   界面切换
-  // ============================
-  function showSetup() {
-    setupCard.style.display = 'block';
-    unlockCard.style.display = 'none';
-    mainPanel.style.display = 'none';
-    clearSession();
-  }
-
-  function showUnlock() {
-    setupCard.style.display = 'none';
-    unlockCard.style.display = 'block';
-    mainPanel.style.display = 'none';
-    clearSession();
-    // ✅ 修复：重置失败计数
-    unlockFailCount = 0;
-    unlockLocked = false;
-    unlockBtn.disabled = false;
-    unlockBtn.textContent = '🔓 解锁';
-    unlockFailTip.style.display = 'none';
-  }
-
-  function showMain() {
-    setupCard.style.display = 'none';
-    unlockCard.style.display = 'none';
-    mainPanel.style.display = 'block';
-    loadProducts();
-  }
-
-  function lockPanel() {
-    clearSession();
-    showUnlock();
-    showToast('已锁定，需重新输入密码解锁', 'info');
-  }
-
-  function resetAll() {
-    localStorage.removeItem(ENC_TOKEN_KEY);
-    localStorage.removeItem(VERIFY_KEY);
-    clearSession();
-    showSetup();
-    showToast('所有数据已清除', 'info');
-  }
-
-  // ============================
   //   初始化
   // ============================
   function init(){
-
-    // ✅ 修复 Bug 3：检测 crypto.subtle 是否可用（仅 HTTPS/localhost 可用）
-    if (!window.crypto || !window.crypto.subtle) {
-      setupCard.innerHTML = `
-        <h2>⚠️ 安全环境要求</h2>
-        <p style="color:var(--danger);margin:16px 0;line-height:1.8">
-          管理后台需要通过以下方式访问：<br>
-          • <strong>HTTPS</strong>（如 GitHub Pages：https://xxx.github.io）<br>
-          • <strong>localhost</strong>（本地开发服务器）<br><br>
-          请勿直接用 <code>file://</code> 协议双击打开此文件。<br>
-          如需本地测试，请运行：<br>
-          <code style="background:#f5f0e8;padding:4px 8px;border-radius:4px;font-size:12px">python3 -m http.server 8080</code><br>
-          然后访问 <code>http://localhost:8080/admin.html</code>
-        </p>`;
-      setupCard.style.display = 'block';
-      return;
-    }
-
-    const hasEncryptedToken = localStorage.getItem(ENC_TOKEN_KEY);
-
-    if (hasEncryptedToken) {
-      showUnlock();
-    } else {
-      showSetup();
+    const token = getToken();
+    if(token){
+      setupCard.style.display = 'none';
+      mainPanel.style.display = 'block';
+      loadProducts();
     }
 
     tokenShow.addEventListener('change', function(){
       tokenInput.type = this.checked ? 'text' : 'password';
     });
 
-    // --- 首次保存：加密 Token ---
-    saveTokenBtn.addEventListener('click', async function(){
-      const token = tokenInput.value.trim();
-      const pwd = passwordInput.value;
-      const pwd2 = passwordConfirm.value;
-
-      if(!token){ showToast('请输入 Token', 'error'); return; }
-      if(!pwd || pwd.length < 4){ showToast('密码至少4位', 'error'); passwordInput.focus(); return; }
-      if(pwd.length > 32){ showToast('密码最长32位', 'error'); passwordInput.focus(); return; }
-      if(pwd !== pwd2){ showToast('两次密码不一致', 'error'); passwordConfirm.focus(); return; }
-
-      try {
-        this.disabled = true;
-        this.textContent = '⏳ 加密中...';
-
-        const encrypted = await encrypt(token, pwd);
-        localStorage.setItem(ENC_TOKEN_KEY, encrypted);
-
-        const verifyHash = await hashPassword(pwd);
-        localStorage.setItem(VERIFY_KEY, verifyHash);
-
-        currentToken = token;
-
-        tokenInput.value = '';
-        passwordInput.value = '';
-        passwordConfirm.value = '';
-
-        showToast('Token 已加密保存 ✅', 'success');
-        showMain();
-      } catch(e) {
-        showToast('加密失败: ' + e.message, 'error');
-      } finally {
-        this.disabled = false;
-        this.textContent = '🔐 加密保存并开始';
-      }
-    });
-
-    // --- 解锁 ---
-    unlockBtn.addEventListener('click', async function(){
-      // ✅ 修复：检查是否被锁定
-      if (unlockLocked) return;
-
-      const pwd = unlockPassword.value;
-      if(!pwd){ showToast('请输入密码', 'error'); return; }
-
-      try {
-        this.disabled = true;
-        this.textContent = '⏳ 解密中...';
-        unlockFailTip.style.display = 'none';
-
-        const storedHash = localStorage.getItem(VERIFY_KEY);
-        const inputHash = await hashPassword(pwd);
-        if (storedHash && inputHash !== storedHash) {
-          // ✅ 修复：密码错误时增加失败计数
-          unlockFailCount++;
-          const remaining = 5 - unlockFailCount;
-
-          if (unlockFailCount >= 5) {
-            // 锁定 60 秒
-            unlockLocked = true;
-            unlockBtn.disabled = true;
-            unlockBtn.textContent = '🔒 已锁定 (60s)';
-            unlockFailTip.style.display = 'block';
-            unlockFailTip.textContent = '失败次数过多，已锁定 60 秒。请稍后重试。';
-
-            let countdown = 60;
-            const timer = setInterval(() => {
-              countdown--;
-              if (countdown <= 0) {
-                clearInterval(timer);
-                unlockLocked = false;
-                unlockFailCount = 0;
-                unlockBtn.disabled = false;
-                unlockBtn.textContent = '🔓 解锁';
-                unlockFailTip.textContent = '已解除锁定，请重新输入密码。';
-                unlockFailTip.style.color = 'var(--primary)';
-              } else {
-                unlockBtn.textContent = '🔒 已锁定 (' + countdown + 's)';
-              }
-            }, 1000);
-
-            return;
-          }
-
-          unlockFailTip.style.display = 'block';
-          unlockFailTip.style.color = 'var(--danger)';
-          unlockFailTip.textContent = '密码错误，还剩 ' + remaining + ' 次尝试机会。';
-          unlockPassword.value = '';
-          unlockPassword.focus();
-          return;
-        }
-
-        const encrypted = localStorage.getItem(ENC_TOKEN_KEY);
-        const token = await decrypt(encrypted, pwd);
-
-        // ✅ 修复 Bug 2：放宽 Token 格式校验（只检查最小长度）
-        if (!token || token.length < 20) {
-          showToast('Token 解密结果异常，请重置', 'error');
-          return;
-        }
-
-        currentToken = token;
-        unlockPassword.value = '';
-        unlockFailCount = 0; // 成功后重置计数
-        showToast('解锁成功 ✅', 'success');
-        showMain();
-      } catch(e) {
-        // 解密失败也算一次失败
-        unlockFailCount++;
-        const remaining = 5 - unlockFailCount;
-
-        if (unlockFailCount >= 5) {
-          unlockLocked = true;
-          unlockBtn.disabled = true;
-          unlockBtn.textContent = '🔒 已锁定 (60s)';
-          unlockFailTip.style.display = 'block';
-          unlockFailTip.textContent = '失败次数过多，已锁定 60 秒。请稍后重试。';
-
-          let countdown = 60;
-          const timer = setInterval(() => {
-            countdown--;
-            if (countdown <= 0) {
-              clearInterval(timer);
-              unlockLocked = false;
-              unlockFailCount = 0;
-              unlockBtn.disabled = false;
-              unlockBtn.textContent = '🔓 解锁';
-              unlockFailTip.textContent = '已解除锁定，请重新输入密码。';
-              unlockFailTip.style.color = 'var(--primary)';
-            } else {
-              unlockBtn.textContent = '🔒 已锁定 (' + countdown + 's)';
-            }
-          }, 1000);
-        } else {
-          unlockFailTip.style.display = 'block';
-          unlockFailTip.style.color = 'var(--danger)';
-          unlockFailTip.textContent = '解密失败，还剩 ' + remaining + ' 次尝试机会。可能是密码错误。';
-        }
-      } finally {
-        if (!unlockLocked) {
-          this.disabled = false;
-          this.textContent = '🔓 解锁';
-        }
-      }
-    });
-
-    // ✅ 修复 Bug 1：解锁界面回车键提交
-    unlockPassword.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !unlockLocked) {
-        unlockBtn.click();
-      }
-    });
-
-    resetAllBtn.addEventListener('click', function(){
-      showConfirm('清除所有数据', '这将清除加密的 Token 和所有本地数据。\n你需要重新输入 Token 和设置密码。', (ok) => {
-        if(ok) resetAll();
-      });
-    });
-
-    lockBtn.addEventListener('click', function(){
-      showConfirm('锁定后台', '锁定后需重新输入密码才能继续使用。', (ok) => {
-        if(ok) lockPanel();
-      });
+    saveTokenBtn.addEventListener('click', function(){
+      const t = tokenInput.value.trim();
+      if(!t){ showToast('请输入 Token', 'error'); return; }
+      setToken(t);
+      setupCard.style.display = 'none';
+      mainPanel.style.display = 'block';
+      showToast('Token 已保存', 'success');
+      loadProducts();
     });
 
     logoutBtn.addEventListener('click', function(e){
       e.preventDefault();
-      lockPanel();
-    });
-
-    changeTokenBtn.addEventListener('click', function(){
-      showConfirm('更换 Token', '当前加密的 Token 将被清除，需重新设置。', (ok) => {
+      showConfirm('清除Token', '清除后需要重新输入 Token。', (ok)=>{
         if(!ok) return;
-        resetAll();
-        setupTitle.textContent = '🔑 更换 Token';
-        showToast('请输入新的 Token 和密码', 'info');
+        removeToken();
+        mainPanel.style.display = 'none';
+        setupCard.style.display = 'block';
+        setupTitle.textContent = '⚙️ 首次设置';
+        tokenInput.value = '';
+        showToast('Token 已清除', 'info');
       });
     });
 
@@ -1138,10 +853,16 @@ select.form-input{appearance:none;-webkit-appearance:none;
       this.value = '';
     });
 
-    uploadArea.addEventListener('dragover', function(e){ e.preventDefault(); this.classList.add('dragover'); });
-    uploadArea.addEventListener('dragleave', function(){ this.classList.remove('dragover'); });
+    uploadArea.addEventListener('dragover', function(e){
+      e.preventDefault();
+      this.classList.add('dragover');
+    });
+    uploadArea.addEventListener('dragleave', function(){
+      this.classList.remove('dragover');
+    });
     uploadArea.addEventListener('drop', function(e){
-      e.preventDefault(); this.classList.remove('dragover');
+      e.preventDefault();
+      this.classList.remove('dragover');
       if(e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
     });
 
@@ -1162,7 +883,7 @@ select.form-input{appearance:none;-webkit-appearance:none;
       this.textContent = '⏳ 刷新中...';
       try {
         await purgeCdn(PRODUCTS_FILE);
-        showToast('CDN 缓存已刷新', 'success', 4000);
+        showToast('CDN 缓存已刷新，前台刷新页面即可看到最新数据', 'success', 4000);
       } catch(e){
         showToast('CDN 刷新失败', 'error');
       }
@@ -1170,20 +891,16 @@ select.form-input{appearance:none;-webkit-appearance:none;
       this.textContent = '⚡ 刷新CDN缓存';
     });
 
-    window.addEventListener('beforeunload', function() {
-      clearSession();
-    });
-
-    let hiddenTime = null;
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden) {
-        hiddenTime = Date.now();
-      } else {
-        if (hiddenTime && (Date.now() - hiddenTime > 30000) && currentToken) {
-          lockPanel();
-        }
-        hiddenTime = null;
-      }
+    changeTokenBtn.addEventListener('click', function(){
+      showConfirm('更换 Token', '确定要更换 Token 吗？当前 Token 将被清除。', (ok) => {
+        if(!ok) return;
+        removeToken();
+        mainPanel.style.display = 'none';
+        setupCard.style.display = 'block';
+        setupTitle.textContent = '🔑 更换 Token';
+        tokenInput.value = '';
+        showToast('请输入新的 Token', 'info');
+      });
     });
   }
 

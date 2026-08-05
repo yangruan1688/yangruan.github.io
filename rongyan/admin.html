@@ -125,10 +125,11 @@
   <div class="auth-box">
     <div class="lock-icon">🔒</div>
     <h3>绒颜 · 管理后台</h3>
-    <p>请输入管理员账号和密码</p>
+    <p>请输入管理员账号、密码和 GitHub Token</p>
     <input type="text" id="emailInput" class="auth-input" placeholder="管理员账号" autocomplete="off">
     <input type="password" id="passwordInput" class="auth-input" placeholder="请输入密码" autocomplete="off">
-    <button class="auth-btn" onclick="doLogin()">验证并进入</button>
+    <input type="password" id="tokenInput" class="auth-input" placeholder="GitHub Token (ghp_开头)" autocomplete="off">
+    <button class="auth-btn" id="loginBtn" onclick="doLogin()">验证并进入</button>
   </div>
 </div>
 
@@ -156,7 +157,7 @@
     <div class="form-group">
       <label class="form-label">分类 *</label>
       <select class="form-select" id="fCategory">
-        <option value="发饰">发饰</option><option value="耳饰">耳饰</option><option value="胸针">胸针</option>
+        <option value="发饰">发饰</option><option value="耳饰">耳饰</option>
         <option value="胸饰">胸饰</option><option value="头饰">头饰</option><option value="其他">其他</option>
       </select>
     </div>
@@ -226,22 +227,32 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  // ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-  // 👇 请修改为你自己的 GitHub 配置 👇
-  // ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+  // ==========================================
+  // 🔐 安全配置（源码中不含任何明文密码和 Token）
+  // ==========================================
   const GITHUB_CONFIG = {
-    token: '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',
     owner: 'yangruan1688',
     repo: 'yangruan.github.io',
-    branch: 'main',           // 分支名，一般是 main
-    imageDir: 'images',       // 图片存放目录
-    dataFile: 'products.json' // 产品数据文件名
+    branch: 'main',
+    imageDir: 'images',
+    dataFile: 'products.json'
   };
 
-  // 管理员登录账号密码（本地验证，不使用云端）
+  // 管理员账号（用户名不涉及敏感信息，可保留）
   const ADMIN_USER = 'admin';
-  const ADMIN_PASS = '10211688';
-  // ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+
+  // 管理员密码的 SHA-256 哈希值（原文不会出现在代码中）
+  // 如需修改密码，在浏览器控制台运行：
+  //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('你的新密码'))
+  //     .then(h => console.log(Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('')))
+  // 然后把输出的哈希值粘贴到下面
+  const ADMIN_PASS_HASH = '6a059d52b6c21e14875e9748a5b9d6a4496c3a6b3b4c5d6e7f8a9b0c1d2e3f4a5';
+  // ⚠️ 上面是示例哈希值！请先用下面的方法生成你真实密码的哈希再替换！
+
+  // 从 localStorage 读取 GitHub Token（登录时存入）
+  function getGithubToken() {
+    return localStorage.getItem('rongyan_github_token') || '';
+  }
 
   // ==========================================
   // 🔧 GitHub API 工具函数
@@ -251,11 +262,28 @@
 
   function githubHeaders() {
     return {
-      'Authorization': 'Bearer ' + GITHUB_CONFIG.token,
+      'Authorization': 'Bearer ' + getGithubToken(),
       'Accept': 'application/vnd.github.v3+json',
       'Content-Type': 'application/json',
       'X-GitHub-Api-Version': '2022-11-28'
     };
+  }
+
+  // 验证 Token 是否有效（调用 GitHub API 测试）
+  async function verifyToken(token) {
+    try {
+      const res = await fetch('https://api.github.com/user', {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      if (!res.ok) return false;
+      const data = await res.json();
+      return data.login || false;
+    } catch {
+      return false;
+    }
   }
 
   // 获取文件内容和 SHA（用于更新）
@@ -263,7 +291,7 @@
     const res = await fetch(`${API_BASE}/contents/${filePath}?ref=${GITHUB_CONFIG.branch}`, {
       headers: githubHeaders()
     });
-    if (res.status === 404) return null; // 文件不存在
+    if (res.status === 404) return null;
     if (!res.ok) throw new Error(`GitHub API 错误: ${res.status}`);
     const data = await res.json();
     return {
@@ -360,10 +388,9 @@
       GITHUB_CONFIG.dataFile,
       base64,
       commitMessage || '更新产品数据',
-      _productsSha // 如果是首次创建，sha 为 null，GitHub 会自动创建文件
+      _productsSha
     );
     _productsCache = products;
-    // 更新 SHA（上传后会变）
     const file = await getFileFromGithub(GITHUB_CONFIG.dataFile);
     if (file) _productsSha = file.sha;
   }
@@ -374,11 +401,22 @@
   }
 
   // ==========================================
-  // 🔐 本地密码验证
+  // 🔐 登录验证（SHA-256 哈希比对 + Token 验证）
   // ==========================================
+
+  // 计算 SHA-256 哈希
+  async function sha256(text) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
   function checkAuth() {
     const loggedIn = localStorage.getItem('rongyan_admin') === 'true';
-    if (loggedIn) {
+    const token = getGithubToken();
+    if (loggedIn && token) {
       showMainApp();
     } else {
       document.getElementById('authOverlay').style.display = 'flex';
@@ -386,32 +424,56 @@
     }
   }
 
-  function doLogin() {
+  async function doLogin() {
     const user = document.getElementById('emailInput').value.trim();
     const pwd = document.getElementById('passwordInput').value;
-    if (!user || !pwd) return showToast('⚠️ 请输入账号和密码');
+    const token = document.getElementById('tokenInput').value.trim();
 
-    const btn = document.querySelector('.auth-btn');
+    if (!user || !pwd) return showToast('⚠️ 请输入账号和密码');
+    if (!token) return showToast('⚠️ 请输入 GitHub Token');
+
+    const btn = document.getElementById('loginBtn');
     btn.disabled = true;
     btn.textContent = '验证中...';
 
-    // 模拟一下延迟让体验更自然
-    setTimeout(() => {
-      btn.disabled = false;
-      btn.textContent = '验证并进入';
-
-      if (user === ADMIN_USER && pwd === ADMIN_PASS) {
-        localStorage.setItem('rongyan_admin', 'true');
-        showMainApp();
-      } else {
+    try {
+      // 1. 验证密码（SHA-256 哈希比对）
+      const inputHash = await sha256(pwd);
+      if (user !== ADMIN_USER || inputHash !== ADMIN_PASS_HASH) {
         showToast('❌ 账号或密码错误');
         document.getElementById('passwordInput').value = '';
+        btn.disabled = false;
+        btn.textContent = '验证并进入';
+        return;
       }
-    }, 500);
+
+      // 2. 验证 GitHub Token 是否有效
+      btn.textContent = '验证 Token 中...';
+      const githubUser = await verifyToken(token);
+      if (!githubUser) {
+        showToast('❌ GitHub Token 无效或已过期');
+        btn.disabled = false;
+        btn.textContent = '验证并进入';
+        return;
+      }
+
+      // 3. 验证通过，保存到 localStorage
+      localStorage.setItem('rongyan_admin', 'true');
+      localStorage.setItem('rongyan_github_token', token);
+      showToast('✅ 欢迎, ' + githubUser + '!');
+      showMainApp();
+    } catch (err) {
+      console.error('登录失败:', err);
+      showToast('❌ 登录异常: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '验证并进入';
+    }
   }
 
   function doLogout() {
     localStorage.removeItem('rongyan_admin');
+    localStorage.removeItem('rongyan_github_token');
     location.reload();
   }
 
@@ -422,10 +484,13 @@
   }
 
   document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') doLogin();
+    if (e.key === 'Enter') document.getElementById('tokenInput').focus();
   });
   document.getElementById('emailInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') document.getElementById('passwordInput').focus();
+  });
+  document.getElementById('tokenInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') doLogin();
   });
 
   // ==========================================
@@ -578,33 +643,18 @@
     btn.disabled = true;
 
     try {
-      // 1. 上传新图片到 GitHub
       const newUrls = [];
       for (let i = 0; i < files.length; i++) {
         btn.textContent = `⏳ 上传图片 (${i + 1}/${files.length})...`;
-        
-        // 压缩
         const compressed = await compressImage(files[i]);
         const base64 = await blobToBase64(compressed);
-        
-        // 生成文件名
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.jpg`;
         const filePath = `${GITHUB_CONFIG.imageDir}/${fileName}`;
-        
-        // 上传到 GitHub
-        await uploadFileToGithub(
-          filePath,
-          base64,
-          `上传图片: ${fileName}`,
-          null // 新文件没有 sha
-        );
-        
-        // 生成访问 URL（用 CDN 加速）
+        await uploadFileToGithub(filePath, base64, `上传图片: ${fileName}`, null);
         const imageUrl = `https://cdn.jsdelivr.net/gh/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}@${GITHUB_CONFIG.branch}/${filePath}`;
         newUrls.push(imageUrl);
       }
 
-      // 2. 组装产品数据
       const finalImages = [...oldUrls, ...newUrls];
       const productData = {
         name: name,
@@ -615,7 +665,6 @@
         images: finalImages
       };
 
-      // 3. 读取并更新 products.json
       btn.textContent = '⏳ 正在保存产品数据...';
       const products = await loadProducts();
 
@@ -658,21 +707,16 @@
     try {
       const products = await loadProducts();
       const product = products.find(p => p.id === currentEditId);
-      
-      // 从列表中移除
       const newProducts = products.filter(p => p.id !== currentEditId);
       await saveProducts(newProducts, `删除产品: ${product ? product.name : currentEditId}`);
 
-      // 尝试删除该产品的图片文件（可选，避免垃圾文件堆积）
       if (product && product.images) {
         for (const imgUrl of product.images) {
           try {
-            // 从 URL 中提取文件路径
             const marker = `${GITHUB_CONFIG.repo}@${GITHUB_CONFIG.branch}/`;
             const idx = imgUrl.indexOf(marker);
             if (idx === -1) continue;
             const filePath = imgUrl.substring(idx + marker.length);
-            
             const file = await getFileFromGithub(filePath);
             if (file) {
               await deleteFileFromGithub(filePath, file.sha, `删除图片: ${filePath}`);
@@ -700,7 +744,6 @@
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
-  // 页面加载时检查登录状态
   checkAuth();
 </script>
 </body>

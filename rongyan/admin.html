@@ -478,17 +478,15 @@ body {
     return await res.json();
   }
 
-  // ✅ 新增：刷新 jsDelivr CDN 缓存
   async function purgeCDN() {
-    const basePath = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
-    const gcorePath = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
+    const purgeUrl = `https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
     try {
-      // 并行刷新两个 CDN
-      await Promise.allSettled([
-        fetch(`https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`, { method: 'GET' }),
-        fetch(`https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`, { method: 'GET' })
-      ]);
-      console.log('CDN 缓存已刷新');
+      const res = await fetch(purgeUrl);
+      if (res.ok) {
+        console.log('CDN 缓存已刷新');
+      } else {
+        console.warn('CDN 缓存刷新返回状态:', res.status);
+      }
     } catch (e) {
       console.warn('CDN 缓存刷新失败:', e.message);
     }
@@ -569,13 +567,13 @@ body {
   }
 
   function safeSessionSet(key, value) {
-    try { sessionStorage.setItem(key, value); } catch (e) { /* 隐私模式或存储满 */ }
+    try { sessionStorage.setItem(key, value); } catch (e) { }
   }
   function safeSessionGet(key) {
     try { return sessionStorage.getItem(key); } catch (e) { return null; }
   }
   function safeSessionRemove(key) {
-    try { sessionStorage.removeItem(key); } catch (e) { /* ignore */ }
+    try { sessionStorage.removeItem(key); } catch (e) { }
   }
 
   async function doLogin() {
@@ -978,7 +976,6 @@ body {
       const sha = existingFile ? existingFile.sha : null;
       await putFile(PRODUCTS_PATH, jsonContent, `update products: ${name}`, sha);
 
-      // ✅ 修复：保存成功后刷新 CDN 缓存
       saveProgressText.textContent = '刷新 CDN 缓存...';
       await purgeCDN();
 
@@ -1029,7 +1026,6 @@ body {
       const sha = existingFile ? existingFile.sha : null;
       await putFile(PRODUCTS_PATH, jsonContent, `delete product: ${p.name}`, sha);
 
-      // ✅ 修复：删除成功后刷新 CDN 缓存
       await purgeCDN();
 
       toast('删除成功', 'success');

@@ -3,8 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="绒颜 - 精选手工饰品详情">
+<meta property="og:title" content="绒颜">
+<meta property="og:description" content="精选手工饰品">
+<meta property="og:type" content="product">
 <title>绒颜</title>
 <link rel="icon" href="../logo.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://gcore.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -25,7 +32,6 @@
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
   }
-
   .top-bar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -58,7 +64,6 @@
   .back-btn svg { width: 20px; height: 20px; }
   .top-bar-title { font-size: 14px; font-weight: 600; letter-spacing: 2px; color: var(--primary); }
   .top-bar-placeholder { width: 60px; }
-
   .gallery-section { margin-top: 52px; position: relative; background: #f0ece6; }
   .gallery-main { position: relative; width: 100%; overflow: hidden; touch-action: pan-y; }
   .gallery-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); will-change: transform; }
@@ -67,7 +72,11 @@
     width: 100%; height: auto; display: block; cursor: zoom-in;
     transition: transform 0.35s ease; user-select: none; -webkit-user-drag: none;
   }
-
+  .gallery-slide .img-placeholder {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: #e8e4de; font-size: 48px; color: #ccc;
+  }
   @media (max-width: 767px) {
     .gallery-slide { padding-top: 100%; position: relative; }
     .gallery-slide img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -78,13 +87,11 @@
       border-radius: 0 0 var(--radius) var(--radius); overflow: hidden;
     }
   }
-
   .slide-counter {
     position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
     background: rgba(0,0,0,0.45); backdrop-filter: blur(8px); color: #fff;
     padding: 4px 14px; border-radius: 20px; font-size: 12px; letter-spacing: 2px; pointer-events: none;
   }
-
   .gallery-arrow {
     position: absolute; top: 50%; transform: translateY(-50%);
     width: 40px; height: 40px; border-radius: 50%;
@@ -100,7 +107,6 @@
   @media (min-width: 768px) {
     .gallery-section:hover .gallery-arrow { opacity: 1; pointer-events: auto; }
   }
-
   .thumb-strip {
     display: flex; gap: 8px; padding: 14px 16px; overflow-x: auto;
     -webkit-overflow-scrolling: touch; scrollbar-width: none; background: #fff;
@@ -113,7 +119,6 @@
   .thumb-item:hover { opacity: 0.8; }
   .thumb-item.active { border-color: var(--primary); opacity: 1; box-shadow: 0 2px 8px rgba(184,134,11,0.25); }
   .thumb-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
   .product-detail { max-width: 700px; margin: 0 auto; padding: 28px 20px 60px; }
   .detail-category {
     display: inline-block;
@@ -130,7 +135,6 @@
     border-radius: 2px; margin-bottom: 20px;
   }
   .detail-desc { font-size: 15px; line-height: 1.8; color: #555; }
-
   .lightbox {
     position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.94);
     display: flex; align-items: center; justify-content: center;
@@ -139,10 +143,16 @@
   .lightbox.open { opacity: 1; visibility: visible; }
   .lightbox-img {
     max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 4px;
-    transform: scale(0.85); transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: scale(0.85); transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
     cursor: zoom-out; user-select: none; -webkit-user-drag: none;
   }
   .lightbox.open .lightbox-img { transform: scale(1); }
+  .lightbox-spinner {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.2);
+    border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
+    pointer-events: none;
+  }
   .lightbox-close {
     position: absolute; top: 16px; right: 16px; width: 40px; height: 40px;
     border-radius: 50%; background: rgba(255,255,255,0.15); border: none; cursor: pointer;
@@ -164,7 +174,6 @@
   .lightbox-arrow svg { width: 20px; height: 20px; color: #fff; }
   .lightbox-arrow.lb-left { left: 16px; }
   .lightbox-arrow.lb-right { right: 16px; }
-
   .page-loading, .page-error {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     min-height: 80vh; color: var(--text-light); gap: 12px;
@@ -235,6 +244,7 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
          stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
   </button>
+  <div class="lightbox-spinner" id="lbSpinner"></div>
   <img class="lightbox-img" id="lbImg" src="" alt="">
   <button class="lightbox-arrow lb-right" id="lbRight">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -245,11 +255,14 @@
 
 <script>
 (function () {
+  'use strict';
+
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
 
   const CDN_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
+  const GCORE_URL = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
   const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
 
   function escapeHtml(str) {
@@ -259,7 +272,23 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+      .replace(/'/g, '&#39;')
+      .replace(/`/g, '&#96;');
+  }
+
+  function fallbackUrl(url) {
+    return String(url).replace(/cdn\.jsdelivr\.net/g, 'gcore.jsdelivr.net');
+  }
+
+  // ✅ 修复：更健壮的 UTF-8 解码，支持 emoji 等高位 Unicode
+  function decodeUtf8(base64) {
+    const cleaned = base64.replace(/\n/g, '');
+    const binary = atob(cleaned);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new TextDecoder('utf-8').decode(bytes);
   }
 
   const params = new URLSearchParams(window.location.search);
@@ -279,10 +308,12 @@
   const lbLeft = document.getElementById('lbLeft');
   const lbRight = document.getElementById('lbRight');
   const lbCounter = document.getElementById('lbCounter');
+  const lbSpinner = document.getElementById('lbSpinner');
 
   let images = [];
   let currentSlide = 0;
   let lightboxIndex = 0;
+  let lbPreloadAbort = null;
 
   async function loadProduct() {
     if (isNaN(productId)) {
@@ -298,6 +329,7 @@
     const timestamp = Date.now();
     const urls = [
       `${CDN_URL}?_=${timestamp}`,
+      `${GCORE_URL}?_=${timestamp}`,
       `${RAW_URL}?_=${timestamp}`
     ];
 
@@ -325,7 +357,7 @@
       return;
     }
 
-    const product = products.find(p => p && p.id === productId);
+    const product = (Array.isArray(products) ? products : []).find(p => p && p.id === productId);
     if (!product) {
       pageLoading.innerHTML = `
         <div class="page-error">
@@ -337,28 +369,66 @@
     }
 
     images = Array.isArray(product.images) ? product.images : [];
-    document.title = (product.name || '产品详情') + ' · 绒颜';
+    const productName = product.name || '产品详情';
+    document.title = productName + ' · 绒颜';
+
+    const descMeta = document.querySelector('meta[name="description"]');
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (descMeta) descMeta.content = `${productName} - ¥${Number(product.price || 0).toFixed(1)}`;
+    if (ogTitle) ogTitle.content = productName + ' · 绒颜';
+    if (ogDesc) ogDesc.content = product.description || productName;
 
     document.getElementById('detailCategory').textContent = product.category || '';
-    document.getElementById('detailName').textContent = product.name || '';
+    document.getElementById('detailName').textContent = productName;
     document.getElementById('detailPrice').textContent = Number(product.price || 0).toFixed(1);
     document.getElementById('detailDesc').textContent = product.description || '';
 
-    // ✅ 优化：图片加上 onerror 兜底，加载失败时显示占位图
-    const imgOnError = `onerror="this.style.opacity='0';this.parentElement.style.background='#e8e4de';this.parentElement.insertAdjacentHTML('beforeend','<span style=&quot;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:32px;color:#ccc&quot;>🖼</span>')"`;
+    galleryTrack.innerHTML = images.map((src, i) => {
+      const safeSrc = escapeHtml(src);
+      const fbSrc = escapeHtml(fallbackUrl(src));
+      const safeAlt = escapeHtml(productName) + ' - 图' + (i + 1);
+      const lazyAttr = i === 0 ? '' : 'loading="lazy"';
+      return `
+        <div class="gallery-slide">
+          <img src="${safeSrc}" alt="${safeAlt}"
+               data-index="${i}" data-fb="${fbSrc}"
+               draggable="false" decoding="async" ${lazyAttr}>
+        </div>
+      `;
+    }).join('');
 
-    galleryTrack.innerHTML = images.map((src, i) => `
-      <div class="gallery-slide">
-        <img src="${escapeHtml(src)}" alt="${escapeHtml(product.name)} - 图${i + 1}"
-             data-index="${i}" draggable="false" decoding="async" ${imgOnError}>
-      </div>
-    `).join('');
+    thumbStrip.innerHTML = images.map((src, i) => {
+      const safeSrc = escapeHtml(src);
+      const fbSrc = escapeHtml(fallbackUrl(src));
+      return `
+        <div class="thumb-item${i === 0 ? ' active' : ''}" data-index="${i}">
+          <img src="${safeSrc}" alt="缩略图${i + 1}" data-fb="${fbSrc}"
+               draggable="false" decoding="async">
+        </div>
+      `;
+    }).join('');
 
-    thumbStrip.innerHTML = images.map((src, i) => `
-      <div class="thumb-item${i === 0 ? ' active' : ''}" data-index="${i}">
-        <img src="${escapeHtml(src)}" alt="缩略图${i + 1}" draggable="false" decoding="async">
-      </div>
-    `).join('');
+    // 事件委托处理图片加载失败
+    galleryTrack.querySelectorAll('img[data-fb]').forEach(img => {
+      img.addEventListener('error', function() {
+        if (!this.dataset.fbDone) {
+          this.dataset.fbDone = '1';
+          this.src = this.dataset.fb;
+        } else {
+          this.style.display = 'none';
+          this.parentElement.insertAdjacentHTML('beforeend', '<div class="img-placeholder">🖼</div>');
+        }
+      });
+    });
+    thumbStrip.querySelectorAll('img[data-fb]').forEach(img => {
+      img.addEventListener('error', function() {
+        if (!this.dataset.fbDone) {
+          this.dataset.fbDone = '1';
+          this.src = this.dataset.fb;
+        }
+      });
+    });
 
     slideCounter.textContent = images.length > 0 ? `1 / ${images.length}` : '0 / 0';
 
@@ -373,8 +443,15 @@
   loadProduct();
 
   function initGallery() {
-    arrowLeft.addEventListener('click', () => goToSlide(currentSlide - 1));
-    arrowRight.addEventListener('click', () => goToSlide(currentSlide + 1));
+    // ✅ 修复：单图时隐藏箭头、禁用拖拽
+    const singleImage = images.length <= 1;
+    if (singleImage) {
+      arrowLeft.style.display = 'none';
+      arrowRight.style.display = 'none';
+    } else {
+      arrowLeft.addEventListener('click', () => goToSlide(currentSlide - 1));
+      arrowRight.addEventListener('click', () => goToSlide(currentSlide + 1));
+    }
 
     thumbStrip.addEventListener('click', (e) => {
       const thumb = e.target.closest('.thumb-item');
@@ -390,23 +467,34 @@
     });
 
     // ===== 触摸事件 =====
-    let touchStartX = 0, touchStartY = 0, touchMoveX = 0, touchDragging = false, touchIsHorizontal = null;
+    let touchStartX = 0, touchStartY = 0, touchMoveX = 0, touchDragging = false;
+    // ✅ 修复：增加 touchDecided 标记，方向未确定前不修改 transform
+    let touchIsHorizontal = null, touchDecided = false;
 
     galleryMain.addEventListener('touchstart', (e) => {
+      if (singleImage) return; // ✅ 单图禁用拖拽
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
       touchDragging = true;
       touchIsHorizontal = null;
+      touchDecided = false;
       galleryTrack.style.transition = 'none';
     }, { passive: true });
 
     galleryMain.addEventListener('touchmove', (e) => {
-      if (!touchDragging) return;
+      if (!touchDragging || singleImage) return;
       const dx = e.touches[0].clientX - touchStartX;
       const dy = e.touches[0].clientY - touchStartY;
-      if (touchIsHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
-        touchIsHorizontal = Math.abs(dx) > Math.abs(dy);
+
+      if (!touchDecided) {
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+          touchIsHorizontal = Math.abs(dx) > Math.abs(dy);
+          touchDecided = true;
+        } else {
+          return; // ✅ 方向未确定，不修改 transform，避免首帧抖动
+        }
       }
+
       if (!touchIsHorizontal) return;
       e.preventDefault();
       touchMoveX = dx;
@@ -415,16 +503,17 @@
     }, { passive: false });
 
     galleryMain.addEventListener('touchend', () => {
-      if (!touchDragging) return;
+      if (!touchDragging || singleImage) return;
       touchDragging = false;
       galleryTrack.style.transition = '';
-      const threshold = galleryMain.offsetWidth * 0.2;
       if (touchIsHorizontal) {
+        const threshold = galleryMain.offsetWidth * 0.2;
         if (touchMoveX < -threshold) goToSlide(currentSlide + 1);
         else if (touchMoveX > threshold) goToSlide(currentSlide - 1);
         else goToSlide(currentSlide);
       }
       touchMoveX = 0;
+      touchDecided = false;
     });
 
     // ===== 鼠标事件 =====
@@ -432,7 +521,7 @@
     mouseDidDrag = false;
 
     galleryMain.addEventListener('mousedown', (e) => {
-      if (e.target.tagName !== 'IMG') return;
+      if (e.target.tagName !== 'IMG' || singleImage) return; // ✅ 单图禁用
       mouseDown = true;
       mouseDidDrag = false;
       mouseStartX = e.clientX;
@@ -489,24 +578,62 @@
   }
 
   function openLightbox(index) {
+    if (lbPreloadAbort) { lbPreloadAbort = null; }
+
     lightboxIndex = index;
-    lbImg.src = images[index];
+    lbSpinner.style.display = 'block';
+    lbImg.style.opacity = '0';
+
+    const currentToken = Date.now();
+    lbPreloadAbort = currentToken;
+
+    const img = new Image();
+    img.onload = () => {
+      if (lbPreloadAbort !== currentToken) return;
+      lbImg.src = img.src;
+      lbImg.style.opacity = '1';
+      lbSpinner.style.display = 'none';
+    };
+    img.onerror = () => {
+      if (lbPreloadAbort !== currentToken) return;
+      const fbUrl = fallbackUrl(images[index]);
+      const img2 = new Image();
+      img2.onload = () => {
+        if (lbPreloadAbort !== currentToken) return;
+        lbImg.src = img2.src;
+        lbImg.style.opacity = '1';
+        lbSpinner.style.display = 'none';
+      };
+      img2.onerror = () => {
+        if (lbPreloadAbort !== currentToken) return;
+        lbSpinner.style.display = 'none';
+        lbImg.alt = '图片加载失败';
+        lbImg.style.opacity = '0.3';
+      };
+      img2.src = fbUrl;
+    };
+    img.src = images[index];
+
     lbCounter.textContent = `${index + 1} / ${images.length}`;
-    lightbox.classList.add('open');
-    document.body.style.overflow = 'hidden';
+
+    if (!lightbox.classList.contains('open')) {
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
   }
 
   function closeLightbox() {
+    lbPreloadAbort = null;
     lightbox.classList.remove('open');
     document.body.style.overflow = '';
   }
 
   function lightboxNav(dir) {
-    lightboxIndex += dir;
-    if (lightboxIndex < 0) lightboxIndex = images.length - 1;
-    if (lightboxIndex >= images.length) lightboxIndex = 0;
-    lbImg.src = images[lightboxIndex];
-    lbCounter.textContent = `${lightboxIndex + 1} / ${images.length}`;
+    let newIndex = lightboxIndex + dir;
+    if (newIndex < 0) newIndex = images.length - 1;
+    if (newIndex >= images.length) newIndex = 0;
+    lightboxIndex = newIndex;
+    openLightbox(lightboxIndex);
   }
 
   lbClose.addEventListener('click', closeLightbox);

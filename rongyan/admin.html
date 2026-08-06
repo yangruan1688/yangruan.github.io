@@ -478,6 +478,7 @@ body {
     return await res.json();
   }
 
+  // ✅ 修正后的 purgeCDN 函数
   async function purgeCDN() {
     const purgeUrl = `https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
     try {
@@ -979,6 +980,9 @@ body {
       saveProgressText.textContent = '刷新 CDN 缓存...';
       await purgeCDN();
 
+      // ✅ 新增：通知其他标签页（index）刷新数据
+      try { localStorage.setItem('_ry_products_updated', String(Date.now())); } catch(e) {}
+
       saveProgressFill.style.width = '100%';
       saveProgressText.textContent = '保存成功！';
       hasUnsavedChanges = false;
@@ -1027,6 +1031,9 @@ body {
       await putFile(PRODUCTS_PATH, jsonContent, `delete product: ${p.name}`, sha);
 
       await purgeCDN();
+
+      // ✅ 新增：通知其他标签页（index）刷新数据
+      try { localStorage.setItem('_ry_products_updated', String(Date.now())); } catch(e) {}
 
       toast('删除成功', 'success');
       setTimeout(loadProducts, 1000);

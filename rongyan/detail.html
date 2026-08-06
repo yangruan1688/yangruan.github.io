@@ -249,11 +249,9 @@
   const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
 
-  // ✅ 优化：配置多个数据源，确保加载成功率
   const CDN_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
   const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
 
-  // ✅ 修复：XSS 转义函数
   function escapeHtml(str) {
     if (str == null) return '';
     return String(str)
@@ -286,9 +284,7 @@
   let currentSlide = 0;
   let lightboxIndex = 0;
 
-  // ✅ 优化：智能多源加载产品数据
   async function loadProduct() {
-    // ✅ 修复：productId 无效时给出友好提示
     if (isNaN(productId)) {
       pageLoading.innerHTML = `
         <div class="page-error">
@@ -329,7 +325,7 @@
       return;
     }
 
-    const product = products.find(p => p.id === productId);
+    const product = products.find(p => p && p.id === productId);
     if (!product) {
       pageLoading.innerHTML = `
         <div class="page-error">
@@ -340,7 +336,7 @@
       return;
     }
 
-    images = product.images || [];
+    images = Array.isArray(product.images) ? product.images : [];
     document.title = (product.name || '产品详情') + ' · 绒颜';
 
     document.getElementById('detailCategory').textContent = product.category || '';
@@ -348,26 +344,30 @@
     document.getElementById('detailPrice').textContent = Number(product.price || 0).toFixed(1);
     document.getElementById('detailDesc').textContent = product.description || '';
 
-    // ✅ 修复：对图片 URL 和产品名做 XSS 转义
+    // ✅ 优化：图片加上 onerror 兜底，加载失败时显示占位图
+    const imgOnError = `onerror="this.style.opacity='0';this.parentElement.style.background='#e8e4de';this.parentElement.insertAdjacentHTML('beforeend','<span style=&quot;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:32px;color:#ccc&quot;>🖼</span>')"`;
+
     galleryTrack.innerHTML = images.map((src, i) => `
       <div class="gallery-slide">
         <img src="${escapeHtml(src)}" alt="${escapeHtml(product.name)} - 图${i + 1}"
-             data-index="${i}" draggable="false">
+             data-index="${i}" draggable="false" decoding="async" ${imgOnError}>
       </div>
     `).join('');
 
     thumbStrip.innerHTML = images.map((src, i) => `
       <div class="thumb-item${i === 0 ? ' active' : ''}" data-index="${i}">
-        <img src="${escapeHtml(src)}" alt="缩略图${i + 1}" draggable="false">
+        <img src="${escapeHtml(src)}" alt="缩略图${i + 1}" draggable="false" decoding="async">
       </div>
     `).join('');
 
-    slideCounter.textContent = `1 / ${images.length}`;
+    slideCounter.textContent = images.length > 0 ? `1 / ${images.length}` : '0 / 0';
 
     pageLoading.style.display = 'none';
     mainContent.style.display = 'block';
 
-    initGallery();
+    if (images.length > 0) {
+      initGallery();
+    }
   }
 
   loadProduct();
@@ -381,7 +381,6 @@
       if (thumb) goToSlide(parseInt(thumb.dataset.index));
     });
 
-    // ✅ 修复：触摸和鼠标使用独立的拖拽状态变量，避免冲突
     let mouseDidDrag = false;
 
     galleryTrack.addEventListener('click', (e) => {
@@ -428,7 +427,7 @@
       touchMoveX = 0;
     });
 
-    // ===== 鼠标事件（独立变量） =====
+    // ===== 鼠标事件 =====
     let mouseStartX = 0, mouseMoveX = 0, mouseDown = false;
     mouseDidDrag = false;
 

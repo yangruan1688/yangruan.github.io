@@ -167,6 +167,8 @@ body {
   transition: all 0.25s; position: relative;
 }
 .upload-area:hover { border-color: var(--primary); background: rgba(184,134,11,0.03); }
+/* ✅ 修复：添加拖拽悬停时的视觉反馈样式 */
+.upload-area.dragover { border-color: var(--primary); background: rgba(184,134,11,0.08); box-shadow: 0 0 0 4px rgba(184,134,11,0.12); }
 .upload-area .upload-icon { font-size: 28px; margin-bottom: 6px; }
 .upload-area p { font-size: 12px; color: var(--text-light); }
 .upload-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
@@ -353,7 +355,7 @@ body {
   let TOKEN = '';
   let products = [];
   let editingId = null;
-  let tempImages = []; // { base64, file, uploadedUrl, isCover }
+  let tempImages = []; // { base64, file, uploadedUrl, isCover, existing }
 
   // ===== DOM =====
   const $ = id => document.getElementById(id);
@@ -383,6 +385,24 @@ body {
   const confirmYes = $('confirmYes');
   const confirmNo = $('confirmNo');
 
+  // ✅ 修复：XSS 转义函数
+  function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // ✅ 优化：使用 TextEncoder 替代 btoa(unescape(encodeURIComponent()))
+  function encodeToBase64(str) {
+    const bytes = new TextEncoder().encode(str);
+    const binStr = Array.from(bytes, b => String.fromCodePoint(b)).join('');
+    return btoa(binStr);
+  }
+
   // ===== Toast =====
   function toast(msg, type = 'info') {
     const el = document.createElement('div');
@@ -392,8 +412,8 @@ body {
     setTimeout(() => el.remove(), 3200);
   }
 
-  // ===== 确认弹窗 =====
-  function confirm2(msg) {
+  // ✅ 优化：confirm2 重命名为语义化的 showConfirm
+  function showConfirm(msg) {
     return new Promise(resolve => {
       confirmMsg.textContent = msg;
       confirmOverlay.classList.add('show');
@@ -560,7 +580,8 @@ body {
     products.forEach(p => { cats[p.category] = (cats[p.category] || 0) + 1; });
     let html = `<div class="stat-card"><div class="stat-num">${products.length}</div><div class="stat-label">全部产品</div></div>`;
     Object.entries(cats).forEach(([cat, count]) => {
-      html += `<div class="stat-card"><div class="stat-num">${count}</div><div class="stat-label">${cat}</div></div>`;
+      // ✅ 修复：分类名转义
+      html += `<div class="stat-card"><div class="stat-num">${count}</div><div class="stat-label">${escapeHtml(cat)}</div></div>`;
     });
     statsBar.innerHTML = html;
   }
@@ -570,23 +591,30 @@ body {
       productList.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>暂无产品，点击上方"＋ 添加"开始</p></div>';
       return;
     }
-    productList.innerHTML = products.slice().reverse().map(p => `
-      <div class="product-item" data-id="${p.id}">
-        <div class="item-img"><img src="${p.cover || ''}" alt="${p.name}" loading="lazy"></div>
-        <div class="item-info">
-          <div class="item-name">${p.name}</div>
-          <div class="item-meta">
-            <span class="price">¥${Number(p.price).toFixed(1)}</span>
-            <span>${p.category}</span>
-            <span>${(p.images || []).length} 图</span>
+    // ✅ 修复：所有动态数据做 XSS 转义
+    productList.innerHTML = products.slice().reverse().map(p => {
+      const safeName = escapeHtml(p.name || '');
+      const safeCategory = escapeHtml(p.category || '');
+      const safeCover = escapeHtml(p.cover || '');
+      const imgCount = (p.images || []).length;
+      return `
+        <div class="product-item" data-id="${p.id}">
+          <div class="item-img"><img src="${safeCover}" alt="${safeName}" loading="lazy"></div>
+          <div class="item-info">
+            <div class="item-name">${safeName}</div>
+            <div class="item-meta">
+              <span class="price">¥${Number(p.price || 0).toFixed(1)}</span>
+              <span>${safeCategory}</span>
+              <span>${imgCount} 图</span>
+            </div>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-sm edit-btn" data-id="${p.id}">编辑</button>
+            <button class="btn btn-sm btn-danger del-btn" data-id="${p.id}">删除</button>
           </div>
         </div>
-        <div class="item-actions">
-          <button class="btn btn-sm edit-btn" data-id="${p.id}">编辑</button>
-          <button class="btn btn-sm btn-danger del-btn" data-id="${p.id}">删除</button>
-        </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   // 列表事件代理
@@ -638,8 +666,11 @@ body {
       imagePreviewList.innerHTML = '';
       return;
     }
+    // ✅ 修复：图片 URL 转义
     imagePreviewList.innerHTML = tempImages.map((img, i) => {
-      const src = img.uploadedUrl || ('data:image/webp;base64,' + img.base64);
+      const src = img.uploadedUrl
+        ? escapeHtml(img.uploadedUrl)
+        : ('data:image/webp;base64,' + img.base64);
       return `
         <div class="image-preview-item ${img.isCover ? 'is-cover' : ''}" data-index="${i}">
           <img src="${src}" alt="图${i + 1}">
@@ -707,6 +738,20 @@ body {
     }
   });
 
+  // ✅ 优化：带重试的上传函数（最多 3 次）
+  async function uploadImageWithRetry(path, base64, message, maxRetries = 3) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await putFile(path, base64, message);
+      } catch (err) {
+        if (attempt >= maxRetries) throw err;
+        const wait = attempt * 2000;
+        toast(`上传失败，${wait / 1000}s 后重试 (${attempt}/${maxRetries})`, 'info');
+        await new Promise(r => setTimeout(r, wait));
+      }
+    }
+  }
+
   // ===== 保存产品 =====
   async function saveProduct() {
     const name = $('fName').value.trim();
@@ -735,11 +780,12 @@ body {
         // 上传新图片
         const filename = `p${timestamp}_${i}.webp`;
         const path = `${IMAGES_PATH}/${filename}`;
-        progressFill.parentElement.parentElement.classList.add('show');
+        uploadProgress.classList.add('show');
         progressText.textContent = `上传图片 ${i + 1}/${tempImages.length}...`;
         progressFill.style.width = ((i / tempImages.length) * 100) + '%';
 
-        await putFile(path, img.base64, `upload image: ${filename}`);
+        // ✅ 优化：使用带重试的上传
+        await uploadImageWithRetry(path, img.base64, `upload image: ${filename}`);
         const url = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${path}`;
         uploadedUrls.push(url);
         img.uploadedUrl = url;
@@ -754,6 +800,30 @@ body {
       let coverIdx = tempImages.findIndex(img => img.isCover);
       if (coverIdx < 0) coverIdx = 0;
       const cover = uploadedUrls[coverIdx];
+
+      // ✅ 优化：编辑模式下，清理 GitHub 上不再使用的旧图片
+      if (editingId !== null) {
+        const oldProduct = products.find(p => p.id === editingId);
+        if (oldProduct && oldProduct.images) {
+          const keepUrls = new Set(uploadedUrls);
+          for (const oldUrl of oldProduct.images) {
+            if (!keepUrls.has(oldUrl)) {
+              const match = oldUrl.match(/rongyan\/images\/([^?]+)/);
+              if (match) {
+                try {
+                  const file = await getFile(`${IMAGES_PATH}/${match[1]}`);
+                  if (file) {
+                    await deleteFile(`${IMAGES_PATH}/${match[1]}`, file.sha);
+                    await new Promise(r => setTimeout(r, 500));
+                  }
+                } catch (e) {
+                  console.warn('清理旧图片失败:', match[1], e.message);
+                }
+              }
+            }
+          }
+        }
+      }
 
       // 3. 更新产品数据
       if (editingId !== null) {
@@ -770,7 +840,8 @@ body {
       }
 
       // 4. 保存 products.json
-      const jsonContent = btoa(unescape(encodeURIComponent(JSON.stringify(products, null, 2))));
+      // ✅ 优化：使用 TextEncoder 替代 btoa(unescape(encodeURIComponent()))
+      const jsonContent = encodeToBase64(JSON.stringify(products, null, 2));
       const existingFile = await getFile(PRODUCTS_PATH);
       const sha = existingFile ? existingFile.sha : null;
       await putFile(PRODUCTS_PATH, jsonContent, `update products: ${name}`, sha);
@@ -791,7 +862,8 @@ body {
   async function deleteProduct(id) {
     const p = products.find(x => x.id === id);
     if (!p) return;
-    const ok = await confirm2(`确定删除「${p.name}」？\n（产品图片也会一并删除）`);
+    // ✅ 使用重命名后的 showConfirm
+    const ok = await showConfirm(`确定删除「${p.name}」？\n（产品图片也会一并删除）`);
     if (!ok) return;
 
     try {
@@ -804,7 +876,9 @@ body {
             const file = await getFile(`${IMAGES_PATH}/${filename}`);
             if (file) await deleteFile(`${IMAGES_PATH}/${filename}`, file.sha);
             await new Promise(r => setTimeout(r, 500));
-          } catch {}
+          } catch (e) {
+            console.warn('删除图片失败:', filename, e.message);
+          }
         }
       }
 
@@ -812,7 +886,8 @@ body {
       products = products.filter(x => x.id !== id);
 
       // 3. 保存 products.json
-      const jsonContent = btoa(unescape(encodeURIComponent(JSON.stringify(products, null, 2))));
+      // ✅ 优化：使用 TextEncoder
+      const jsonContent = encodeToBase64(JSON.stringify(products, null, 2));
       const existingFile = await getFile(PRODUCTS_PATH);
       const sha = existingFile ? existingFile.sha : null;
       await putFile(PRODUCTS_PATH, jsonContent, `delete product: ${p.name}`, sha);

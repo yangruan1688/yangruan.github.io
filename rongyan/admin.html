@@ -3,420 +3,475 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>管理后台 · 绒颜</title>
+<title>绒颜 · 管理后台</title>
 <link rel="icon" href="../logo.jpg" type="image/jpeg">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --primary:#b8860b;--primary-light:#d4a843;--bg:#faf8f5;--card-bg:#fff;
-  --text:#2c2c2c;--text-light:#888;--danger:#d9534f;--success:#5cb85c;
-  --radius:12px;--shadow:0 2px 16px rgba(0,0,0,0.07);
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --primary: #b8860b;
+  --primary-light: #d4a843;
+  --bg: #faf8f5;
+  --card-bg: #ffffff;
+  --text: #2c2c2c;
+  --text-light: #888;
+  --danger: #e74c3c;
+  --success: #27ae60;
+  --shadow: 0 2px 16px rgba(0,0,0,0.07);
+  --radius: 12px;
 }
-body{
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',
-  'Hiragino Sans GB','Microsoft YaHei',sans-serif;
-  background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;
-  min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0)
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+               'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--bg); color: var(--text);
+  -webkit-font-smoothing: antialiased; min-height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom, 20px);
 }
-a{color:var(--primary);text-decoration:none}
 
-/* 顶栏 */
-.topbar{
-  position:fixed;top:0;left:0;right:0;z-index:900;height:52px;
-  background:rgba(255,255,255,.92);backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.06);
-  display:flex;align-items:center;justify-content:space-between;padding:0 16px
+/* ===== 通用按钮 ===== */
+.btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 9px 18px; border: 1px solid rgba(0,0,0,0.1);
+  background: #fff; border-radius: 20px; font-size: 13px;
+  color: var(--text); cursor: pointer; transition: all 0.25s;
+  white-space: nowrap; font-weight: 500;
 }
-.topbar a{display:flex;align-items:center;gap:6px;font-size:15px;color:var(--text);
-  padding:8px 12px 8px 4px;border-radius:8px;transition:background .2s}
-.topbar a:hover{background:rgba(0,0,0,.04)}
-.topbar a svg{width:20px;height:20px}
-.topbar-title{font-size:14px;font-weight:600;letter-spacing:2px;color:var(--primary)}
-.topbar-right{width:60px;text-align:right}
-.topbar-right a{font-size:13px;padding:6px 10px;cursor:pointer}
+.btn:hover { border-color: var(--primary); color: var(--primary); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-primary:hover { background: var(--primary-light); border-color: var(--primary-light); color: #fff; }
+.btn-danger { color: var(--danger); border-color: rgba(231,76,60,0.3); }
+.btn-danger:hover { background: rgba(231,76,60,0.06); border-color: var(--danger); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
 
-/* 页面容器 */
-.page{max-width:600px;margin:0 auto;padding:68px 16px 40px}
+/* ===== 登录页 ===== */
+.login-page {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 100vh; padding: 24px;
+}
+.login-page h1 { font-size: 22px; color: var(--primary); letter-spacing: 4px; margin-bottom: 6px; }
+.login-page .sub { color: var(--text-light); font-size: 13px; margin-bottom: 28px; }
+.login-box {
+  width: 100%; max-width: 380px; background: var(--card-bg);
+  padding: 28px 22px; border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.login-box label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.login-box input {
+  width: 100%; padding: 11px 14px; border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px; font-size: 14px; outline: none; margin-bottom: 14px;
+  transition: border-color 0.25s; background: #fafafa;
+}
+.login-box input:focus { border-color: var(--primary); background: #fff; }
+.login-box .hint { font-size: 11px; color: var(--text-light); margin-top: -8px; margin-bottom: 14px; line-height: 1.5; }
+.login-box .hint a { color: var(--primary); }
+.login-error { color: var(--danger); font-size: 13px; margin-top: 8px; display: none; text-align: center; }
 
-/* 设置卡片 */
-.setup-card{
-  background:var(--card-bg);border-radius:var(--radius);padding:28px 22px;
-  box-shadow:var(--shadow);margin-bottom:24px;text-align:center
+/* ===== 管理主界面 ===== */
+.admin-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
 }
-.setup-card h2{font-size:18px;margin-bottom:6px}
-.setup-card p{font-size:13px;color:var(--text-light);margin-bottom:20px;line-height:1.7}
-.setup-card code{background:#f5f0e8;padding:1px 6px;border-radius:4px;font-size:12px}
-.setup-card ol{text-align:left;font-size:13px;color:#666;line-height:2;margin:0 0 20px 20px}
+.admin-header h2 { font-size: 15px; color: var(--primary); letter-spacing: 2px; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.admin-body { max-width: 800px; margin: 0 auto; padding: 16px 14px; }
 
-/* 表单 */
-.form-group{margin-bottom:18px;text-align:left}
-.form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)}
-.form-input{
-  width:100%;padding:10px 14px;border:1px solid rgba(0,0,0,.1);border-radius:10px;
-  font-size:14px;outline:none;transition:border-color .25s;background:#fff;font-family:inherit
+/* 统计卡片 */
+.stats-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.stat-card {
+  flex: 1; min-width: 80px; background: var(--card-bg);
+  border-radius: 10px; padding: 12px 8px; text-align: center; box-shadow: var(--shadow);
 }
-.form-input:focus{border-color:var(--primary)}
-textarea.form-input{min-height:80px;resize:vertical;line-height:1.6}
-select.form-input{appearance:none;-webkit-appearance:none;
-  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;
-  padding-right:36px}
-
-/* 图片上传 */
-.upload-area{
-  border:2px dashed rgba(0,0,0,.12);border-radius:var(--radius);padding:24px 16px;
-  text-align:center;cursor:pointer;transition:all .25s;position:relative;overflow:hidden
-}
-.upload-area:hover,.upload-area.dragover{border-color:var(--primary);background:rgba(184,134,11,.03)}
-.upload-area .upload-icon{font-size:36px;margin-bottom:8px}
-.upload-area .upload-text{font-size:13px;color:var(--text-light);line-height:1.6}
-.upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
-
-.preview-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-.preview-item{
-  position:relative;width:80px;height:80px;border-radius:8px;overflow:hidden;
-  box-shadow:0 1px 6px rgba(0,0,0,.1);flex-shrink:0
-}
-.preview-item img{width:100%;height:100%;object-fit:cover;display:block}
-.preview-item .remove-btn{
-  position:absolute;top:2px;right:2px;width:22px;height:22px;border-radius:50%;
-  background:rgba(0,0,0,.55);color:#fff;border:none;cursor:pointer;
-  font-size:14px;display:flex;align-items:center;justify-content:center;line-height:1
-}
-.preview-item .cover-badge{
-  position:absolute;bottom:0;left:0;right:0;background:var(--primary);color:#fff;
-  font-size:10px;text-align:center;padding:2px 0;font-weight:600}
-
-/* 按钮 */
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:12px 28px;border:none;border-radius:10px;font-size:15px;font-weight:600;
-  cursor:pointer;transition:all .25s;font-family:inherit;width:100%
-}
-.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-light));
-  color:#fff;box-shadow:0 4px 16px rgba(184,134,11,.3)}
-.btn-primary:hover{box-shadow:0 6px 24px rgba(184,134,11,.4);transform:translateY(-1px)}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
-.btn-sm{padding:8px 16px;font-size:13px;border-radius:8px;width:auto}
-.btn-danger{background:var(--danger);color:#fff}
-.btn-outline{background:transparent;border:1px solid rgba(0,0,0,.12);color:var(--text)}
-.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.stat-card .stat-num { font-size: 22px; font-weight: 700; color: var(--primary); }
+.stat-card .stat-label { font-size: 11px; color: var(--text-light); margin-top: 2px; }
 
 /* 产品列表 */
-.section-card{
-  background:var(--card-bg);border-radius:var(--radius);padding:20px;
-  box-shadow:var(--shadow);margin-bottom:20px
+.product-list { display: flex; flex-direction: column; gap: 10px; }
+.product-item {
+  background: var(--card-bg); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 12px; display: flex;
+  gap: 12px; align-items: center; transition: transform 0.2s;
 }
-.section-card h3{font-size:16px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.section-card h3 .count{
-  font-size:12px;background:rgba(184,134,11,.1);color:var(--primary);
-  padding:2px 10px;border-radius:20px;font-weight:500}
+.product-item .item-img {
+  width: 60px; height: 60px; border-radius: 8px;
+  overflow: hidden; flex-shrink: 0; background: #f0ece6;
+}
+.product-item .item-img img { width: 100%; height: 100%; object-fit: cover; }
+.product-item .item-info { flex: 1; min-width: 0; }
+.product-item .item-name {
+  font-size: 14px; font-weight: 600; margin-bottom: 3px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.product-item .item-meta { font-size: 12px; color: var(--text-light); display: flex; gap: 10px; }
+.product-item .item-meta .price { color: var(--primary); font-weight: 600; }
+.product-item .item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
+.empty-state .empty-icon { font-size: 42px; margin-bottom: 10px; }
 
-.product-item{
-  display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.05);align-items:center
+/* ===== 编辑弹窗 ===== */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.5); display: flex;
+  align-items: flex-end; justify-content: center;
+  opacity: 0; visibility: hidden; transition: all 0.3s;
 }
-.product-item:last-child{border-bottom:none}
-.product-item .pi-img{width:56px;height:56px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#f0ece6}
-.product-item .pi-img img{width:100%;height:100%;object-fit:cover}
-.product-item .pi-info{flex:1;min-width:0}
-.product-item .pi-name{font-size:14px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.product-item .pi-meta{font-size:12px;color:var(--text-light)}
-.product-item .pi-actions{display:flex;gap:6px;flex-shrink:0}
-.product-item .pi-actions button{
-  padding:6px 10px;border:1px solid rgba(0,0,0,.08);border-radius:6px;
-  background:#fff;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit
+.modal-overlay.show { opacity: 1; visibility: visible; }
+.modal-content {
+  background: #fff; width: 100%; max-width: 600px; max-height: 92vh;
+  border-radius: 16px 16px 0 0; overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  padding-bottom: env(safe-area-inset-bottom, 20px);
 }
-.product-item .pi-actions button:hover{border-color:var(--primary);color:var(--primary)}
-.product-item .pi-actions button.del-btn:hover{border-color:var(--danger);color:var(--danger)}
+.modal-overlay.show .modal-content { transform: translateY(0); }
+@media (min-width: 768px) {
+  .modal-overlay { align-items: center; }
+  .modal-content { border-radius: 16px; max-height: 85vh; }
+}
+.modal-header {
+  position: sticky; top: 0; background: #fff;
+  padding: 14px 18px; border-bottom: 1px solid rgba(0,0,0,0.06);
+  display: flex; align-items: center; justify-content: space-between; z-index: 10;
+}
+.modal-header h3 { font-size: 16px; color: var(--primary); }
+.modal-close {
+  background: none; border: none; font-size: 22px;
+  color: var(--text-light); cursor: pointer; padding: 4px 8px;
+  border-radius: 6px; transition: background 0.2s; line-height: 1;
+}
+.modal-close:hover { background: rgba(0,0,0,0.05); }
+.modal-body { padding: 18px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 10px 14px; border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px; font-size: 14px; outline: none;
+  transition: border-color 0.25s; font-family: inherit; background: #fff;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+.form-group textarea { resize: vertical; min-height: 72px; }
+.form-row { display: flex; gap: 12px; }
+.form-row .form-group { flex: 1; }
+.modal-footer {
+  position: sticky; bottom: 0; background: #fff;
+  padding: 12px 18px; border-top: 1px solid rgba(0,0,0,0.06);
+  display: flex; gap: 10px; justify-content: flex-end;
+}
 
-.empty-msg{text-align:center;padding:30px;color:var(--text-light);font-size:13px}
+/* 图片上传 */
+.upload-area {
+  border: 2px dashed rgba(0,0,0,0.12); border-radius: 10px;
+  padding: 18px; text-align: center; cursor: pointer;
+  transition: all 0.25s; position: relative;
+}
+.upload-area:hover { border-color: var(--primary); background: rgba(184,134,11,0.03); }
+.upload-area .upload-icon { font-size: 28px; margin-bottom: 6px; }
+.upload-area p { font-size: 12px; color: var(--text-light); }
+.upload-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.image-preview-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.image-preview-item {
+  position: relative; width: 72px; height: 72px;
+  border-radius: 8px; overflow: hidden; border: 2px solid transparent;
+}
+.image-preview-item.is-cover { border-color: var(--primary); }
+.image-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+.image-preview-item .cover-badge {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--primary); color: #fff; font-size: 9px; text-align: center; padding: 2px;
+}
+.image-preview-item .img-actions {
+  position: absolute; top: 0; right: 0; display: flex; flex-direction: column; gap: 2px;
+}
+.image-preview-item .img-btn {
+  width: 20px; height: 20px; border-radius: 0 0 0 6px;
+  background: rgba(0,0,0,0.6); color: #fff; border: none;
+  font-size: 10px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; line-height: 1;
+}
+.image-preview-item .img-btn.set-cover { border-radius: 0 0 6px 0; }
+.upload-progress { display: none; margin-top: 10px; }
+.upload-progress.show { display: block; }
+.progress-bar { height: 4px; background: #eee; border-radius: 2px; overflow: hidden; }
+.progress-bar .progress-fill { height: 100%; background: var(--primary); transition: width 0.3s; width: 0%; }
+.progress-text { font-size: 11px; color: var(--text-light); margin-top: 4px; text-align: center; }
 
 /* Toast */
-.toast{
-  position:fixed;top:64px;left:50%;transform:translateX(-50%) translateY(-120px);
-  z-index:9999;padding:10px 24px;border-radius:10px;font-size:14px;font-weight:500;
-  box-shadow:0 4px 24px rgba(0,0,0,.15);transition:transform .35s cubic-bezier(.4,0,.2,1);
-  max-width:88vw;text-align:center
+.toast-container {
+  position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+  z-index: 9999; display: flex; flex-direction: column; gap: 6px; pointer-events: none;
 }
-.toast.show{transform:translateX(-50%) translateY(0)}
-.toast.success{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
-.toast.error{background:#ffebee;color:#c62828;border:1px solid #ffcdd2}
-.toast.info{background:#fff8e1;color:#f57f17;border:1px solid #ffecb3}
-
-/* 进度条 */
-.progress-wrap{margin:16px 0;display:none}
-.progress-wrap.show{display:block}
-.progress-bar{height:4px;background:#eee;border-radius:2px;overflow:hidden}
-.progress-bar-inner{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-light));
-  width:0;transition:width .3s;border-radius:2px}
-.progress-text{font-size:12px;color:var(--text-light);margin-top:6px;text-align:center}
+.toast {
+  padding: 10px 20px; border-radius: 8px; font-size: 13px;
+  color: #fff; pointer-events: auto;
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+  white-space: nowrap; box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+.toast.info { background: var(--primary); }
+@keyframes toastIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes toastOut { from { opacity:1; } to { opacity:0; } }
 
 /* 确认弹窗 */
-.modal-overlay{
-  position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.45);
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;visibility:hidden;transition:all .25s
+.confirm-overlay {
+  position: fixed; inset: 0; z-index: 3000;
+  background: rgba(0,0,0,0.5); display: flex;
+  align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden; transition: all 0.3s;
 }
-.modal-overlay.show{opacity:1;visibility:visible}
-.modal-box{
-  background:#fff;border-radius:16px;padding:28px 24px 20px;width:88%;max-width:340px;
-  box-shadow:0 12px 48px rgba(0,0,0,.15);transform:scale(.9);transition:transform .25s
+.confirm-overlay.show { opacity: 1; visibility: visible; }
+.confirm-box {
+  background: #fff; border-radius: 14px;
+  padding: 24px 20px 18px; max-width: 300px; width: 88%; text-align: center;
 }
-.modal-overlay.show .modal-box{transform:scale(1)}
-.modal-box h3{font-size:16px;margin-bottom:8px}
-.modal-box p{font-size:13px;color:#666;margin-bottom:20px;line-height:1.6;white-space:pre-line}
-.modal-actions{display:flex;gap:10px}
-.modal-actions .btn{flex:1}
+.confirm-box p { font-size: 14px; margin-bottom: 18px; line-height: 1.5; }
+.confirm-box .confirm-actions { display: flex; gap: 10px; justify-content: center; }
 
-.token-toggle{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--text-light);cursor:pointer}
-.token-toggle input{accent-color:var(--primary)}
-
-@media(max-width:480px){
-  .page{padding:60px 12px 30px}
-  .setup-card{padding:22px 16px}
-  .section-card{padding:16px 14px}
-  .preview-item{width:68px;height:68px}
+/* Loading spinner */
+.spinner {
+  width: 28px; height: 28px; border: 3px solid #eee;
+  border-top-color: var(--primary); border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin: 0 auto 10px;
 }
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#d0c8b8;border-radius:3px}
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
-<!-- 顶栏 -->
-<div class="topbar">
-  <a href="index.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-         stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="15 18 9 12 15 6"/>
-    </svg>
-    返回
-  </a>
-  <span class="topbar-title">✦ 管理后台 ✦</span>
-  <div class="topbar-right"><a id="logoutBtn" title="清除Token">🔑</a></div>
-</div>
-
-<!-- Toast -->
-<div class="toast" id="toast"></div>
-
-<!-- 确认弹窗 -->
-<div class="modal-overlay" id="confirmModal">
-  <div class="modal-box">
-    <h3 id="confirmTitle">确认操作</h3>
-    <p id="confirmMsg"></p>
-    <div class="modal-actions">
-      <button class="btn btn-outline btn-sm" id="confirmCancel">取消</button>
-      <button class="btn btn-danger btn-sm" id="confirmOk">确认</button>
-    </div>
+<!-- ===== 登录页 ===== -->
+<div class="login-page" id="loginPage">
+  <h1>✦ 绒颜 ✦</h1>
+  <p class="sub">产品管理后台</p>
+  <div class="login-box">
+    <label>GitHub Token</label>
+    <input type="password" id="tokenInput" placeholder="粘贴 Fine-grained PAT（github_pat_xxx...）" autocomplete="off">
+    <p class="hint">
+      使用 <a href="https://github.com/settings/tokens?type=beta" target="_blank">Fine-grained Token</a>，
+      仅授权本仓库 Contents 读写权限，建议有效期 30 天。<br>
+      Token 仅保存在当前浏览器会话中，关闭页面即失效。
+    </p>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;" id="loginBtn">登 录</button>
+    <div class="login-error" id="loginError"></div>
   </div>
 </div>
 
-<div class="page">
-
-  <!-- 首次设置 -->
-  <div class="setup-card" id="setupCard">
-    <h2 id="setupTitle">⚙️ 首次设置</h2>
-    <p>初次登录管理后台需要输入一次管理密码，后续不需要。</p>
-    <ol>
-      <li>联系管理员索要密码</li>
-      <li>粘贴到下方输入框</li>
-    </ol>
-    <div class="form-group">
-      <input type="password" class="form-input" id="tokenInput" placeholder="粘贴 密码 (ghp_xxxx...)">
-      <label class="token-toggle">
-        <input type="checkbox" id="tokenShow"> 显示Token
-      </label>
+<!-- ===== 管理主界面 ===== -->
+<div id="adminPanel" style="display:none">
+  <div class="admin-header">
+    <h2>✦ 绒颜管理</h2>
+    <div class="header-actions">
+      <button class="btn btn-primary btn-sm" id="addBtn">＋ 添加</button>
+      <button class="btn btn-sm" id="refreshBtn">↻ 刷新</button>
+      <button class="btn btn-sm btn-danger" id="logoutBtn">退出</button>
     </div>
-    <button class="btn btn-primary" id="saveTokenBtn">💾 保存Token并开始</button>
   </div>
+  <div class="admin-body">
+    <div class="stats-bar" id="statsBar"></div>
+    <div class="product-list" id="productList"></div>
+  </div>
+</div>
 
-  <!-- 主面板 -->
-  <div id="mainPanel" style="display:none">
-
-    <!-- 添加/编辑产品 -->
-    <div class="section-card">
-      <h3>📦 <span id="formTitle">添加产品</span></h3>
-      <input type="hidden" id="editId" value="">
-
-      <div class="form-group">
-        <label>产品名称 *</label>
-        <input type="text" class="form-input" id="pName" placeholder="如：珍珠花朵发夹">
+<!-- ===== 编辑弹窗 ===== -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="modalTitle">添加产品</h3>
+      <button class="modal-close" id="modalClose">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>产品名称</label>
+          <input type="text" id="fName" placeholder="如：珍珠花朵发夹">
+        </div>
+        <div class="form-group" style="max-width:120px">
+          <label>价格（¥）</label>
+          <input type="number" id="fPrice" placeholder="0.0" step="0.1" min="0">
+        </div>
       </div>
-
       <div class="form-group">
-        <label>价格 (元) *</label>
-        <input type="number" class="form-input" id="pPrice" placeholder="如：39.9" step="0.1" min="0">
-      </div>
-
-      <div class="form-group">
-        <label>分类 *</label>
-        <select class="form-input" id="pCategory">
-          <option value="发饰">💇‍♀️ 发饰</option>
-          <option value="耳饰">✨ 耳饰</option>
-          <option value="胸饰">🌸 胸饰</option>
-          <option value="其他">🎁 其他</option>
+        <label>分类</label>
+        <select id="fCategory">
+          <option value="发饰">发饰</option>
+          <option value="耳饰">耳饰</option>
+          <option value="胸饰">胸饰</option>
+          <option value="其他">其他</option>
         </select>
       </div>
-
       <div class="form-group">
         <label>产品描述</label>
-        <textarea class="form-input" id="pDesc" placeholder="描述产品的材质、工艺、适用场景等..."></textarea>
+        <textarea id="fDesc" placeholder="描述产品的特点、材质、适用场景等..."></textarea>
       </div>
-
       <div class="form-group">
-        <label>产品图片 * <span style="font-weight:400;color:var(--text-light)">（第一张为封面）</span></label>
+        <label>产品图片（自动压缩为 webp）</label>
         <div class="upload-area" id="uploadArea">
-          <input type="file" id="fileInput" accept="image/*" multiple>
           <div class="upload-icon">📷</div>
-          <div class="upload-text">点击或拖放图片到这里<br><span style="font-size:11px">支持 JPG / PNG / WEBP</span></div>
+          <p>点击选择或拖拽图片到此处<br>支持 jpg / png / webp，可多选</p>
+          <input type="file" id="fileInput" accept="image/*" multiple>
         </div>
-        <div class="preview-grid" id="previewGrid"></div>
-      </div>
-
-      <div class="progress-wrap" id="progressWrap">
-        <div class="progress-bar"><div class="progress-bar-inner" id="progressBar"></div></div>
-        <div class="progress-text" id="progressText">处理中...</div>
-      </div>
-
-      <div style="display:flex;gap:10px;margin-top:6px">
-        <button class="btn btn-primary" id="submitBtn">📤 添加产品</button>
-        <button class="btn btn-outline" id="cancelEditBtn" style="display:none;width:auto;padding:12px 20px">取消</button>
-      </div>
-    </div>
-
-    <!-- 产品列表 -->
-    <div class="section-card">
-      <h3>📋 产品列表 <span class="count" id="productCount">0 件</span></h3>
-      <div id="productList">
-        <div class="empty-msg">加载中...</div>
-      </div>
-    </div>
-
-    <!-- 数据管理 -->
-    <div class="section-card">
-      <h3>🔧 数据管理</h3>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <button class="btn btn-outline btn-sm" id="refreshBtn">🔄 刷新产品数据</button>
-        <button class="btn btn-outline btn-sm" id="purgeCdnBtn">⚡ 刷新CDN缓存</button>
-        <button class="btn btn-outline btn-sm" id="changeTokenBtn">🔑 更换Token</button>
-        <div style="font-size:11px;color:var(--text-light);text-align:center;margin-top:4px">
-          图片存放在 rongyan/images/ 文件夹<br>
-          产品数据存放在 rongyan/products.json<br>
-          CDN 缓存约 1~3 分钟刷新
+        <div class="upload-progress" id="uploadProgress">
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-text" id="progressText">处理中...</div>
         </div>
+        <div class="image-preview-list" id="imagePreviewList"></div>
       </div>
     </div>
-
+    <div class="modal-footer">
+      <button class="btn" id="cancelBtn">取消</button>
+      <button class="btn btn-primary" id="saveBtn">保存</button>
+    </div>
   </div>
 </div>
 
+<!-- ===== 确认弹窗 ===== -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <p id="confirmMsg">确定删除？</p>
+    <div class="confirm-actions">
+      <button class="btn" id="confirmNo">取消</button>
+      <button class="btn btn-danger" id="confirmYes">确定</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast 容器 -->
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
-(function(){
-  // ============================
-  //   配置
-  // ============================
-  const GITHUB_OWNER  = 'yangruan1688';
-  const GITHUB_REPO   = 'yangruan.github.io';
+(function () {
+  // ===== 配置 =====
+  const GITHUB_OWNER = 'yangruan1688';
+  const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
-  const PRODUCTS_FILE = 'rongyan/products.json';
-  const IMAGES_DIR    = 'rongyan/images';
+  const PRODUCTS_PATH = 'rongyan/products.json';
+  const IMAGES_PATH   = 'rongyan/images';
+  const API_BASE = 'https://api.github.com';
 
-  const GITHUB_API    = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${PRODUCTS_FILE}`;
-  const CDN_BASE      = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
-  const TOKEN_KEY     = 'rongyan_admin_token';
-  const PURGE_BASE    = `https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}`;
-
-  // ============================
-  //   DOM
-  // ============================
-  const $ = id => document.getElementById(id);
-  const setupCard=$('setupCard'), mainPanel=$('mainPanel'), tokenInput=$('tokenInput'),
-        tokenShow=$('tokenShow'), saveTokenBtn=$('saveTokenBtn'), logoutBtn=$('logoutBtn'),
-        formTitle=$('formTitle'), editId=$('editId'), pName=$('pName'), pPrice=$('pPrice'),
-        pCategory=$('pCategory'), pDesc=$('pDesc'), fileInput=$('fileInput'),
-        uploadArea=$('uploadArea'), previewGrid=$('previewGrid'), submitBtn=$('submitBtn'),
-        cancelEditBtn=$('cancelEditBtn'), productList=$('productList'), productCount=$('productCount'),
-        refreshBtn=$('refreshBtn'), purgeCdnBtn=$('purgeCdnBtn'), changeTokenBtn=$('changeTokenBtn'),
-        progressWrap=$('progressWrap'), progressBar=$('progressBar'), progressText=$('progressText'),
-        toastEl=$('toast'), confirmModal=$('confirmModal'), setupTitle=$('setupTitle');
-
-  // ============================
-  //   状态
-  // ============================
+  // ===== 全局状态 =====
+  let TOKEN = '';
   let products = [];
-  let images = []; 
-  let fileSha = null;
-  let isSubmitting = false;
+  let editingId = null;
+  let tempImages = []; // { base64, file, uploadedUrl, isCover }
 
-  // ============================
-  //   工具函数
-  // ============================
-  function escapeHTML(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = String(str);
-    return div.innerHTML;
+  // ===== DOM =====
+  const $ = id => document.getElementById(id);
+  const loginPage = $('loginPage');
+  const adminPanel = $('adminPanel');
+  const tokenInput = $('tokenInput');
+  const loginBtn = $('loginBtn');
+  const loginError = $('loginError');
+  const addBtn = $('addBtn');
+  const refreshBtn = $('refreshBtn');
+  const logoutBtn = $('logoutBtn');
+  const statsBar = $('statsBar');
+  const productList = $('productList');
+  const editModal = $('editModal');
+  const modalTitle = $('modalTitle');
+  const modalClose = $('modalClose');
+  const cancelBtn = $('cancelBtn');
+  const saveBtn = $('saveBtn');
+  const fileInput = $('fileInput');
+  const uploadArea = $('uploadArea');
+  const uploadProgress = $('uploadProgress');
+  const progressFill = $('progressFill');
+  const progressText = $('progressText');
+  const imagePreviewList = $('imagePreviewList');
+  const confirmOverlay = $('confirmOverlay');
+  const confirmMsg = $('confirmMsg');
+  const confirmYes = $('confirmYes');
+  const confirmNo = $('confirmNo');
+
+  // ===== Toast =====
+  function toast(msg, type = 'info') {
+    const el = document.createElement('div');
+    el.className = 'toast ' + type;
+    el.textContent = msg;
+    $('toastContainer').appendChild(el);
+    setTimeout(() => el.remove(), 3200);
   }
 
-  function showToast(msg, type='info', duration=2500){
-    toastEl.textContent = msg;
-    toastEl.className = 'toast ' + type + ' show';
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(()=> toastEl.classList.remove('show'), duration);
+  // ===== 确认弹窗 =====
+  function confirm2(msg) {
+    return new Promise(resolve => {
+      confirmMsg.textContent = msg;
+      confirmOverlay.classList.add('show');
+      const yes = () => { cleanup(); resolve(true); };
+      const no  = () => { cleanup(); resolve(false); };
+      function cleanup() {
+        confirmOverlay.classList.remove('show');
+        confirmYes.removeEventListener('click', yes);
+        confirmNo.removeEventListener('click', no);
+      }
+      confirmYes.addEventListener('click', yes);
+      confirmNo.addEventListener('click', no);
+    });
   }
 
-  function showProgress(pct, text){
-    progressWrap.classList.add('show');
-    progressBar.style.width = pct + '%';
-    if(text) progressText.textContent = text;
+  // ===== GitHub API 封装 =====
+  const headers = () => ({
+    'Authorization': `Bearer ${TOKEN}`,
+    'Accept': 'application/vnd.github.v3+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  });
+
+  async function getFile(path) {
+    const res = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`, {
+      headers: headers()
+    });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`API 错误: ${res.status}`);
+    return await res.json();
   }
-  function hideProgress(){ progressWrap.classList.remove('show'); progressBar.style.width='0'; }
 
-  function showConfirm(title, msg, callback){
-    $('confirmTitle').textContent = title;
-    $('confirmMsg').textContent = msg;
-    confirmModal.classList.add('show');
-    const ok = $('confirmOk'), cancel = $('confirmCancel');
-    const cleanup = ()=>{ confirmModal.classList.remove('show'); ok.onclick=null; cancel.onclick=null; };
-    ok.onclick = ()=>{ cleanup(); callback(true); };
-    cancel.onclick = cleanup;
-  }
-
-  function getToken(){ return (localStorage.getItem(TOKEN_KEY) || '').trim(); }
-  function setToken(t){ localStorage.setItem(TOKEN_KEY, t.trim()); }
-  function removeToken(){ localStorage.removeItem(TOKEN_KEY); }
-
-  // ✅ 优化：通用 CDN 缓存清除函数
-  async function purgeCdn(path) {
-    try {
-      const purgeUrl = `${PURGE_BASE}/${path}`;
-      await fetch(purgeUrl);
-      console.log('CDN Purge 请求已发送:', path);
-    } catch (e) {
-      console.warn('CDN Purge 失败:', path, e);
+  async function putFile(path, content, message, sha) {
+    const body = {
+      message, content, branch: GITHUB_BRANCH
+    };
+    if (sha) body.sha = sha;
+    const res = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
+      method: 'PUT', headers: headers(),
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || '上传失败');
     }
+    return await res.json();
   }
 
-  // ============================
-  //   图片压缩
-  // ============================
-  function compressImage(file, maxSize=800, quality=0.75){
-    return new Promise((resolve, reject)=>{
+  async function deleteFile(path, sha) {
+    const res = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
+      method: 'DELETE', headers: headers(),
+      body: JSON.stringify({ message: `delete: ${path}`, branch: GITHUB_BRANCH, sha })
+    });
+    if (!res.ok) throw new Error('删除失败');
+    return await res.json();
+  }
+
+  // ===== 图片压缩（Canvas → webp） =====
+  function compressImage(file, maxWidth = 1200, quality = 0.82) {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = function(e){
+      reader.onload = (e) => {
         const img = new Image();
-        img.onload = function(){
-          const canvas = document.createElement('canvas');
+        img.onload = () => {
           let w = img.width, h = img.height;
-          if(w > maxSize || h > maxSize){
-            if(w > h){ h = Math.round(h * maxSize / w); w = maxSize; }
-            else     { w = Math.round(w * maxSize / h); h = maxSize; }
-          }
-          canvas.width = w;
-          canvas.height = h;
+          if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', quality));
+          canvas.toBlob(blob => {
+            if (!blob) return reject(new Error('压缩失败'));
+            const reader2 = new FileReader();
+            reader2.onload = () => {
+              const base64 = reader2.result.split(',')[1];
+              resolve({ base64, width: w, height: h });
+            };
+            reader2.readAsDataURL(blob);
+          }, 'image/webp', quality);
         };
         img.onerror = reject;
         img.src = e.target.result;
@@ -426,467 +481,368 @@ select.form-input{appearance:none;-webkit-appearance:none;
     });
   }
 
-  // ============================
-  //   GitHub API
-  // ============================
-  async function fetchProductsFromGitHub(){
-    const token = getToken();
-    // ✅ 优化：加上时间戳防止浏览器缓存旧数据
-    const res = await fetch(GITHUB_API + '?t=' + Date.now(), {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    if(res.status === 404) return { products: [], sha: null };
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    fileSha = data.sha;
-    const content = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-    return { products: Array.isArray(content) ? content : [], sha: data.sha };
-  }
+  // ===== 登录 =====
+  async function doLogin() {
+    const token = tokenInput.value.trim();
+    if (!token) { showLoginError('请输入 Token'); return; }
 
-  async function saveProductsToGitHub(updatedProducts){
-    const token = getToken();
-    const jsonStr = JSON.stringify(updatedProducts, null, 2);
-    const contentB64 = btoa(unescape(encodeURIComponent(jsonStr)));
+    loginBtn.disabled = true;
+    loginBtn.textContent = '验证中...';
+    showLoginError('');
 
-    const body = {
-      message: 'update products via admin',
-      content: contentB64,
-      branch: GITHUB_BRANCH
-    };
-    if(fileSha) body.sha = fileSha;
-
-    const res = await fetch(GITHUB_API, {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    if(!res.ok){
-      const errData = await res.json().catch(()=>({}));
-      if(res.status === 401) throw new Error('Token 无效或已过期');
-      if(res.status === 403) throw new Error('Token 权限不足');
-      if(res.status === 404) throw new Error('找不到仓库');
-      throw new Error(errData.message || '保存失败 (HTTP ' + res.status + ')');
-    }
-
-    const result = await res.json();
-    fileSha = result.content.sha;
-
-    // ✅ 优化：保存成功后立即清除 products.json 的 CDN 缓存
-    await purgeCdn(PRODUCTS_FILE);
-
-    return result;
-  }
-
-  async function uploadImageToGitHub(dataUrl, fileName){
-    const token = getToken();
-    const base64Content = dataUrl.split(',')[1];
-    const filePath = `${IMAGES_DIR}/${fileName}`;
-    const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}`;
-
-    const body = {
-      message: `upload image: ${fileName}`,
-      content: base64Content,
-      branch: GITHUB_BRANCH
-    };
-
-    const res = await fetch(apiUrl, {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    if(!res.ok){
-      const err = await res.json().catch(()=>({}));
-      throw new Error(err.message || '图片上传失败 (HTTP ' + res.status + ')');
-    }
-
-    const cdnUrl = `${CDN_BASE}/${filePath}`;
-    // ✅ 优化：上传图片后清除该图片的 CDN 缓存
-    await purgeCdn(filePath);
-
-    return cdnUrl;
-  }
-
-  async function deleteImageFromGitHub(fileName){
-    const token = getToken();
-    const filePath = `${IMAGES_DIR}/${fileName}`;
-    const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}`;
-
-    const getRes = await fetch(apiUrl, {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    if(!getRes.ok) return; 
-    const fileData = await getRes.json();
-
-    await fetch(apiUrl, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: `delete image: ${fileName}`,
-        sha: fileData.sha,
-        branch: GITHUB_BRANCH
-      })
-    });
-  }
-
-  function extractFileName(cdnUrl){
-    if(!cdnUrl) return null;
-    const parts = cdnUrl.split('/');
-    return parts[parts.length - 1].split('?')[0]; // ✅ 优化：防止带参数导致文件名错误
-  }
-
-  // ============================
-  //   加载产品
-  // ============================
-  async function loadProducts(){
-    productList.innerHTML = '<div class="empty-msg">加载中...</div>';
     try {
-      const result = await fetchProductsFromGitHub();
-      products = result.products;
-    } catch(e){
-      console.warn('GitHub API 加载失败:', e);
-      showToast('加载失败: ' + e.message, 'error', 4000);
-      products = [];
-      fileSha = null;
+      TOKEN = token;
+      const res = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}`, { headers: headers() });
+      if (!res.ok) throw new Error(res.status === 401 ? 'Token 无效' : '连接失败');
+
+      // 检查写入权限
+      const permRes = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${PRODUCTS_PATH}?ref=${GITHUB_BRANCH}`, {
+        headers: headers()
+      });
+      if (permRes.status === 403) throw new Error('Token 没有仓库 Contents 权限');
+
+      sessionStorage.setItem('_ry_token', token);
+      showAdmin();
+    } catch (err) {
+      showLoginError(err.message || '登录失败');
+      TOKEN = '';
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = '登 录';
     }
-    renderProductList();
   }
 
-  function renderProductList(){
-    productCount.textContent = products.length + ' 件';
-    if(products.length === 0){
-      productList.innerHTML = '<div class="empty-msg">暂无产品，请添加第一个产品 ✨</div>';
+  function showLoginError(msg) {
+    loginError.textContent = msg;
+    loginError.style.display = msg ? 'block' : 'none';
+  }
+
+  loginBtn.addEventListener('click', doLogin);
+  tokenInput.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  // ===== 显示管理面板 =====
+  async function showAdmin() {
+    loginPage.style.display = 'none';
+    adminPanel.style.display = 'block';
+    await loadProducts();
+  }
+
+  function doLogout() {
+    sessionStorage.removeItem('_ry_token');
+    TOKEN = '';
+    adminPanel.style.display = 'none';
+    loginPage.style.display = 'flex';
+    tokenInput.value = '';
+  }
+
+  // ===== 加载产品 =====
+  async function loadProducts() {
+    productList.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>加载中...</p></div>';
+    try {
+      const file = await getFile(PRODUCTS_PATH);
+      if (file) {
+        const decoded = decodeURIComponent(escape(atob(file.content)));
+        const data = JSON.parse(decoded);
+        products = Array.isArray(data) ? data : (data.products || []);
+      } else {
+        products = [];
+      }
+    } catch (err) {
+      toast('加载失败: ' + err.message, 'error');
+      products = [];
+    }
+    renderStats();
+    renderList();
+  }
+
+  function renderStats() {
+    const cats = {};
+    products.forEach(p => { cats[p.category] = (cats[p.category] || 0) + 1; });
+    let html = `<div class="stat-card"><div class="stat-num">${products.length}</div><div class="stat-label">全部产品</div></div>`;
+    Object.entries(cats).forEach(([cat, count]) => {
+      html += `<div class="stat-card"><div class="stat-num">${count}</div><div class="stat-label">${cat}</div></div>`;
+    });
+    statsBar.innerHTML = html;
+  }
+
+  function renderList() {
+    if (products.length === 0) {
+      productList.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>暂无产品，点击上方"＋ 添加"开始</p></div>';
       return;
     }
-    const sorted = [...products].sort((a,b) => b.id - a.id);
-    
-    productList.innerHTML = sorted.map(p => `
-      <div class="product-item">
-        <div class="pi-img"><img src="${escapeHTML(p.cover)}" alt="${escapeHTML(p.name)}" loading="lazy"></div>
-        <div class="pi-info">
-          <div class="pi-name">${escapeHTML(p.name)}</div>
-          <div class="pi-meta">${escapeHTML(p.category)} · ¥${Number(p.price).toFixed(1)} · ${p.images ? p.images.length : 0}图</div>
+    productList.innerHTML = products.slice().reverse().map(p => `
+      <div class="product-item" data-id="${p.id}">
+        <div class="item-img"><img src="${p.cover || ''}" alt="${p.name}" loading="lazy"></div>
+        <div class="item-info">
+          <div class="item-name">${p.name}</div>
+          <div class="item-meta">
+            <span class="price">¥${Number(p.price).toFixed(1)}</span>
+            <span>${p.category}</span>
+            <span>${(p.images || []).length} 图</span>
+          </div>
         </div>
-        <div class="pi-actions">
-          <button onclick="window._admin.editProduct(${p.id})">编辑</button>
-          <button class="del-btn" onclick="window._admin.deleteProduct(${p.id})">删除</button>
+        <div class="item-actions">
+          <button class="btn btn-sm edit-btn" data-id="${p.id}">编辑</button>
+          <button class="btn btn-sm btn-danger del-btn" data-id="${p.id}">删除</button>
         </div>
       </div>
     `).join('');
   }
 
-  // ============================
-  //   图片预览
-  // ============================
-  function renderImagePreviews(){
-    previewGrid.innerHTML = images.map((img, i) => `
-      <div class="preview-item">
-        <img src="${escapeHTML(img.src)}" alt="图片${i+1}">
-        <button class="remove-btn" onclick="window._admin.removeImage(${i})">×</button>
-        ${i === 0 ? '<div class="cover-badge">封面</div>' : ''}
-      </div>
-    `).join('');
+  // 列表事件代理
+  productList.addEventListener('click', async (e) => {
+    const editB = e.target.closest('.edit-btn');
+    const delB = e.target.closest('.del-btn');
+    if (editB) openEditModal(parseInt(editB.dataset.id));
+    if (delB) await deleteProduct(parseInt(delB.dataset.id));
+  });
+
+  // ===== 编辑弹窗 =====
+  function openAddModal() {
+    editingId = null;
+    modalTitle.textContent = '添加产品';
+    $('fName').value = '';
+    $('fPrice').value = '';
+    $('fCategory').value = '发饰';
+    $('fDesc').value = '';
+    tempImages = [];
+    renderImagePreviews();
+    editModal.classList.add('show');
   }
 
-  async function handleFiles(fileList){
-    const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
-    if(!files.length) return;
+  function openEditModal(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    editingId = id;
+    modalTitle.textContent = '编辑产品';
+    $('fName').value = p.name;
+    $('fPrice').value = p.price;
+    $('fCategory').value = p.category;
+    $('fDesc').value = p.description || '';
+    tempImages = (p.images || []).map((url, i) => ({
+      uploadedUrl: url,
+      isCover: url === p.cover,
+      existing: true
+    }));
+    renderImagePreviews();
+    editModal.classList.add('show');
+  }
 
-    for(let i = 0; i < files.length; i++){
-      showProgress(((i+1)/files.length*80).toFixed(0), `压缩图片 ${i+1}/${files.length}...`);
+  function closeEditModal() {
+    editModal.classList.remove('show');
+    tempImages = [];
+  }
+
+  function renderImagePreviews() {
+    if (tempImages.length === 0) {
+      imagePreviewList.innerHTML = '';
+      return;
+    }
+    imagePreviewList.innerHTML = tempImages.map((img, i) => {
+      const src = img.uploadedUrl || ('data:image/webp;base64,' + img.base64);
+      return `
+        <div class="image-preview-item ${img.isCover ? 'is-cover' : ''}" data-index="${i}">
+          <img src="${src}" alt="图${i + 1}">
+          ${img.isCover ? '<div class="cover-badge">封面</div>' : ''}
+          <div class="img-actions">
+            <button class="img-btn" data-action="remove" data-index="${i}" title="删除">✕</button>
+            ${!img.isCover ? `<button class="img-btn set-cover" data-action="cover" data-index="${i}" title="设为封面">★</button>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  imagePreviewList.addEventListener('click', (e) => {
+    const btn = e.target.closest('.img-btn');
+    if (!btn) return;
+    const idx = parseInt(btn.dataset.index);
+    const action = btn.dataset.action;
+    if (action === 'remove') {
+      tempImages.splice(idx, 1);
+    } else if (action === 'cover') {
+      tempImages.forEach(img => img.isCover = false);
+      tempImages[idx].isCover = true;
+    }
+    renderImagePreviews();
+  });
+
+  // 文件选择
+  fileInput.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    fileInput.value = '';
+
+    uploadProgress.classList.add('show');
+    let done = 0;
+
+    for (const file of files) {
+      progressText.textContent = `压缩中 (${done + 1}/${files.length}): ${file.name}`;
+      progressFill.style.width = ((done / files.length) * 100) + '%';
       try {
-        const compressed = await compressImage(files[i]);
-        images.push({ src: compressed, isNew: true, fileName: null });
-      } catch(e){
-        showToast('图片压缩失败: ' + files[i].name, 'error');
+        const { base64 } = await compressImage(file);
+        tempImages.push({ base64, isCover: tempImages.length === 0 });
+        renderImagePreviews();
+      } catch (err) {
+        toast('图片处理失败: ' + file.name, 'error');
       }
+      done++;
+      progressFill.style.width = ((done / files.length) * 100) + '%';
     }
-    hideProgress();
-    renderImagePreviews();
-  }
 
-  // ============================
-  //   表单
-  // ============================
-  function resetForm(){
-    editId.value = '';
-    pName.value = '';
-    pPrice.value = '';
-    pCategory.value = '发饰';
-    pDesc.value = '';
-    images = [];
-    renderImagePreviews();
-    formTitle.textContent = '添加产品';
-    submitBtn.innerHTML = '📤 添加产品';
-    cancelEditBtn.style.display = 'none';
-  }
+    progressText.textContent = `完成，共 ${files.length} 张图片`;
+    setTimeout(() => uploadProgress.classList.remove('show'), 1500);
+  });
 
-  window._admin = {
-    removeImage(idx){
-      images.splice(idx, 1);
-      renderImagePreviews();
-    },
-
-    editProduct(id){
-      const p = products.find(x => x.id === id);
-      if(!p) return;
-      editId.value = id;
-      pName.value = p.name;
-      pPrice.value = p.price;
-      pCategory.value = p.category;
-      pDesc.value = p.description || '';
-      
-      images = (p.images || []).map(url => ({
-        src: url,
-        isNew: false,
-        fileName: extractFileName(url)
-      }));
-      
-      renderImagePreviews();
-      formTitle.textContent = '编辑产品 #' + id;
-      submitBtn.innerHTML = '💾 保存修改';
-      cancelEditBtn.style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-
-    async deleteProduct(id){
-      const p = products.find(x => x.id === id);
-      if(!p) return;
-      
-      showConfirm('删除产品', `确定要删除「${p.name}」吗？\n同时会删除该产品的所有图片。`, async(confirmed)=>{
-        if(!confirmed) return;
-        try {
-          showProgress(30, '正在删除图片...');
-          if(p.images && p.images.length > 0){
-            for(let i = 0; i < p.images.length; i++){
-              const fileName = extractFileName(p.images[i]);
-              if(fileName) await deleteImageFromGitHub(fileName);
-            }
-          }
-
-          showProgress(70, '正在更新产品数据...');
-          products = products.filter(x => x.id !== id);
-          await saveProductsToGitHub(products);
-          
-          hideProgress();
-          showToast('已删除「' + p.name + '」', 'success');
-          renderProductList();
-        } catch(e){
-          hideProgress();
-          showToast('删除失败: ' + e.message, 'error', 4000);
-        }
-      });
+  // 拖拽
+  uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+  uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    const dt = e.dataTransfer;
+    if (dt.files.length) {
+      fileInput.files = dt.files;
+      fileInput.dispatchEvent(new Event('change'));
     }
-  };
+  });
 
-  // ============================
-  //   提交
-  // ============================
-  async function handleSubmit(){
-    if(isSubmitting) return;
+  // ===== 保存产品 =====
+  async function saveProduct() {
+    const name = $('fName').value.trim();
+    const price = parseFloat($('fPrice').value);
+    const category = $('fCategory').value;
+    const description = $('fDesc').value.trim();
 
-    const name     = pName.value.trim();
-    const price    = parseFloat(pPrice.value);
-    const category = pCategory.value;
-    const desc     = pDesc.value.trim();
-    const eId      = editId.value;
+    if (!name) { toast('请输入产品名称', 'error'); return; }
+    if (isNaN(price) || price < 0) { toast('请输入有效价格', 'error'); return; }
+    if (tempImages.length === 0) { toast('请至少上传一张图片', 'error'); return; }
 
-    if(!name)     { showToast('请输入产品名称', 'error'); pName.focus(); return; }
-    if(isNaN(price) || price < 0) { showToast('请输入有效价格', 'error'); pPrice.focus(); return; }
-    if(images.length === 0) { showToast('请至少上传一张图片', 'error'); return; }
-
-    isSubmitting = true;
-    submitBtn.disabled = true;
+    saveBtn.disabled = true;
+    saveBtn.textContent = '保存中...';
 
     try {
-      const finalImageUrls = [];
-      let uploadCount = 0;
-      const newImages = images.filter(img => img.isNew);
+      // 1. 上传新图片到 GitHub
+      const uploadedUrls = [];
+      const timestamp = Date.now();
 
-      for(let i = 0; i < images.length; i++){
-        const img = images[i];
-        if(!img.isNew){
-          finalImageUrls.push(img.src);
-        } else {
-          uploadCount++;
-          showProgress(20 + (uploadCount / newImages.length * 50), 
-            `上传图片 ${uploadCount}/${newImages.length}...`);
-          
-          const timestamp = Date.now();
-          const randomStr = Math.random().toString(36).substring(2, 8);
-          const fileName = `${timestamp}_${randomStr}.jpg`;
-          
-          const cdnUrl = await uploadImageToGitHub(img.src, fileName);
-          finalImageUrls.push(cdnUrl);
+      for (let i = 0; i < tempImages.length; i++) {
+        const img = tempImages[i];
+        if (img.existing && img.uploadedUrl) {
+          uploadedUrls.push(img.uploadedUrl);
+          continue;
         }
+        // 上传新图片
+        const filename = `p${timestamp}_${i}.webp`;
+        const path = `${IMAGES_PATH}/${filename}`;
+        progressFill.parentElement.parentElement.classList.add('show');
+        progressText.textContent = `上传图片 ${i + 1}/${tempImages.length}...`;
+        progressFill.style.width = ((i / tempImages.length) * 100) + '%';
+
+        await putFile(path, img.base64, `upload image: ${filename}`);
+        const url = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${path}`;
+        uploadedUrls.push(url);
+        img.uploadedUrl = url;
+
+        // GitHub API 限速，稍等
+        await new Promise(r => setTimeout(r, 800));
       }
 
-      showProgress(80, '保存产品数据...');
+      progressFill.style.width = '100%';
 
-      if(eId){
-        const id = parseInt(eId);
-        const idx = products.findIndex(x => x.id === id);
-        if(idx < 0) throw new Error('产品不存在');
-        
-        const oldImages = products[idx].images || [];
-        const deletedImages = oldImages.filter(url => !finalImageUrls.includes(url));
-        
-        if(deletedImages.length > 0){
-          showProgress(85, '清理旧图片...');
-          for(const url of deletedImages){
-            const fileName = extractFileName(url);
-            if(fileName) await deleteImageFromGitHub(fileName);
-          }
+      // 2. 确定封面
+      let coverIdx = tempImages.findIndex(img => img.isCover);
+      if (coverIdx < 0) coverIdx = 0;
+      const cover = uploadedUrls[coverIdx];
+
+      // 3. 更新产品数据
+      if (editingId !== null) {
+        const idx = products.findIndex(p => p.id === editingId);
+        if (idx >= 0) {
+          products[idx] = { ...products[idx], name, price, category, description, images: uploadedUrls, cover };
         }
-
-        products[idx].name = name;
-        products[idx].price = price;
-        products[idx].category = category;
-        products[idx].description = desc;
-        products[idx].cover = finalImageUrls[0];
-        products[idx].images = [...finalImageUrls];
       } else {
-        const maxId = products.reduce((m, p) => Math.max(m, p.id || 0), 0);
+        const maxId = products.reduce((max, p) => Math.max(max, p.id || 0), 0);
         products.push({
-          id: maxId + 1,
-          name,
-          price,
-          category,
-          description: desc,
-          cover: finalImageUrls[0],
-          images: [...finalImageUrls]
+          id: maxId + 1, name, price, category, description,
+          images: uploadedUrls, cover, createdAt: new Date().toISOString()
         });
       }
 
-      showProgress(90, '更新 products.json...');
-      await saveProductsToGitHub(products);
+      // 4. 保存 products.json
+      const jsonContent = btoa(unescape(encodeURIComponent(JSON.stringify(products, null, 2))));
+      const existingFile = await getFile(PRODUCTS_PATH);
+      const sha = existingFile ? existingFile.sha : null;
+      await putFile(PRODUCTS_PATH, jsonContent, `update products: ${name}`, sha);
 
-      // ✅ 优化：双重 Purge 保障
-      showProgress(95, '刷新CDN缓存，确保前台可见...');
-      await purgeCdn(PRODUCTS_FILE);
+      toast('保存成功！', 'success');
+      closeEditModal();
+      setTimeout(loadProducts, 1000);
 
-      showProgress(100, '完成！');
-      setTimeout(hideProgress, 800);
-
-      // ✅ 优化：提示用户 CDN 同步需要一点时间
-      showToast(eId ? '✅ 已更新！前台约需1~2分钟同步' : '✅ 已添加！前台约需1~2分钟同步', 'success', 4000);
-      resetForm();
-      renderProductList();
-
-    } catch(e){
-      hideProgress();
-      showToast('保存失败: ' + e.message, 'error', 4000);
+    } catch (err) {
+      toast('保存失败: ' + err.message, 'error');
     } finally {
-      isSubmitting = false;
-      submitBtn.disabled = false;
+      saveBtn.disabled = false;
+      saveBtn.textContent = '保存';
     }
   }
 
-  // ============================
-  //   初始化
-  // ============================
-  function init(){
-    const token = getToken();
-    if(token){
-      setupCard.style.display = 'none';
-      mainPanel.style.display = 'block';
-      loadProducts();
-    }
+  // ===== 删除产品 =====
+  async function deleteProduct(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    const ok = await confirm2(`确定删除「${p.name}」？\n（产品图片也会一并删除）`);
+    if (!ok) return;
 
-    tokenShow.addEventListener('change', function(){
-      tokenInput.type = this.checked ? 'text' : 'password';
-    });
-
-    saveTokenBtn.addEventListener('click', function(){
-      const t = tokenInput.value.trim();
-      if(!t){ showToast('请输入 Token', 'error'); return; }
-      setToken(t);
-      setupCard.style.display = 'none';
-      mainPanel.style.display = 'block';
-      showToast('Token 已保存', 'success');
-      loadProducts();
-    });
-
-    logoutBtn.addEventListener('click', function(e){
-      e.preventDefault();
-      showConfirm('清除Token', '清除后需要重新输入 Token。', (ok)=>{
-        if(!ok) return;
-        removeToken();
-        mainPanel.style.display = 'none';
-        setupCard.style.display = 'block';
-        setupTitle.textContent = '⚙️ 首次设置';
-        tokenInput.value = '';
-        showToast('Token 已清除', 'info');
-      });
-    });
-
-    fileInput.addEventListener('change', function(){
-      if(this.files.length) handleFiles(this.files);
-      this.value = '';
-    });
-
-    uploadArea.addEventListener('dragover', function(e){
-      e.preventDefault();
-      this.classList.add('dragover');
-    });
-    uploadArea.addEventListener('dragleave', function(){
-      this.classList.remove('dragover');
-    });
-    uploadArea.addEventListener('drop', function(e){
-      e.preventDefault();
-      this.classList.remove('dragover');
-      if(e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
-    });
-
-    submitBtn.addEventListener('click', handleSubmit);
-    cancelEditBtn.addEventListener('click', resetForm);
-
-    refreshBtn.addEventListener('click', async function(){
-      this.disabled = true;
-      this.textContent = '⏳ 刷新中...';
-      await loadProducts();
-      this.disabled = false;
-      this.textContent = '🔄 刷新产品数据';
-      showToast('数据已刷新', 'success');
-    });
-
-    purgeCdnBtn.addEventListener('click', async function(){
-      this.disabled = true;
-      this.textContent = '⏳ 刷新中...';
-      try {
-        await purgeCdn(PRODUCTS_FILE);
-        showToast('✅ CDN 缓存已刷新，前台刷新页面即可看到最新数据', 'success', 4000);
-      } catch(e){
-        showToast('CDN 刷新失败', 'error');
+    try {
+      // 1. 删除图片文件
+      for (const imgUrl of (p.images || [])) {
+        const match = imgUrl.match(/rongyan\/images\/([^?]+)/);
+        if (match) {
+          const filename = match[1];
+          try {
+            const file = await getFile(`${IMAGES_PATH}/${filename}`);
+            if (file) await deleteFile(`${IMAGES_PATH}/${filename}`, file.sha);
+            await new Promise(r => setTimeout(r, 500));
+          } catch {}
+        }
       }
-      this.disabled = false;
-      this.textContent = '⚡ 刷新CDN缓存';
-    });
 
-    changeTokenBtn.addEventListener('click', function(){
-      showConfirm('更换 Token', '确定要更换 Token 吗？当前 Token 将被清除。', (ok) => {
-        if(!ok) return;
-        removeToken();
-        mainPanel.style.display = 'none';
-        setupCard.style.display = 'block';
-        setupTitle.textContent = '🔑 更换 Token';
-        tokenInput.value = '';
-        showToast('请输入新的 Token', 'info');
-      });
-    });
+      // 2. 从列表移除
+      products = products.filter(x => x.id !== id);
+
+      // 3. 保存 products.json
+      const jsonContent = btoa(unescape(encodeURIComponent(JSON.stringify(products, null, 2))));
+      const existingFile = await getFile(PRODUCTS_PATH);
+      const sha = existingFile ? existingFile.sha : null;
+      await putFile(PRODUCTS_PATH, jsonContent, `delete product: ${p.name}`, sha);
+
+      toast('删除成功', 'success');
+      setTimeout(loadProducts, 1000);
+
+    } catch (err) {
+      toast('删除失败: ' + err.message, 'error');
+    }
   }
 
-  init();
+  // ===== 事件绑定 =====
+  addBtn.addEventListener('click', openAddModal);
+  refreshBtn.addEventListener('click', loadProducts);
+  logoutBtn.addEventListener('click', doLogout);
+  modalClose.addEventListener('click', closeEditModal);
+  cancelBtn.addEventListener('click', closeEditModal);
+  saveBtn.addEventListener('click', saveProduct);
+
+  editModal.addEventListener('click', (e) => {
+    if (e.target === editModal) closeEditModal();
+  });
+
+  // ===== 自动登录（sessionStorage） =====
+  const savedToken = sessionStorage.getItem('_ry_token');
+  if (savedToken) {
+    TOKEN = savedToken;
+    showAdmin();
+  }
 })();
 </script>
 </body>

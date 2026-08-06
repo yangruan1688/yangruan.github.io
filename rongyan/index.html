@@ -35,73 +35,46 @@ body {
   border-bottom: 1px solid rgba(0,0,0,0.06);
   padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
 }
-.header h1 {
-  font-size: 18px; color: var(--primary); letter-spacing: 4px; font-weight: 600;
-}
+.header h1 { font-size: 18px; color: var(--primary); letter-spacing: 4px; font-weight: 600; }
 .header nav { display: flex; gap: 16px; align-items: center; }
 .header nav a {
   color: var(--text); text-decoration: none; font-size: 13px; font-weight: 500;
   padding: 5px 10px; border-radius: 18px; transition: all 0.25s;
 }
-.header nav a:hover, .header nav a.active {
-  background: rgba(184,134,11,0.1); color: var(--primary);
-}
-.hero {
-  text-align: center; padding: 40px 16px 28px;
-  background: linear-gradient(180deg, #fdfcfa 0%, var(--bg) 100%);
-}
+.header nav a:hover, .header nav a.active { background: rgba(184,134,11,0.1); color: var(--primary); }
+.hero { text-align: center; padding: 40px 16px 28px; background: linear-gradient(180deg, #fdfcfa 0%, var(--bg) 100%); }
 .hero h2 { font-size: 24px; letter-spacing: 6px; color: var(--primary); font-weight: 300; margin-bottom: 8px; }
 .hero p { font-size: 13px; color: var(--text-light); letter-spacing: 2px; }
-.filter-bar {
-  display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto;
-  -webkit-overflow-scrolling: touch; scrollbar-width: none;
-}
+.filter-bar { display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .filter-bar::-webkit-scrollbar { display: none; }
 .filter-btn {
-  padding: 7px 18px; border: 1px solid rgba(0,0,0,0.1);
-  background: #fff; border-radius: 20px; font-size: 13px;
-  color: var(--text); cursor: pointer; transition: all 0.25s;
-  white-space: nowrap; font-weight: 500;
+  padding: 7px 18px; border: 1px solid rgba(0,0,0,0.1); background: #fff; border-radius: 20px;
+  font-size: 13px; color: var(--text); cursor: pointer; transition: all 0.25s; white-space: nowrap; font-weight: 500;
 }
 .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
 .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-.grid {
-  display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: 12px; padding: 8px 16px 80px;
-}
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 8px 16px 80px; }
 @media (min-width: 600px) { .grid { grid-template-columns: repeat(3, 1fr); } }
 @media (min-width: 900px) { .grid { grid-template-columns: repeat(4, 1fr); } }
 .card {
-  background: var(--card-bg); border-radius: var(--radius);
-  overflow: hidden; box-shadow: var(--shadow);
-  transition: transform 0.3s, box-shadow 0.3s;
-  text-decoration: none; color: inherit; display: block;
+  background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+  transition: transform 0.3s, box-shadow 0.3s; text-decoration: none; color: inherit; display: block;
 }
 .card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-.card-img {
-  width: 100%; aspect-ratio: 1; object-fit: cover;
-  background: #f0ece6; display: block;
-}
+.card-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #f0ece6; display: block; }
 .card-info { padding: 10px 12px 14px; }
-.card-name {
-  font-size: 14px; font-weight: 600; margin-bottom: 4px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
+.card-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .card-price { font-size: 14px; color: var(--primary); font-weight: 600; }
 .card-category { font-size: 11px; color: var(--text-light); margin-top: 2px; }
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
 .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
 .loading { text-align: center; padding: 60px 20px; color: var(--text-light); }
 .loading .spinner {
-  width: 32px; height: 32px; border: 3px solid #eee;
-  border-top-color: var(--primary); border-radius: 50%;
-  animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+  width: 32px; height: 32px; border: 3px solid #eee; border-top-color: var(--primary);
+  border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-.footer {
-  text-align: center; padding: 20px; font-size: 11px; color: var(--text-light);
-  border-top: 1px solid rgba(0,0,0,0.05);
-}
+.footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-light); border-top: 1px solid rgba(0,0,0,0.05); }
 .footer a { color: var(--primary); text-decoration: none; }
 </style>
 </head>
@@ -126,10 +99,7 @@ body {
 </div>
 
 <div class="grid" id="productGrid">
-  <div class="loading">
-    <div class="spinner"></div>
-    <p>加载中...</p>
-  </div>
+  <div class="loading"><div class="spinner"></div><p>加载中...</p></div>
 </div>
 
 <footer class="footer">
@@ -157,23 +127,14 @@ body {
 
   function escapeHtml(str) {
     if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replace(/`/g, '&#96;');
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
   }
 
   async function fetchProducts(url, timeout = 8000) {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
     try {
-      const res = await fetch(url, {
-        signal: controller.signal,
-        cache: 'no-store'
-      });
+      const res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
       clearTimeout(id);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
@@ -185,9 +146,7 @@ body {
 
   async function loadProducts() {
     productGrid.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
-
     const ts = Date.now();
-
     const results = await Promise.all([
       fetchProducts(`${RAW_URL}?_=${ts}`),
       fetchProducts(`${CDN_URL}?_=${ts}`),
@@ -195,7 +154,6 @@ body {
     ]);
 
     let bestData = null;
-
     if (results[0] !== null) {
       bestData = Array.isArray(results[0]) ? results[0] : (results[0].products || []);
     } else {
@@ -221,10 +179,7 @@ body {
 
   function renderFilters() {
     const categories = {};
-    allProducts.forEach(p => {
-      if (p.category) categories[p.category] = (categories[p.category] || 0) + 1;
-    });
-
+    allProducts.forEach(p => { if (p.category) categories[p.category] = (categories[p.category] || 0) + 1; });
     let html = '<button class="filter-btn active" data-category="all">全部</button>';
     Object.keys(categories).sort().forEach(cat => {
       html += `<button class="filter-btn" data-category="${escapeHtml(cat)}">${escapeHtml(cat)} (${categories[cat]})</button>`;
@@ -233,15 +188,11 @@ body {
   }
 
   function renderProducts() {
-    const filtered = currentCategory === 'all'
-      ? allProducts
-      : allProducts.filter(p => p.category === currentCategory);
-
+    const filtered = currentCategory === 'all' ? allProducts : allProducts.filter(p => p.category === currentCategory);
     if (filtered.length === 0) {
       productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>该分类暂无产品</p></div>';
       return;
     }
-
     productGrid.innerHTML = filtered.slice().reverse().map(p => {
       const safeName = escapeHtml(p.name || '');
       const safeCover = escapeHtml(p.cover || '');
@@ -256,8 +207,7 @@ body {
             <div class="card-price">¥${safePrice}</div>
             <div class="card-category">${safeCategory}</div>
           </div>
-        </a>
-      `;
+        </a>`;
     }).join('');
   }
 
@@ -271,29 +221,11 @@ body {
   });
 
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      const elapsed = Date.now() - lastLoadTime;
-      if (elapsed > 5000) {
-        console.log('页面重新可见，自动刷新产品数据');
-        loadProducts();
-      }
-    }
+    if (document.visibilityState === 'visible' && Date.now() - lastLoadTime > 5000) loadProducts();
   });
-
-  window.addEventListener('pageshow', (e) => {
-    if (e.persisted) {
-      console.log('页面从缓存恢复，自动刷新产品数据');
-      lastLoadTime = Date.now();
-      loadProducts();
-    }
-  });
-
+  window.addEventListener('pageshow', (e) => { if (e.persisted) loadProducts(); });
   window.addEventListener('storage', function (e) {
-    if (e.key === '_ry_products_updated' && e.newValue) {
-      console.log('检测到产品数据更新，自动刷新列表');
-      lastLoadTime = Date.now();
-      loadProducts();
-    }
+    if (e.key === '_ry_products_updated' && e.newValue) loadProducts();
   });
 
   loadProducts();

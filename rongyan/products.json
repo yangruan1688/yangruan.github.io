@@ -1,14 +1,1 @@
-[
-  {
-    "id": 1,
-    "name": "1",
-    "price": 168,
-    "category": "其他",
-    "description": "",
-    "images": [
-      "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786034137333_0.webp"
-    ],
-    "cover": "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786034137333_0.webp",
-    "createdAt": "2026-08-06T16:35:40.387Z"
-  }
-]
+[]

@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://gcore.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+<link rel="preconnect" href="https://api.github.com" crossorigin>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -27,38 +28,21 @@
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
                  'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg); color: var(--text);
     -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
+    min-height: 100vh; overflow-x: hidden;
   }
   .top-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 900;
-    height: 52px;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 900; height: 52px;
     background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(0,0,0,0.06);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 16px;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
   }
   .back-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: none;
-    border: none;
-    font-size: 15px;
-    color: var(--text);
-    cursor: pointer;
-    padding: 8px 12px 8px 4px;
-    border-radius: 8px;
-    transition: background 0.2s;
-    text-decoration: none;
+    display: flex; align-items: center; gap: 6px; background: none; border: none;
+    font-size: 15px; color: var(--text); cursor: pointer;
+    padding: 8px 12px 8px 4px; border-radius: 8px; transition: background 0.2s; text-decoration: none;
   }
   .back-btn:hover { background: rgba(0,0,0,0.04); }
   .back-btn svg { width: 20px; height: 20px; }
@@ -143,7 +127,8 @@
   .lightbox.open { opacity: 1; visibility: visible; }
   .lightbox-img {
     max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 4px;
-    transform: scale(0.85); transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
+    transform: scale(0.85);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
     cursor: zoom-out; user-select: none; -webkit-user-drag: none;
   }
   .lightbox.open .lightbox-img { transform: scale(1); }
@@ -193,10 +178,7 @@
 
 <div class="top-bar">
   <a class="back-btn" href="index.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-         stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="15 18 9 12 15 6"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     返回
   </a>
   <span class="top-bar-title">产品详情</span>
@@ -213,18 +195,15 @@
     <div class="gallery-main" id="galleryMain">
       <div class="gallery-track" id="galleryTrack"></div>
       <button class="gallery-arrow arrow-left" id="arrowLeft">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <button class="gallery-arrow arrow-right" id="arrowRight">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
       </button>
       <div class="slide-counter" id="slideCounter">1 / 1</div>
     </div>
     <div class="thumb-strip" id="thumbStrip"></div>
   </div>
-
   <div class="product-detail">
     <span class="detail-category" id="detailCategory"></span>
     <h1 class="detail-name" id="detailName"></h1>
@@ -237,18 +216,15 @@
 
 <div class="lightbox" id="lightbox">
   <button class="lightbox-close" id="lbClose">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-         stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
   <button class="lightbox-arrow lb-left" id="lbLeft">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-         stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
   </button>
   <div class="lightbox-spinner" id="lbSpinner"></div>
   <img class="lightbox-img" id="lbImg" src="" alt="">
   <button class="lightbox-arrow lb-right" id="lbRight">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-         stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
   </button>
   <div class="lightbox-counter" id="lbCounter"></div>
 </div>
@@ -261,33 +237,25 @@
   const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
 
-  const CDN_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
+  // ✅ 修复：gcore 优先，同 index.html
   const GCORE_URL = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
-  const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
+  const CDN_URL   = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
+  const RAW_URL   = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
 
   function escapeHtml(str) {
     if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replace(/`/g, '&#96;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/`/g, '&#96;');
   }
 
   function fallbackUrl(url) {
     return String(url).replace(/cdn\.jsdelivr\.net/g, 'gcore.jsdelivr.net');
   }
 
-  // ✅ 修复：更健壮的 UTF-8 解码，支持 emoji 等高位 Unicode
-  function decodeUtf8(base64) {
-    const cleaned = base64.replace(/\n/g, '');
+  function decodeGithubContent(content) {
+    const cleaned = content.replace(/\n/g, '');
     const binary = atob(cleaned);
     const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
     return new TextDecoder('utf-8').decode(bytes);
   }
 
@@ -317,19 +285,15 @@
 
   async function loadProduct() {
     if (isNaN(productId)) {
-      pageLoading.innerHTML = `
-        <div class="page-error">
-          <p style="font-size:36px">🔗</p>
-          <p>产品链接无效，缺少产品 ID</p>
-          <a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a>
-        </div>`;
+      pageLoading.innerHTML = `<div class="page-error"><p style="font-size:36px">🔗</p><p>产品链接无效，缺少产品 ID</p><a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a></div>`;
       return;
     }
 
     const timestamp = Date.now();
+    // ✅ 修复：gcore 优先
     const urls = [
-      `${CDN_URL}?_=${timestamp}`,
       `${GCORE_URL}?_=${timestamp}`,
+      `${CDN_URL}?_=${timestamp}`,
       `${RAW_URL}?_=${timestamp}`
     ];
 
@@ -339,32 +303,52 @@
       try {
         const res = await fetch(url);
         if (res.ok) {
-          products = await res.json();
-          break;
+          const data = await res.json();
+          const parsed = Array.isArray(data) ? data : (data.products || []);
+          // ✅ 修复：只有找到目标产品才算成功
+          if (parsed.some(p => p && p.id === productId)) {
+            products = parsed;
+            break;
+          }
+          // 没找到目标产品，可能是旧缓存，继续尝试下一个源
+          if (!products) products = parsed;
         }
       } catch (err) {
         console.warn('数据源加载失败，尝试下一个:', url, err.message);
       }
     }
 
+    // ✅ 修复：GitHub API 兜底，带重试
+    if (!products || !products.some(p => p && p.id === productId)) {
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/rongyan/products.json?ref=${GITHUB_BRANCH}&_=${Date.now()}`;
+          const res = await fetch(apiUrl);
+          if (res.ok) {
+            const fileData = await res.json();
+            const decoded = decodeGithubContent(fileData.content);
+            const parsed = JSON.parse(decoded);
+            const arr = Array.isArray(parsed) ? parsed : [];
+            if (arr.some(p => p && p.id === productId)) {
+              products = arr;
+              break;
+            }
+          }
+        } catch (err) {
+          console.warn(`GitHub API 兜底第${attempt}次失败:`, err.message);
+          if (attempt < 2) await new Promise(r => setTimeout(r, 1000));
+        }
+      }
+    }
+
     if (!products) {
-      pageLoading.innerHTML = `
-        <div class="page-error">
-          <p style="font-size:36px">😢</p>
-          <p>数据加载失败，请检查网络或刷新重试</p>
-          <a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a>
-        </div>`;
+      pageLoading.innerHTML = `<div class="page-error"><p style="font-size:36px">😢</p><p>数据加载失败，请检查网络或刷新重试</p><a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a></div>`;
       return;
     }
 
-    const product = (Array.isArray(products) ? products : []).find(p => p && p.id === productId);
+    const product = products.find(p => p && p.id === productId);
     if (!product) {
-      pageLoading.innerHTML = `
-        <div class="page-error">
-          <p style="font-size:36px">🔍</p>
-          <p>产品不存在或已被删除</p>
-          <a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a>
-        </div>`;
+      pageLoading.innerHTML = `<div class="page-error"><p style="font-size:36px">🔍</p><p>产品不存在或已被删除</p><a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a></div>`;
       return;
     }
 
@@ -389,61 +373,34 @@
       const fbSrc = escapeHtml(fallbackUrl(src));
       const safeAlt = escapeHtml(productName) + ' - 图' + (i + 1);
       const lazyAttr = i === 0 ? '' : 'loading="lazy"';
-      return `
-        <div class="gallery-slide">
-          <img src="${safeSrc}" alt="${safeAlt}"
-               data-index="${i}" data-fb="${fbSrc}"
-               draggable="false" decoding="async" ${lazyAttr}>
-        </div>
-      `;
+      return `<div class="gallery-slide"><img src="${safeSrc}" alt="${safeAlt}" data-index="${i}" data-fb="${fbSrc}" draggable="false" decoding="async" ${lazyAttr}></div>`;
     }).join('');
 
     thumbStrip.innerHTML = images.map((src, i) => {
       const safeSrc = escapeHtml(src);
       const fbSrc = escapeHtml(fallbackUrl(src));
-      return `
-        <div class="thumb-item${i === 0 ? ' active' : ''}" data-index="${i}">
-          <img src="${safeSrc}" alt="缩略图${i + 1}" data-fb="${fbSrc}"
-               draggable="false" decoding="async">
-        </div>
-      `;
+      return `<div class="thumb-item${i === 0 ? ' active' : ''}" data-index="${i}"><img src="${safeSrc}" alt="缩略图${i + 1}" data-fb="${fbSrc}" draggable="false" decoding="async"></div>`;
     }).join('');
 
-    // 事件委托处理图片加载失败
     galleryTrack.querySelectorAll('img[data-fb]').forEach(img => {
       img.addEventListener('error', function() {
-        if (!this.dataset.fbDone) {
-          this.dataset.fbDone = '1';
-          this.src = this.dataset.fb;
-        } else {
-          this.style.display = 'none';
-          this.parentElement.insertAdjacentHTML('beforeend', '<div class="img-placeholder">🖼</div>');
-        }
+        if (!this.dataset.fbDone) { this.dataset.fbDone = '1'; this.src = this.dataset.fb; }
+        else { this.style.display = 'none'; this.parentElement.insertAdjacentHTML('beforeend', '<div class="img-placeholder">🖼</div>'); }
       });
     });
     thumbStrip.querySelectorAll('img[data-fb]').forEach(img => {
-      img.addEventListener('error', function() {
-        if (!this.dataset.fbDone) {
-          this.dataset.fbDone = '1';
-          this.src = this.dataset.fb;
-        }
-      });
+      img.addEventListener('error', function() { if (!this.dataset.fbDone) { this.dataset.fbDone = '1'; this.src = this.dataset.fb; } });
     });
 
     slideCounter.textContent = images.length > 0 ? `1 / ${images.length}` : '0 / 0';
-
     pageLoading.style.display = 'none';
     mainContent.style.display = 'block';
-
-    if (images.length > 0) {
-      initGallery();
-    }
+    if (images.length > 0) initGallery();
   }
 
   loadProduct();
 
   function initGallery() {
-    // ✅ 修复：单图时隐藏箭头、禁用拖拽
     const singleImage = images.length <= 1;
     if (singleImage) {
       arrowLeft.style.display = 'none';
@@ -461,23 +418,16 @@
     let mouseDidDrag = false;
 
     galleryTrack.addEventListener('click', (e) => {
-      if (e.target.tagName === 'IMG' && !mouseDidDrag) {
-        openLightbox(parseInt(e.target.dataset.index));
-      }
+      if (e.target.tagName === 'IMG' && !mouseDidDrag) openLightbox(parseInt(e.target.dataset.index));
     });
 
-    // ===== 触摸事件 =====
     let touchStartX = 0, touchStartY = 0, touchMoveX = 0, touchDragging = false;
-    // ✅ 修复：增加 touchDecided 标记，方向未确定前不修改 transform
     let touchIsHorizontal = null, touchDecided = false;
 
     galleryMain.addEventListener('touchstart', (e) => {
-      if (singleImage) return; // ✅ 单图禁用拖拽
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      touchDragging = true;
-      touchIsHorizontal = null;
-      touchDecided = false;
+      if (singleImage) return;
+      touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
+      touchDragging = true; touchIsHorizontal = null; touchDecided = false;
       galleryTrack.style.transition = 'none';
     }, { passive: true });
 
@@ -485,16 +435,10 @@
       if (!touchDragging || singleImage) return;
       const dx = e.touches[0].clientX - touchStartX;
       const dy = e.touches[0].clientY - touchStartY;
-
       if (!touchDecided) {
-        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
-          touchIsHorizontal = Math.abs(dx) > Math.abs(dy);
-          touchDecided = true;
-        } else {
-          return; // ✅ 方向未确定，不修改 transform，避免首帧抖动
-        }
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) { touchIsHorizontal = Math.abs(dx) > Math.abs(dy); touchDecided = true; }
+        else return;
       }
-
       if (!touchIsHorizontal) return;
       e.preventDefault();
       touchMoveX = dx;
@@ -512,21 +456,16 @@
         else if (touchMoveX > threshold) goToSlide(currentSlide - 1);
         else goToSlide(currentSlide);
       }
-      touchMoveX = 0;
-      touchDecided = false;
+      touchMoveX = 0; touchDecided = false;
     });
 
-    // ===== 鼠标事件 =====
     let mouseStartX = 0, mouseMoveX = 0, mouseDown = false;
     mouseDidDrag = false;
 
     galleryMain.addEventListener('mousedown', (e) => {
-      if (e.target.tagName !== 'IMG' || singleImage) return; // ✅ 单图禁用
-      mouseDown = true;
-      mouseDidDrag = false;
-      mouseStartX = e.clientX;
-      galleryTrack.style.transition = 'none';
-      e.preventDefault();
+      if (e.target.tagName !== 'IMG' || singleImage) return;
+      mouseDown = true; mouseDidDrag = false; mouseStartX = e.clientX;
+      galleryTrack.style.transition = 'none'; e.preventDefault();
     });
 
     window.addEventListener('mousemove', (e) => {
@@ -568,54 +507,30 @@
     galleryTrack.style.transition = '';
     galleryTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
     slideCounter.textContent = `${currentSlide + 1} / ${images.length}`;
-    thumbStrip.querySelectorAll('.thumb-item').forEach((t, i) => {
-      t.classList.toggle('active', i === currentSlide);
-    });
+    thumbStrip.querySelectorAll('.thumb-item').forEach((t, i) => t.classList.toggle('active', i === currentSlide));
     const activeThumb = thumbStrip.children[currentSlide];
-    if (activeThumb) {
-      activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    }
+    if (activeThumb) activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   }
 
   function openLightbox(index) {
-    if (lbPreloadAbort) { lbPreloadAbort = null; }
-
+    if (lbPreloadAbort) lbPreloadAbort = null;
     lightboxIndex = index;
     lbSpinner.style.display = 'block';
     lbImg.style.opacity = '0';
-
     const currentToken = Date.now();
     lbPreloadAbort = currentToken;
-
     const img = new Image();
-    img.onload = () => {
-      if (lbPreloadAbort !== currentToken) return;
-      lbImg.src = img.src;
-      lbImg.style.opacity = '1';
-      lbSpinner.style.display = 'none';
-    };
+    img.onload = () => { if (lbPreloadAbort !== currentToken) return; lbImg.src = img.src; lbImg.style.opacity = '1'; lbSpinner.style.display = 'none'; };
     img.onerror = () => {
       if (lbPreloadAbort !== currentToken) return;
       const fbUrl = fallbackUrl(images[index]);
       const img2 = new Image();
-      img2.onload = () => {
-        if (lbPreloadAbort !== currentToken) return;
-        lbImg.src = img2.src;
-        lbImg.style.opacity = '1';
-        lbSpinner.style.display = 'none';
-      };
-      img2.onerror = () => {
-        if (lbPreloadAbort !== currentToken) return;
-        lbSpinner.style.display = 'none';
-        lbImg.alt = '图片加载失败';
-        lbImg.style.opacity = '0.3';
-      };
+      img2.onload = () => { if (lbPreloadAbort !== currentToken) return; lbImg.src = img2.src; lbImg.style.opacity = '1'; lbSpinner.style.display = 'none'; };
+      img2.onerror = () => { if (lbPreloadAbort !== currentToken) return; lbSpinner.style.display = 'none'; lbImg.alt = '图片加载失败'; lbImg.style.opacity = '0.3'; };
       img2.src = fbUrl;
     };
     img.src = images[index];
-
     lbCounter.textContent = `${index + 1} / ${images.length}`;
-
     if (!lightbox.classList.contains('open')) {
       lightbox.classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -640,26 +555,15 @@
   lbImg.addEventListener('click', closeLightbox);
   lbLeft.addEventListener('click', () => lightboxNav(-1));
   lbRight.addEventListener('click', () => lightboxNav(1));
-
-  lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) closeLightbox();
-  });
+  lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
 
   let lbStartX = 0, lbMoveX = 0, lbDragging = false;
-  lightbox.addEventListener('touchstart', (e) => {
-    lbStartX = e.touches[0].clientX;
-    lbDragging = true;
-  }, { passive: true });
-  lightbox.addEventListener('touchmove', (e) => {
-    if (!lbDragging) return;
-    lbMoveX = e.touches[0].clientX - lbStartX;
-  }, { passive: true });
+  lightbox.addEventListener('touchstart', (e) => { lbStartX = e.touches[0].clientX; lbDragging = true; }, { passive: true });
+  lightbox.addEventListener('touchmove', (e) => { if (!lbDragging) return; lbMoveX = e.touches[0].clientX - lbStartX; }, { passive: true });
   lightbox.addEventListener('touchend', () => {
     if (!lbDragging) return;
     lbDragging = false;
-    if (Math.abs(lbMoveX) > 50) {
-      lightboxNav(lbMoveX < 0 ? 1 : -1);
-    }
+    if (Math.abs(lbMoveX) > 50) lightboxNav(lbMoveX < 0 ? 1 : -1);
     lbMoveX = 0;
   });
 })();

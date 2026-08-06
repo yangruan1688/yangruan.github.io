@@ -120,7 +120,10 @@
     align-items: center;
     gap: 10px;
     overflow: visible;
+    /* ✅ 优化：初始隐藏 toolbar 直到 JS 定位完成，避免闪烁 */
+    visibility: hidden;
   }
+  .toolbar.ready { visibility: visible; }
   .toolbar-btn {
     display: inline-flex;
     align-items: center;
@@ -255,7 +258,10 @@
   .product-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
   @keyframes cardIn { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
   .product-card .card-img-wrap { position: relative; width: 100%; padding-top: 100%; overflow: hidden; background: #f0ece6; }
-  .product-card .card-img-wrap img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+  .product-card .card-img-wrap img {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover; transition: transform 0.5s ease;
+  }
   .product-card:hover .card-img-wrap img { transform: scale(1.06); }
   .product-card .card-tag { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.88); backdrop-filter: blur(6px); padding: 3px 10px; border-radius: 20px; font-size: 11px; color: var(--primary); font-weight: 600; }
   .product-card .card-info { padding: 14px 14px 16px; }
@@ -338,7 +344,6 @@
   const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
 
-  // ✅ 优化：配置多个 CDN 源和 Raw 源，确保加载成功率
   const CDN_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
   const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
 
@@ -359,7 +364,6 @@
   const searchClear = document.getElementById('searchClear');
   const toolbar = document.getElementById('toolbar');
 
-  // ✅ 修复：XSS 转义函数，防止 innerHTML 注入
   function escapeHtml(str) {
     if (str == null) return '';
     return String(str)
@@ -375,12 +379,13 @@
     const toolH = toolbar.offsetHeight;
     toolbar.style.top = navH + 'px';
     document.body.style.paddingTop = (navH + toolH + 8) + 'px';
+    // ✅ 优化：定位完成后再显示 toolbar，避免初始闪烁
+    toolbar.classList.add('ready');
   }
   updateToolbarPosition();
   window.addEventListener('resize', updateToolbarPosition);
   window.addEventListener('load', updateToolbarPosition);
 
-  // ✅ 优化：智能多源加载数据
   async function loadProducts() {
     const timestamp = Date.now();
     const urls = [
@@ -396,6 +401,8 @@
         if (res.ok) {
           const data = await res.json();
           allProducts = Array.isArray(data) ? data : (data.products || []);
+          // ✅ 优化：数据防御性校验，确保每个产品都有必要字段
+          allProducts = allProducts.filter(p => p && typeof p === 'object' && p.id != null);
           dataLoaded = true;
           break;
         }
@@ -513,18 +520,19 @@
       : allProducts.filter(p => p.category === currentCategory);
 
     if (currentSearch) {
+      // ✅ 优化：缓存小写搜索词，避免每次循环都 toLowerCase
+      const searchLower = currentSearch.toLowerCase();
       products = products.filter(p =>
-        p.name.toLowerCase().includes(currentSearch.toLowerCase())
+        (p.name || '').toLowerCase().includes(searchLower)
       );
     }
 
     switch (currentSort) {
-      case 'price-asc':  products.sort((a, b) => a.price - b.price); break;
-      case 'price-desc': products.sort((a, b) => b.price - a.price); break;
-      case 'newest':     products.sort((a, b) => b.id - a.id); break;
+      case 'price-asc':  products.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0)); break;
+      case 'price-desc': products.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0)); break;
+      case 'newest':     products.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0)); break;
     }
 
-    // ✅ 修复：对搜索词和分类名做 XSS 转义
     if (currentSearch) {
       sectionTitle.innerHTML = `—— 搜索 &ldquo;<span>${escapeHtml(currentSearch)}</span>&rdquo; 的结果 (${products.length}) ——`;
     } else {
@@ -544,14 +552,14 @@
       return;
     }
 
-    // ✅ 优化：去掉 Date.now() 时间戳，改用稳定的版本号，让图片走浏览器缓存
-    // 版本号基于产品数据摘要，只有数据真正变化时才刷新图片缓存
     const imgVersion = allProducts.reduce((s, p) => s + (p.id || 0) + (p.cover || '').length, 0);
 
+    // ✅ 优化：animation-delay 最大不超过 1.2s，避免大量产品时后面卡片长时间空白
+    const maxDelay = 1.2;
+    const delayStep = products.length > 1 ? Math.min(0.06, maxDelay / (products.length - 1)) : 0;
+
     grid.innerHTML = products.map((p, i) => {
-      // ✅ 修复：对 URL 和文本内容做 XSS 转义
       let coverUrl = p.cover || '';
-      // 只对不含查询参数的 URL 追加版本号
       if (coverUrl && !coverUrl.includes('?')) {
         coverUrl += `?v=${imgVersion}`;
       }
@@ -559,12 +567,13 @@
       const safeName = escapeHtml(p.name || '');
       const safeCategory = escapeHtml(p.category || '');
       const safePrice = Number(p.price || 0).toFixed(1);
+      const delay = (i * delayStep).toFixed(3);
 
       return `
         <a class="product-card" href="detail.html?id=${encodeURIComponent(p.id)}"
-           style="animation-delay:${i * 0.06}s">
+           style="animation-delay:${delay}s">
           <div class="card-img-wrap">
-            <img src="${escapeHtml(coverUrl)}" alt="${safeName}" loading="lazy">
+            <img src="${escapeHtml(coverUrl)}" alt="${safeName}" loading="lazy" decoding="async">
             <span class="card-tag">${safeCategory}</span>
           </div>
           <div class="card-info">

@@ -1,16 +1,1 @@
-[
-  {
-    "id": 1,
-    "name": "绒花",
-    "price": 168,
-    "category": "发饰",
-    "description": "",
-    "images": [
-      "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786000843332_0.webp",
-      "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786000843332_1.webp",
-      "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786000843332_2.webp"
-    ],
-    "cover": "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786000843332_0.webp",
-    "createdAt": "2026-08-06T07:20:52.055Z"
-  }
-]
+[]

@@ -170,7 +170,10 @@ body {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
     try {
-      const res = await fetch(url, { signal: controller.signal });
+      const res = await fetch(url, {
+        signal: controller.signal,
+        cache: 'no-store'
+      });
       clearTimeout(id);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
@@ -183,21 +186,25 @@ body {
   async function loadProducts() {
     productGrid.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
 
+    const ts = Date.now();
+
     const results = await Promise.all([
-      fetchProducts(RAW_URL),
-      fetchProducts(CDN_URL),
-      fetchProducts(GCORE_URL)
+      fetchProducts(`${RAW_URL}?_=${ts}`),
+      fetchProducts(`${CDN_URL}?_=${ts}`),
+      fetchProducts(`${GCORE_URL}?_=${ts}`)
     ]);
 
     let bestData = null;
-    let maxCount = -1;
 
-    for (const data of results) {
-      if (data) {
-        const arr = Array.isArray(data) ? data : (data.products || []);
-        if (arr.length > maxCount) {
-          maxCount = arr.length;
-          bestData = arr;
+    if (results[0]) {
+      bestData = Array.isArray(results[0]) ? results[0] : (results[0].products || []);
+    }
+
+    if (!bestData) {
+      for (let i = 1; i < results.length; i++) {
+        if (results[i]) {
+          bestData = Array.isArray(results[i]) ? results[i] : (results[i].products || []);
+          if (bestData.length > 0) break;
         }
       }
     }
@@ -264,7 +271,6 @@ body {
     renderProducts();
   });
 
-  // ✅ 页面可见性变化时自动刷新（从admin返回后）
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       const elapsed = Date.now() - lastLoadTime;
@@ -275,7 +281,6 @@ body {
     }
   });
 
-  // ✅ 页面导航返回时自动刷新（移动端）
   window.addEventListener('pageshow', (e) => {
     if (e.persisted) {
       console.log('页面从缓存恢复，自动刷新产品数据');
@@ -284,7 +289,6 @@ body {
     }
   });
 
-  // ✅ 跨标签页实时同步（admin 保存后，index 瞬间刷新）
   window.addEventListener('storage', function (e) {
     if (e.key === '_ry_products_updated' && e.newValue) {
       console.log('检测到产品数据更新，自动刷新列表');

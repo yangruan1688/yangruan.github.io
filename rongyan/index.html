@@ -12,6 +12,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://gcore.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+<link rel="preconnect" href="https://api.github.com" crossorigin>
 <link rel="dns-prefetch" href="https://testingcf.jsdelivr.net">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,195 +32,103 @@
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
                  'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg); color: var(--text);
     -webkit-font-smoothing: antialiased;
-    padding-top: 130px;
-    overflow-x: hidden;
+    padding-top: 130px; overflow-x: hidden;
   }
   .navbar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 1000;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
     min-height: var(--nav-height);
     background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(0,0,0,0.06);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    display: flex; flex-direction: column; justify-content: center;
     padding: 10px 12px 0;
   }
   .navbar-brand {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    font-size: 13px;
-    letter-spacing: 6px;
-    color: var(--primary);
-    font-weight: 600;
-    margin-bottom: 6px;
-    text-transform: uppercase;
+    display: flex; align-items: center; width: 100%;
+    font-size: 13px; letter-spacing: 6px; color: var(--primary);
+    font-weight: 600; margin-bottom: 6px; text-transform: uppercase;
   }
   .navbar-brand .brand-text { flex: 1; text-align: center; }
   .nav-side-btn {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    font-size: 13px;
-    letter-spacing: 1px;
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 500;
-    padding: 4px 10px;
-    border-radius: 20px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: none;
-    background: none;
+    flex: 1; display: inline-flex; align-items: center;
+    font-size: 13px; letter-spacing: 1px; color: var(--primary);
+    text-decoration: none; font-weight: 500; padding: 4px 10px;
+    border-radius: 20px; transition: all 0.3s ease; cursor: pointer;
+    border: none; background: none;
   }
   .nav-side-btn:hover { background: rgba(184,134,11,0.08); color: var(--primary-light); }
   .nav-side-btn .back-icon { margin-right: 3px; font-size: 16px; line-height: 1; }
   .nav-side-btn.right { justify-content: flex-end; }
   .navbar-categories {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    display: flex; justify-content: center; gap: 6px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
     -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
     mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
     padding: 2px 8px;
   }
   .navbar-categories::-webkit-scrollbar { display: none; }
   .nav-btn {
-    flex-shrink: 0;
-    padding: 5px 14px;
-    border: none;
-    background: transparent;
-    color: var(--text);
-    font-size: 13px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    white-space: nowrap;
-    position: relative;
+    flex-shrink: 0; padding: 5px 14px; border: none; background: transparent;
+    color: var(--text); font-size: 13px; border-radius: 20px; cursor: pointer;
+    transition: all 0.3s ease; font-weight: 500; white-space: nowrap; position: relative;
   }
   .nav-btn:hover { color: var(--primary); background: rgba(184,134,11,0.06); }
   .nav-btn.active { background: var(--primary); color: #fff; box-shadow: 0 2px 12px rgba(184,134,11,0.3); }
   .nav-btn .nav-icon { margin-right: 4px; font-size: 14px; }
   .toolbar {
-    position: fixed;
-    top: 0;
-    left: 0; right: 0;
-    z-index: 999;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
     background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(0,0,0,0.06);
-    padding: 8px 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    overflow: visible;
-    visibility: hidden;
+    padding: 8px 16px; display: flex; align-items: center; gap: 10px;
+    overflow: visible; visibility: hidden;
   }
   .toolbar.ready { visibility: visible; }
   .toolbar-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 6px 14px;
-    border: 1px solid rgba(0,0,0,0.1);
-    background: #fff;
-    border-radius: 20px;
-    font-size: 13px;
-    color: var(--text);
-    cursor: pointer;
-    transition: all 0.25s ease;
-    white-space: nowrap;
-    position: relative;
-    flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 14px; border: 1px solid rgba(0,0,0,0.1);
+    background: #fff; border-radius: 20px; font-size: 13px;
+    color: var(--text); cursor: pointer; transition: all 0.25s ease;
+    white-space: nowrap; position: relative; flex-shrink: 0;
   }
   .toolbar-btn:hover { border-color: var(--primary); color: var(--primary); }
   .toolbar-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(184,134,11,0.06); }
   .toolbar-btn .btn-icon { font-size: 14px; }
   .sort-dropdown {
-    position: absolute;
-    top: calc(100% + 6px);
-    left: 0;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-    min-width: 130px;
-    overflow: hidden;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px);
-    transition: all 0.25s ease;
-    z-index: 1002;
+    position: absolute; top: calc(100% + 6px); left: 0;
+    background: #fff; border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12); min-width: 130px;
+    overflow: hidden; opacity: 0; visibility: hidden;
+    transform: translateY(-8px); transition: all 0.25s ease; z-index: 1002;
   }
   .sort-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
   .sort-dropdown .sort-option {
-    display: block;
-    width: 100%;
-    padding: 10px 16px;
-    border: none;
-    background: none;
-    text-align: left;
-    font-size: 13px;
-    color: var(--text);
-    cursor: pointer;
-    transition: background 0.2s;
+    display: block; width: 100%; padding: 10px 16px; border: none;
+    background: none; text-align: left; font-size: 13px; color: var(--text);
+    cursor: pointer; transition: background 0.2s;
   }
   .sort-dropdown .sort-option:hover { background: rgba(184,134,11,0.08); }
   .sort-dropdown .sort-option.active { color: var(--primary); font-weight: 600; }
   .search-container {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-    max-width: 0;
-    opacity: 0;
-    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    min-width: 0;
+    flex: 1; display: flex; align-items: center; overflow: hidden;
+    max-width: 0; opacity: 0;
+    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); min-width: 0;
   }
   .search-container.show { max-width: 400px; opacity: 1; }
-  .search-input-wrap {
-    flex: 1;
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 100%;
-  }
+  .search-input-wrap { flex: 1; position: relative; display: flex; align-items: center; width: 100%; }
   .search-input {
-    width: 100%;
-    padding: 7px 36px 7px 14px;
-    border: 1px solid rgba(0,0,0,0.1);
-    border-radius: 20px;
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.25s;
-    background: #fff;
+    width: 100%; padding: 7px 36px 7px 14px;
+    border: 1px solid rgba(0,0,0,0.1); border-radius: 20px;
+    font-size: 13px; outline: none; transition: border-color 0.25s; background: #fff;
   }
   .search-input:focus { border-color: var(--primary); }
   .search-input::placeholder { color: #bbb; }
   .search-clear {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #bbb;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 2px;
-    display: none;
-    line-height: 1;
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: #bbb; font-size: 16px;
+    cursor: pointer; padding: 2px; display: none; line-height: 1;
   }
   .search-clear.show { display: block; }
   .search-clear:hover { color: var(--text); }
@@ -244,15 +153,10 @@
     .product-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
   }
   .product-card {
-    background: var(--card-bg);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    cursor: pointer;
+    background: var(--card-bg); border-radius: var(--radius); overflow: hidden;
+    box-shadow: var(--shadow); cursor: pointer;
     transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    text-decoration: none;
-    color: inherit;
-    display: block;
+    text-decoration: none; color: inherit; display: block;
     animation: cardIn 0.5s ease backwards;
   }
   .product-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
@@ -284,13 +188,9 @@
 
 <nav class="navbar" id="navbar">
   <div class="navbar-brand">
-    <a href="../index.html" class="nav-side-btn" title="返回上一级">
-      <span class="back-icon">←</span>返回
-    </a>
+    <a href="../index.html" class="nav-side-btn" title="返回上一级"><span class="back-icon">←</span>返回</a>
     <span class="brand-text">✦ 绒颜 ✦</span>
-    <a href="admin.html" class="nav-side-btn right" title="进入管理后台">
-      ⚙️管理
-    </a>
+    <a href="admin.html" class="nav-side-btn right" title="进入管理后台">⚙️管理</a>
   </div>
   <div class="navbar-categories" id="navCategories">
     <button class="nav-btn active" data-category="全部"><span class="nav-icon">🏠</span>全部</button>
@@ -303,9 +203,7 @@
 
 <div class="toolbar" id="toolbar">
   <div style="position:relative; flex-shrink: 0;">
-    <button class="toolbar-btn" id="sortBtn">
-      <span class="btn-icon">↕</span>排序
-    </button>
+    <button class="toolbar-btn" id="sortBtn"><span class="btn-icon">↕</span>排序</button>
     <div class="sort-dropdown" id="sortDropdown">
       <button class="sort-option active" data-sort="default">默认排序</button>
       <button class="sort-option" data-sort="price-asc">价格升序</button>
@@ -313,9 +211,7 @@
       <button class="sort-option" data-sort="newest">最新上架</button>
     </div>
   </div>
-  <button class="toolbar-btn" id="searchBtn">
-    <span class="btn-icon">🔍</span>搜索
-  </button>
+  <button class="toolbar-btn" id="searchBtn"><span class="btn-icon">🔍</span>搜索</button>
   <div class="search-container" id="searchContainer">
     <div class="search-input-wrap">
       <input type="text" class="search-input" id="searchInput" placeholder="搜索产品名称...">
@@ -325,14 +221,9 @@
 </div>
 
 <div class="main-container">
-  <div class="section-title" id="sectionTitle">
-    —— 为你精选 <span>全部</span> 饰品 ——
-  </div>
+  <div class="section-title" id="sectionTitle">—— 为你精选 <span>全部</span> 饰品 ——</div>
   <div class="product-grid" id="productGrid">
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>正在加载产品...</p>
-    </div>
+    <div class="loading"><div class="spinner"></div><p>正在加载产品...</p></div>
   </div>
 </div>
 
@@ -346,9 +237,10 @@
   const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
 
-  const CDN_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
+  // ✅ 修复：gcore 优先（中国可用性最高），cdn 次之，raw 再次（中国常不可用），API 最后兜底
   const GCORE_BASE = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
-  const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
+  const CDN_BASE   = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
+  const RAW_BASE   = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
 
   let allProducts = [];
   let currentCategory = '全部';
@@ -369,13 +261,16 @@
 
   function escapeHtml(str) {
     if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replace(/`/g, '&#96;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/`/g, '&#96;');
+  }
+
+  // ✅ 新增：解码 GitHub API 返回的 base64 内容
+  function decodeGithubContent(content) {
+    const cleaned = content.replace(/\n/g, '');
+    const binary = atob(cleaned);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(bytes);
   }
 
   function buildImgTag(src, alt, lazy) {
@@ -395,9 +290,7 @@
         } else {
           this.removeEventListener('error', handleImgError);
           this.style.opacity = '0.3';
-          if (this.parentElement) {
-            this.parentElement.style.background = '#e8e4de';
-          }
+          if (this.parentElement) this.parentElement.style.background = '#e8e4de';
         }
       });
     });
@@ -416,9 +309,10 @@
 
   async function loadProducts() {
     const timestamp = Date.now();
+    // ✅ 修复：gcore 优先，cdn 次之，raw 第三（中国常不可用）
     const urls = [
-      `${CDN_BASE}?_=${timestamp}`,
       `${GCORE_BASE}?_=${timestamp}`,
+      `${CDN_BASE}?_=${timestamp}`,
       `${RAW_BASE}?_=${timestamp}`
     ];
 
@@ -429,22 +323,48 @@
         const res = await fetch(url);
         if (res.ok) {
           const data = await res.json();
-          allProducts = Array.isArray(data) ? data : (data.products || []);
-          allProducts = allProducts.filter(p => p && typeof p === 'object' && p.id != null);
-          dataLoaded = true;
-          break;
+          let parsed = Array.isArray(data) ? data : (data.products || []);
+          parsed = parsed.filter(p => p && typeof p === 'object' && p.id != null);
+          // ✅ 修复：只有加载到有效数据才算成功，否则继续尝试下一个源
+          if (parsed.length > 0 || dataLoaded === false) {
+            allProducts = parsed;
+            dataLoaded = true;
+            if (parsed.length > 0) break; // 有数据就直接用
+            // 如果是空数组但不确定是否最新，继续尝试下一个源
+          }
         }
       } catch (err) {
         console.warn('数据源加载失败，尝试下一个:', url, err.message);
       }
     }
 
-    if (!dataLoaded) {
-      grid.innerHTML = `
-        <div class="empty-state" style="grid-column:1/-1">
-          <div class="empty-icon">😢</div>
-          <p>产品加载失败，请检查网络连接或刷新重试</p>
-        </div>`;
+    // ✅ 修复：GitHub API 兜底，带重试
+    if (!dataLoaded || allProducts.length === 0) {
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/rongyan/products.json?ref=${GITHUB_BRANCH}&_=${Date.now()}`;
+          const res = await fetch(apiUrl);
+          if (res.ok) {
+            const fileData = await res.json();
+            const decoded = decodeGithubContent(fileData.content);
+            const data = JSON.parse(decoded);
+            let parsed = Array.isArray(data) ? data : (data.products || []);
+            parsed = parsed.filter(p => p && typeof p === 'object' && p.id != null);
+            if (parsed.length > 0) {
+              allProducts = parsed;
+              dataLoaded = true;
+              break;
+            }
+          }
+        } catch (err) {
+          console.warn(`GitHub API 兜底第${attempt}次失败:`, err.message);
+          if (attempt < 2) await new Promise(r => setTimeout(r, 1000));
+        }
+      }
+    }
+
+    if (!dataLoaded && allProducts.length === 0) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">😢</div><p>产品加载失败，请检查网络连接或刷新重试</p></div>`;
       return;
     }
 
@@ -462,7 +382,9 @@
     currentCategory = btn.dataset.category;
     updateView();
     btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    window.scrollTo({ top: navbar.offsetHeight + toolbar.offsetHeight, behavior: 'smooth' });
+    // ✅ 修复：用 toolbar 底部位置作为滚动目标
+    const scrollTarget = navbar.offsetHeight + toolbar.offsetHeight + 4;
+    window.scrollTo({ top: scrollTarget, behavior: 'smooth' });
   });
 
   sortBtn.addEventListener('click', function (e) {
@@ -481,7 +403,6 @@
     sortDropdown.classList.remove('show');
     sortBtn.classList.remove('active');
     updateView();
-    updateToolbarPosition();
   });
 
   searchBtn.addEventListener('click', function (e) {
@@ -497,6 +418,8 @@
       searchClear.classList.remove('show');
       updateView();
     }
+    // ✅ 修复：搜索框展开/收起后 toolbar 高度变化，及时更新 padding
+    setTimeout(updateToolbarPosition, 400);
   });
 
   let searchTimer = null;
@@ -504,10 +427,7 @@
     const val = this.value.trim();
     searchClear.classList.toggle('show', val.length > 0);
     clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => {
-      currentSearch = val;
-      updateView();
-    }, 300);
+    searchTimer = setTimeout(() => { currentSearch = val; updateView(); }, 300);
   });
 
   searchClear.addEventListener('click', function () {
@@ -526,6 +446,7 @@
     if (searchContainer.classList.contains('show') && !toolbar.contains(e.target)) {
       searchContainer.classList.remove('show');
       searchBtn.classList.remove('active');
+      setTimeout(updateToolbarPosition, 400);
     }
   });
 
@@ -535,6 +456,7 @@
         searchInput.blur();
         searchContainer.classList.remove('show');
         searchBtn.classList.remove('active');
+        setTimeout(updateToolbarPosition, 400);
       }
       if (sortDropdown.classList.contains('show')) {
         sortDropdown.classList.remove('show');
@@ -544,16 +466,13 @@
   });
 
   function updateView() {
-    // ✅ 始终使用浅拷贝，排序不会污染 allProducts
     let products = currentCategory === '全部'
       ? [...allProducts]
       : allProducts.filter(p => p.category === currentCategory);
 
     if (currentSearch) {
       const searchLower = currentSearch.toLowerCase();
-      products = products.filter(p =>
-        (p.name || '').toLowerCase().includes(searchLower)
-      );
+      products = products.filter(p => (p.name || '').toLowerCase().includes(searchLower));
     }
 
     switch (currentSort) {
@@ -573,11 +492,7 @@
 
   function renderProducts(products) {
     if (products.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-state" style="grid-column:1/-1">
-          <div class="empty-icon">🔍</div>
-          <p>${currentSearch ? '未找到相关产品' : '该分类暂无产品'}</p>
-        </div>`;
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔍</div><p>${currentSearch ? '未找到相关产品' : '该分类暂无产品'}</p></div>`;
       return;
     }
 
@@ -598,8 +513,7 @@
       const isLazy = i >= 8;
 
       return `
-        <a class="product-card" href="detail.html?id=${encodeURIComponent(p.id)}"
-           style="animation-delay:${delay}s">
+        <a class="product-card" href="detail.html?id=${encodeURIComponent(p.id)}" style="animation-delay:${delay}s">
           <div class="card-img-wrap">
             ${buildImgTag(coverUrl, p.name || '', isLazy)}
             <span class="card-tag">${safeCategory}</span>
@@ -608,8 +522,7 @@
             <div class="card-name">${safeName}</div>
             <div class="card-price">${safePrice}</div>
           </div>
-        </a>
-      `;
+        </a>`;
     }).join('');
 
     attachImgErrorHandlers(grid);

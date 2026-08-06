@@ -2,255 +2,121 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="description" content="绒颜 - 产品详情">
-<meta property="og:title" content="绒颜">
-<meta property="og:description" content="精选手工饰品">
-<meta property="og:type" content="product">
-<title>绒颜</title>
-<link rel="icon" href="../logo.jpg" type="image/jpeg">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>绒颜 · 产品详情</title>
+<link rel="icon" href="https://raw.githubusercontent.com/yangruan1688/yangruan.github.io/main/logo.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://gcore.jsdelivr.net" crossorigin>
-<link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  :root {
-    --primary: #b8860b;
-    --primary-light: #d4a843;
-    --bg: #faf8f5;
-    --card-bg: #ffffff;
-    --text: #2c2c2c;
-    --text-light: #999;
-    --radius: 12px;
-  }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
-                 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-  }
-  .top-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 900;
-    height: 52px;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(0,0,0,0.06);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 16px;
-  }
-  .back-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: none;
-    border: none;
-    font-size: 15px;
-    color: var(--text);
-    cursor: pointer;
-    padding: 8px 12px 8px 4px;
-    border-radius: 8px;
-    transition: background 0.2s;
-    text-decoration: none;
-  }
-  .back-btn:hover { background: rgba(0,0,0,0.04); }
-  .back-btn svg { width: 20px; height: 20px; }
-  .top-bar-title { font-size: 14px; font-weight: 600; letter-spacing: 2px; color: var(--primary); }
-  .top-bar-placeholder { width: 60px; }
-  .gallery-section { margin-top: 52px; position: relative; background: #f0ece6; }
-  .gallery-main { position: relative; width: 100%; overflow: hidden; touch-action: pan-y; }
-  .gallery-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); will-change: transform; }
-  .gallery-slide { flex: 0 0 100%; width: 100%; position: relative; }
-  .gallery-slide img {
-    width: 100%; height: auto; display: block; cursor: zoom-in;
-    transition: transform 0.35s ease; user-select: none; -webkit-user-drag: none;
-  }
-  .gallery-slide .img-placeholder {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    display: flex; align-items: center; justify-content: center;
-    background: #e8e4de; font-size: 48px; color: #ccc;
-  }
-  @media (max-width: 767px) {
-    .gallery-slide { padding-top: 100%; position: relative; }
-    .gallery-slide img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-  }
-  @media (min-width: 768px) {
-    .gallery-section {
-      max-width: 700px; margin-left: auto; margin-right: auto; margin-top: 52px;
-      border-radius: 0 0 var(--radius) var(--radius); overflow: hidden;
-    }
-  }
-  .slide-counter {
-    position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
-    background: rgba(0,0,0,0.45); backdrop-filter: blur(8px); color: #fff;
-    padding: 4px 14px; border-radius: 20px; font-size: 12px; letter-spacing: 2px; pointer-events: none;
-  }
-  .gallery-arrow {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    width: 40px; height: 40px; border-radius: 50%;
-    background: rgba(255,255,255,0.85); backdrop-filter: blur(6px);
-    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.1); transition: all 0.25s; z-index: 10;
-    opacity: 0; pointer-events: none;
-  }
-  .gallery-arrow:hover { background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
-  .gallery-arrow svg { width: 18px; height: 18px; color: var(--text); }
-  .gallery-arrow.arrow-left { left: 12px; }
-  .gallery-arrow.arrow-right { right: 12px; }
-  @media (min-width: 768px) {
-    .gallery-section:hover .gallery-arrow { opacity: 1; pointer-events: auto; }
-  }
-  .thumb-strip {
-    display: flex; gap: 8px; padding: 14px 16px; overflow-x: auto;
-    -webkit-overflow-scrolling: touch; scrollbar-width: none; background: #fff;
-  }
-  .thumb-strip::-webkit-scrollbar { display: none; }
-  .thumb-item {
-    flex-shrink: 0; width: 56px; height: 56px; border-radius: 8px; overflow: hidden;
-    cursor: pointer; border: 2px solid transparent; transition: all 0.25s; opacity: 0.55;
-  }
-  .thumb-item:hover { opacity: 0.8; }
-  .thumb-item.active { border-color: var(--primary); opacity: 1; box-shadow: 0 2px 8px rgba(184,134,11,0.25); }
-  .thumb-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .product-detail { max-width: 700px; margin: 0 auto; padding: 28px 20px 60px; }
-  .detail-category {
-    display: inline-block;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: #fff; padding: 3px 14px; border-radius: 20px; font-size: 12px;
-    font-weight: 600; letter-spacing: 1px; margin-bottom: 14px;
-  }
-  .detail-name { font-size: 22px; font-weight: 700; line-height: 1.4; margin-bottom: 12px; }
-  .detail-price { font-size: 28px; font-weight: 800; color: var(--primary); margin-bottom: 20px; }
-  .detail-price::before { content: '¥'; font-size: 16px; margin-right: 2px; }
-  .detail-divider {
-    width: 40px; height: 3px;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    border-radius: 2px; margin-bottom: 20px;
-  }
-  .detail-desc { font-size: 15px; line-height: 1.8; color: #555; }
-  .lightbox {
-    position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.94);
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; visibility: hidden; transition: all 0.35s ease;
-  }
-  .lightbox.open { opacity: 1; visibility: visible; }
-  .lightbox-img {
-    max-width: 92vw; max-height: 90vh; object-fit: contain; border-radius: 4px;
-    transform: scale(0.85); transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
-    cursor: zoom-out; user-select: none; -webkit-user-drag: none;
-  }
-  .lightbox.open .lightbox-img { transform: scale(1); }
-  .lightbox-spinner {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.2);
-    border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite;
-    pointer-events: none;
-  }
-  .lightbox-close {
-    position: absolute; top: 16px; right: 16px; width: 40px; height: 40px;
-    border-radius: 50%; background: rgba(255,255,255,0.15); border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; transition: background 0.2s;
-  }
-  .lightbox-close:hover { background: rgba(255,255,255,0.3); }
-  .lightbox-close svg { width: 20px; height: 20px; color: #fff; }
-  .lightbox-counter {
-    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-    color: rgba(255,255,255,0.7); font-size: 13px; letter-spacing: 3px;
-  }
-  .lightbox-arrow {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.12);
-    border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s;
-  }
-  .lightbox-arrow:hover { background: rgba(255,255,255,0.25); }
-  .lightbox-arrow svg { width: 20px; height: 20px; color: #fff; }
-  .lightbox-arrow.lb-left { left: 16px; }
-  .lightbox-arrow.lb-right { right: 16px; }
-  .page-loading, .page-error {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 80vh; color: var(--text-light); gap: 12px;
-  }
-  .page-loading .spinner {
-    width: 36px; height: 36px; border: 3px solid #eee; border-top-color: var(--primary);
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .bottom-safe { height: env(safe-area-inset-bottom, 0px); }
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #d0c8b8; border-radius: 3px; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --primary: #b8860b;
+  --primary-light: #d4a843;
+  --bg: #faf8f5;
+  --card-bg: #ffffff;
+  --text: #2c2c2c;
+  --text-light: #999;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --radius: 12px;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+               'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--bg); color: var(--text);
+  -webkit-font-smoothing: antialiased; min-height: 100vh;
+}
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
+}
+.header h1 {
+  font-size: 18px; color: var(--primary); letter-spacing: 4px; font-weight: 600;
+}
+.header h1 a { color: var(--primary); text-decoration: none; }
+.header .back-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  color: var(--text); text-decoration: none; font-size: 13px;
+  padding: 5px 10px; border-radius: 18px; transition: all 0.25s;
+}
+.header .back-btn:hover { background: rgba(0,0,0,0.05); }
+.detail-container { max-width: 700px; margin: 0 auto; padding: 0 16px 80px; }
+.gallery {
+  position: relative; width: 100%; border-radius: var(--radius);
+  overflow: hidden; margin-bottom: 20px; background: #f0ece6;
+}
+.gallery-main {
+  width: 100%; aspect-ratio: 1; object-fit: cover; display: block;
+}
+.gallery-thumbs {
+  display: flex; gap: 8px; padding: 10px 12px; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  background: var(--card-bg); border-radius: 0 0 var(--radius) var(--radius);
+}
+.gallery-thumbs::-webkit-scrollbar { display: none; }
+.gallery-thumb {
+  width: 56px; height: 56px; border-radius: 8px; object-fit: cover;
+  flex-shrink: 0; cursor: pointer; border: 2px solid transparent;
+  transition: border-color 0.25s; opacity: 0.7;
+}
+.gallery-thumb:hover { opacity: 1; }
+.gallery-thumb.active { border-color: var(--primary); opacity: 1; }
+.product-info { padding: 0 4px; }
+.product-name { font-size: 22px; font-weight: 600; margin-bottom: 8px; letter-spacing: 1px; }
+.product-price { font-size: 20px; color: var(--primary); font-weight: 700; margin-bottom: 12px; }
+.product-category {
+  display: inline-block; padding: 4px 14px; background: rgba(184,134,11,0.1);
+  color: var(--primary); border-radius: 20px; font-size: 12px; font-weight: 500;
+  margin-bottom: 20px;
+}
+.product-desc {
+  font-size: 14px; line-height: 1.8; color: #555;
+  background: var(--card-bg); border-radius: var(--radius);
+  padding: 18px 20px; box-shadow: var(--shadow); margin-bottom: 24px;
+}
+.product-desc:empty { display: none; }
+.buy-btn {
+  display: block; width: 100%; padding: 14px; text-align: center;
+  background: var(--primary); color: #fff; border: none; border-radius: 30px;
+  font-size: 15px; font-weight: 600; letter-spacing: 2px;
+  text-decoration: none; transition: all 0.3s; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(184,134,11,0.3);
+}
+.buy-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--text-light); text-decoration: none; font-size: 13px;
+  margin-top: 20px; padding: 8px 0; transition: color 0.25s;
+}
+.back-link:hover { color: var(--primary); }
+.loading { text-align: center; padding: 60px 20px; color: var(--text-light); }
+.loading .spinner {
+  width: 32px; height: 32px; border: 3px solid #eee;
+  border-top-color: var(--primary); border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
+.error-state .error-icon { font-size: 48px; margin-bottom: 12px; }
+.error-state a { color: var(--primary); }
 </style>
 </head>
 <body>
 
-<div class="top-bar">
-  <a class="back-btn" href="index.html">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-         stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="15 18 9 12 15 6"/>
-    </svg>
-    返回
-  </a>
-  <span class="top-bar-title">产品详情</span>
-  <div class="top-bar-placeholder"></div>
-</div>
+<header class="header">
+  <h1><a href="index.html">✦ 绒颜 ✦</a></h1>
+  <a class="back-btn" href="index.html">← 返回首页</a>
+</header>
 
-<div class="page-loading" id="pageLoading">
-  <div class="spinner"></div>
-  <p>加载中...</p>
-</div>
-
-<div id="mainContent" style="display:none">
-  <div class="gallery-section">
-    <div class="gallery-main" id="galleryMain">
-      <div class="gallery-track" id="galleryTrack"></div>
-      <button class="gallery-arrow arrow-left" id="arrowLeft">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <button class="gallery-arrow arrow-right" id="arrowRight">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
-      </button>
-      <div class="slide-counter" id="slideCounter">1 / 1</div>
-    </div>
-    <div class="thumb-strip" id="thumbStrip"></div>
+<div class="detail-container" id="detailContainer">
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>加载中...</p>
   </div>
-
-  <div class="product-detail">
-    <span class="detail-category" id="detailCategory"></span>
-    <h1 class="detail-name" id="detailName"></h1>
-    <div class="detail-price" id="detailPrice"></div>
-    <div class="detail-divider"></div>
-    <p class="detail-desc" id="detailDesc"></p>
-  </div>
-  <div class="bottom-safe"></div>
-</div>
-
-<div class="lightbox" id="lightbox">
-  <button class="lightbox-close" id="lbClose">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-         stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-  </button>
-  <button class="lightbox-arrow lb-left" id="lbLeft">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-         stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-  </button>
-  <div class="lightbox-spinner" id="lbSpinner"></div>
-  <img class="lightbox-img" id="lbImg" src="" alt="">
-  <button class="lightbox-arrow lb-right" id="lbRight">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-         stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
-  </button>
-  <div class="lightbox-counter" id="lbCounter"></div>
 </div>
 
 <script>
@@ -260,10 +126,12 @@
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
+  const PRODUCTS_PATH = 'rongyan/products.json';
+  const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
+  const CDN_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
+  const GCORE_URL = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
 
-  const CDN_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
-  const GCORE_URL = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
-  const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
+  const container = document.getElementById('detailContainer');
 
   function escapeHtml(str) {
     if (str == null) return '';
@@ -276,392 +144,123 @@
       .replace(/`/g, '&#96;');
   }
 
-  function fallbackUrl(url) {
-    return String(url).replace(/cdn\.jsdelivr\.net/g, 'gcore.jsdelivr.net');
-  }
-
-  const params = new URLSearchParams(window.location.search);
-  const productId = parseInt(params.get('id'));
-
-  const pageLoading = document.getElementById('pageLoading');
-  const mainContent = document.getElementById('mainContent');
-  const galleryTrack = document.getElementById('galleryTrack');
-  const galleryMain = document.getElementById('galleryMain');
-  const thumbStrip = document.getElementById('thumbStrip');
-  const slideCounter = document.getElementById('slideCounter');
-  const arrowLeft = document.getElementById('arrowLeft');
-  const arrowRight = document.getElementById('arrowRight');
-  const lightbox = document.getElementById('lightbox');
-  const lbImg = document.getElementById('lbImg');
-  const lbClose = document.getElementById('lbClose');
-  const lbLeft = document.getElementById('lbLeft');
-  const lbRight = document.getElementById('lbRight');
-  const lbCounter = document.getElementById('lbCounter');
-  const lbSpinner = document.getElementById('lbSpinner');
-
-  let images = [];
-  let currentSlide = 0;
-  let lightboxIndex = 0;
-  let lbPreloadAbort = null;
-
-  // ✅ 修复：并行请求所有数据源，取产品数量最多的（最新数据）
-  async function fetchOneSource(url) {
+  async function fetchProducts(url, timeout = 8000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
     try {
       const res = await fetch(url, {
-        cache: 'no-store',
-        headers: { 'Accept': 'application/json' }
+        signal: controller.signal,
+        cache: 'no-store'
       });
-      if (!res.ok) return null;
-      const data = await res.json();
-      let list = Array.isArray(data) ? data : (data.products || []);
-      return list;
-    } catch (err) {
-      console.warn('数据源加载失败:', url, err.message);
+      clearTimeout(id);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (e) {
+      clearTimeout(id);
       return null;
     }
   }
 
-  async function loadProduct() {
-    if (isNaN(productId)) {
-      pageLoading.innerHTML = `
-        <div class="page-error">
-          <p style="font-size:36px">🔗</p>
-          <p>产品链接无效，缺少产品 ID</p>
-          <a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a>
-        </div>`;
+  function getProductId() {
+    const params = new URLSearchParams(window.location.search);
+    return parseInt(params.get('id')) || null;
+  }
+
+  function renderDetail(product) {
+    const safeName = escapeHtml(product.name || '');
+    const safePrice = Number(product.price || 0).toFixed(1);
+    const safeCategory = escapeHtml(product.category || '');
+    const safeDesc = escapeHtml(product.description || '');
+    const images = product.images || [];
+    const safeImages = images.map(url => escapeHtml(url));
+
+    let galleryHtml = '';
+    if (safeImages.length > 0) {
+      galleryHtml = `
+        <div class="gallery">
+          <img class="gallery-main" id="galleryMain" src="${safeImages[0]}" alt="${safeName}" decoding="async">
+        </div>
+        ${safeImages.length > 1 ? `
+          <div class="gallery-thumbs" id="galleryThumbs">
+            ${safeImages.map((url, i) => `
+              <img class="gallery-thumb ${i === 0 ? 'active' : ''}" data-index="${i}" src="${url}" alt="图${i + 1}" decoding="async" loading="lazy">
+            `).join('')}
+          </div>
+        ` : ''}
+      `;
+    }
+
+    container.innerHTML = `
+      ${galleryHtml}
+      <div class="product-info">
+        <h2 class="product-name">${safeName}</h2>
+        <div class="product-price">¥${safePrice}</div>
+        <span class="product-category">${safeCategory}</span>
+        <div class="product-desc">${safeDesc}</div>
+        <a class="buy-btn" href="https://weidian.com/s/xxxxxxxxx" target="_blank" rel="noopener">前往微店购买</a>
+        <a class="back-link" href="index.html">← 返回产品列表</a>
+      </div>
+    `;
+
+    if (safeImages.length > 1) {
+      const thumbs = document.getElementById('galleryThumbs');
+      thumbs.addEventListener('click', (e) => {
+        const thumb = e.target.closest('.gallery-thumb');
+        if (!thumb) return;
+        const idx = parseInt(thumb.dataset.index);
+        document.getElementById('galleryMain').src = safeImages[idx];
+        thumbs.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+      });
+    }
+  }
+
+  async function loadAndRender() {
+    const id = getProductId();
+    if (!id) {
+      container.innerHTML = '<div class="error-state"><div class="error-icon">❌</div><p>无效的产品链接</p><p><a href="index.html">返回首页</a></p></div>';
       return;
     }
 
-    const timestamp = Date.now();
-    const urls = [
-      `${RAW_URL}?_=${timestamp}`,
-      `${CDN_URL}?_=${timestamp}`,
-      `${GCORE_URL}?_=${timestamp}`
-    ];
+    container.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
 
-    // 并行请求所有源
-    const results = await Promise.all(urls.map(url => fetchOneSource(url)));
+    const ts = Date.now();
+    const results = await Promise.all([
+      fetchProducts(`${RAW_URL}?_=${ts}`),
+      fetchProducts(`${CDN_URL}?_=${ts}`),
+      fetchProducts(`${GCORE_URL}?_=${ts}`)
+    ]);
 
-    // 取产品数量最多的结果
-    let products = null;
-    let maxCount = -1;
-    for (const list of results) {
-      if (list && list.length > maxCount) {
-        maxCount = list.length;
-        products = list;
+    let bestData = null;
+
+    if (results[0]) {
+      bestData = Array.isArray(results[0]) ? results[0] : (results[0].products || []);
+    }
+
+    if (!bestData) {
+      for (let i = 1; i < results.length; i++) {
+        if (results[i]) {
+          bestData = Array.isArray(results[i]) ? results[i] : (results[i].products || []);
+          if (bestData.length > 0) break;
+        }
       }
     }
 
-    if (!products) {
-      pageLoading.innerHTML = `
-        <div class="page-error">
-          <p style="font-size:36px">😢</p>
-          <p>数据加载失败，请检查网络或刷新重试</p>
-          <a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a>
-        </div>`;
+    if (!bestData || bestData.length === 0) {
+      container.innerHTML = '<div class="error-state"><div class="error-icon">📦</div><p>数据加载失败</p><p><a href="index.html">返回首页</a></p></div>';
       return;
     }
 
-    const product = (Array.isArray(products) ? products : []).find(p => p && p.id === productId);
+    const product = bestData.find(p => p.id === id);
     if (!product) {
-      pageLoading.innerHTML = `
-        <div class="page-error">
-          <p style="font-size:36px">🔍</p>
-          <p>产品不存在或已被删除</p>
-          <a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a>
-        </div>`;
+      container.innerHTML = '<div class="error-state"><div class="error-icon">🔍</div><p>未找到该产品</p><p><a href="index.html">返回首页</a></p></div>';
       return;
     }
 
-    images = Array.isArray(product.images) ? product.images : [];
-    const productName = product.name || '产品详情';
-    document.title = productName + ' · 绒颜';
-
-    const descMeta = document.querySelector('meta[name="description"]');
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (descMeta) descMeta.content = `${productName} - ¥${Number(product.price || 0).toFixed(1)}`;
-    if (ogTitle) ogTitle.content = productName + ' · 绒颜';
-    if (ogDesc) ogDesc.content = product.description || productName;
-
-    document.getElementById('detailCategory').textContent = product.category || '';
-    document.getElementById('detailName').textContent = productName;
-    document.getElementById('detailPrice').textContent = Number(product.price || 0).toFixed(1);
-    document.getElementById('detailDesc').textContent = product.description || '';
-
-    galleryTrack.innerHTML = images.map((src, i) => {
-      const safeSrc = escapeHtml(src);
-      const fbSrc = escapeHtml(fallbackUrl(src));
-      const safeAlt = escapeHtml(productName) + ' - 图' + (i + 1);
-      const lazyAttr = i === 0 ? '' : 'loading="lazy"';
-      return `
-        <div class="gallery-slide">
-          <img src="${safeSrc}" alt="${safeAlt}"
-               data-index="${i}" data-fb="${fbSrc}"
-               draggable="false" decoding="async" ${lazyAttr}>
-        </div>
-      `;
-    }).join('');
-
-    thumbStrip.innerHTML = images.map((src, i) => {
-      const safeSrc = escapeHtml(src);
-      const fbSrc = escapeHtml(fallbackUrl(src));
-      return `
-        <div class="thumb-item${i === 0 ? ' active' : ''}" data-index="${i}">
-          <img src="${safeSrc}" alt="缩略图${i + 1}" data-fb="${fbSrc}"
-               draggable="false" decoding="async">
-        </div>
-      `;
-    }).join('');
-
-    galleryTrack.querySelectorAll('img[data-fb]').forEach(img => {
-      img.addEventListener('error', function() {
-        if (!this.dataset.fbDone) {
-          this.dataset.fbDone = '1';
-          this.src = this.dataset.fb;
-        } else {
-          this.style.display = 'none';
-          this.parentElement.insertAdjacentHTML('beforeend', '<div class="img-placeholder">🖼</div>');
-        }
-      });
-    });
-    thumbStrip.querySelectorAll('img[data-fb]').forEach(img => {
-      img.addEventListener('error', function() {
-        if (!this.dataset.fbDone) {
-          this.dataset.fbDone = '1';
-          this.src = this.dataset.fb;
-        }
-      });
-    });
-
-    slideCounter.textContent = images.length > 0 ? `1 / ${images.length}` : '0 / 0';
-
-    pageLoading.style.display = 'none';
-    mainContent.style.display = 'block';
-
-    if (images.length > 0) {
-      initGallery();
-    }
+    renderDetail(product);
   }
 
-  loadProduct();
-
-  function initGallery() {
-    const singleImage = images.length <= 1;
-    if (singleImage) {
-      arrowLeft.style.display = 'none';
-      arrowRight.style.display = 'none';
-    } else {
-      arrowLeft.addEventListener('click', () => goToSlide(currentSlide - 1));
-      arrowRight.addEventListener('click', () => goToSlide(currentSlide + 1));
-    }
-
-    thumbStrip.addEventListener('click', (e) => {
-      const thumb = e.target.closest('.thumb-item');
-      if (thumb) goToSlide(parseInt(thumb.dataset.index));
-    });
-
-    let mouseDidDrag = false;
-
-    galleryTrack.addEventListener('click', (e) => {
-      if (e.target.tagName === 'IMG' && !mouseDidDrag) {
-        openLightbox(parseInt(e.target.dataset.index));
-      }
-    });
-
-    let touchStartX = 0, touchStartY = 0, touchMoveX = 0, touchDragging = false;
-    let touchIsHorizontal = null, touchDecided = false;
-
-    galleryMain.addEventListener('touchstart', (e) => {
-      if (singleImage) return;
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-      touchDragging = true;
-      touchIsHorizontal = null;
-      touchDecided = false;
-      galleryTrack.style.transition = 'none';
-    }, { passive: true });
-
-    galleryMain.addEventListener('touchmove', (e) => {
-      if (!touchDragging || singleImage) return;
-      const dx = e.touches[0].clientX - touchStartX;
-      const dy = e.touches[0].clientY - touchStartY;
-
-      if (!touchDecided) {
-        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
-          touchIsHorizontal = Math.abs(dx) > Math.abs(dy);
-          touchDecided = true;
-        } else {
-          return;
-        }
-      }
-
-      if (!touchIsHorizontal) return;
-      e.preventDefault();
-      touchMoveX = dx;
-      const offset = -(currentSlide * galleryMain.offsetWidth) + touchMoveX;
-      galleryTrack.style.transform = `translateX(${offset}px)`;
-    }, { passive: false });
-
-    galleryMain.addEventListener('touchend', () => {
-      if (!touchDragging || singleImage) return;
-      touchDragging = false;
-      galleryTrack.style.transition = '';
-      if (touchIsHorizontal) {
-        const threshold = galleryMain.offsetWidth * 0.2;
-        if (touchMoveX < -threshold) goToSlide(currentSlide + 1);
-        else if (touchMoveX > threshold) goToSlide(currentSlide - 1);
-        else goToSlide(currentSlide);
-      }
-      touchMoveX = 0;
-      touchDecided = false;
-    });
-
-    let mouseStartX = 0, mouseMoveX = 0, mouseDown = false;
-    mouseDidDrag = false;
-
-    galleryMain.addEventListener('mousedown', (e) => {
-      if (e.target.tagName !== 'IMG' || singleImage) return;
-      mouseDown = true;
-      mouseDidDrag = false;
-      mouseStartX = e.clientX;
-      galleryTrack.style.transition = 'none';
-      e.preventDefault();
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!mouseDown) return;
-      const dx = e.clientX - mouseStartX;
-      if (Math.abs(dx) > 5) mouseDidDrag = true;
-      mouseMoveX = dx;
-      const offset = -(currentSlide * galleryMain.offsetWidth) + mouseMoveX;
-      galleryTrack.style.transform = `translateX(${offset}px)`;
-    });
-
-    window.addEventListener('mouseup', () => {
-      if (!mouseDown) return;
-      mouseDown = false;
-      galleryTrack.style.transition = '';
-      const threshold = galleryMain.offsetWidth * 0.15;
-      if (mouseMoveX < -threshold) goToSlide(currentSlide + 1);
-      else if (mouseMoveX > threshold) goToSlide(currentSlide - 1);
-      else goToSlide(currentSlide);
-      mouseMoveX = 0;
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (lightbox.classList.contains('open')) {
-        if (e.key === 'Escape') closeLightbox();
-        if (e.key === 'ArrowLeft') lightboxNav(-1);
-        if (e.key === 'ArrowRight') lightboxNav(1);
-        return;
-      }
-      if (e.key === 'ArrowLeft') goToSlide(currentSlide - 1);
-      if (e.key === 'ArrowRight') goToSlide(currentSlide + 1);
-    });
-  }
-
-  function goToSlide(index) {
-    if (index < 0) index = 0;
-    if (index >= images.length) index = images.length - 1;
-    currentSlide = index;
-    galleryTrack.style.transition = '';
-    galleryTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
-    slideCounter.textContent = `${currentSlide + 1} / ${images.length}`;
-    thumbStrip.querySelectorAll('.thumb-item').forEach((t, i) => {
-      t.classList.toggle('active', i === currentSlide);
-    });
-    const activeThumb = thumbStrip.children[currentSlide];
-    if (activeThumb) {
-      activeThumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    }
-  }
-
-  function openLightbox(index) {
-    if (lbPreloadAbort) { lbPreloadAbort = null; }
-
-    lightboxIndex = index;
-    lbSpinner.style.display = 'block';
-    lbImg.style.opacity = '0';
-
-    const currentToken = Date.now();
-    lbPreloadAbort = currentToken;
-
-    const img = new Image();
-    img.onload = () => {
-      if (lbPreloadAbort !== currentToken) return;
-      lbImg.src = img.src;
-      lbImg.style.opacity = '1';
-      lbSpinner.style.display = 'none';
-    };
-    img.onerror = () => {
-      if (lbPreloadAbort !== currentToken) return;
-      const fbUrl = fallbackUrl(images[index]);
-      const img2 = new Image();
-      img2.onload = () => {
-        if (lbPreloadAbort !== currentToken) return;
-        lbImg.src = img2.src;
-        lbImg.style.opacity = '1';
-        lbSpinner.style.display = 'none';
-      };
-      img2.onerror = () => {
-        if (lbPreloadAbort !== currentToken) return;
-        lbSpinner.style.display = 'none';
-        lbImg.alt = '图片加载失败';
-        lbImg.style.opacity = '0.3';
-      };
-      img2.src = fbUrl;
-    };
-    img.src = images[index];
-
-    lbCounter.textContent = `${index + 1} / ${images.length}`;
-
-    if (!lightbox.classList.contains('open')) {
-      lightbox.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-  }
-
-  function closeLightbox() {
-    lbPreloadAbort = null;
-    lightbox.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  function lightboxNav(dir) {
-    let newIndex = lightboxIndex + dir;
-    if (newIndex < 0) newIndex = images.length - 1;
-    if (newIndex >= images.length) newIndex = 0;
-    lightboxIndex = newIndex;
-    openLightbox(lightboxIndex);
-  }
-
-  lbClose.addEventListener('click', closeLightbox);
-  lbImg.addEventListener('click', closeLightbox);
-  lbLeft.addEventListener('click', () => lightboxNav(-1));
-  lbRight.addEventListener('click', () => lightboxNav(1));
-
-  lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) closeLightbox();
-  });
-
-  let lbStartX = 0, lbMoveX = 0, lbDragging = false;
-  lightbox.addEventListener('touchstart', (e) => {
-    lbStartX = e.touches[0].clientX;
-    lbDragging = true;
-  }, { passive: true });
-  lightbox.addEventListener('touchmove', (e) => {
-    if (!lbDragging) return;
-    lbMoveX = e.touches[0].clientX - lbStartX;
-  }, { passive: true });
-  lightbox.addEventListener('touchend', () => {
-    if (!lbDragging) return;
-    lbDragging = false;
-    if (Math.abs(lbMoveX) > 50) {
-      lightboxNav(lbMoveX < 0 ? 1 : -1);
-    }
-    lbMoveX = 0;
-  });
+  loadAndRender();
 })();
 </script>
 </body>

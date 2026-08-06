@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="noindex, nofollow">
 <title>绒颜 · 管理后台</title>
 <link rel="icon" href="../logo.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://api.github.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -16,6 +19,7 @@
   --text-light: #888;
   --danger: #e74c3c;
   --success: #27ae60;
+  --warning: #f39c12;
   --shadow: 0 2px 16px rgba(0,0,0,0.07);
   --radius: 12px;
 }
@@ -27,7 +31,6 @@ body {
   -webkit-font-smoothing: antialiased; min-height: 100vh;
   padding-bottom: env(safe-area-inset-bottom, 20px);
 }
-
 .btn {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 9px 18px; border: 1px solid rgba(0,0,0,0.1);
@@ -42,7 +45,6 @@ body {
 .btn-danger { color: var(--danger); border-color: rgba(231,76,60,0.3); }
 .btn-danger:hover { background: rgba(231,76,60,0.06); border-color: var(--danger); }
 .btn-sm { padding: 6px 12px; font-size: 12px; }
-
 .login-page {
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; min-height: 100vh; padding: 24px;
@@ -63,7 +65,6 @@ body {
 .login-box .hint { font-size: 11px; color: var(--text-light); margin-top: -8px; margin-bottom: 14px; line-height: 1.5; }
 .login-box .hint a { color: var(--primary); }
 .login-error { color: var(--danger); font-size: 13px; margin-top: 8px; display: none; text-align: center; }
-
 .admin-header {
   position: sticky; top: 0; z-index: 100;
   background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
@@ -74,7 +75,6 @@ body {
 .admin-header h2 { font-size: 15px; color: var(--primary); letter-spacing: 2px; }
 .header-actions { display: flex; gap: 8px; align-items: center; }
 .admin-body { max-width: 800px; margin: 0 auto; padding: 16px 14px; }
-
 .stats-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
 .stat-card {
   flex: 1; min-width: 80px; background: var(--card-bg);
@@ -82,7 +82,6 @@ body {
 }
 .stat-card .stat-num { font-size: 22px; font-weight: 700; color: var(--primary); }
 .stat-card .stat-label { font-size: 11px; color: var(--text-light); margin-top: 2px; }
-
 .product-list { display: flex; flex-direction: column; gap: 10px; }
 .product-item {
   background: var(--card-bg); border-radius: var(--radius);
@@ -104,7 +103,6 @@ body {
 .product-item .item-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
 .empty-state .empty-icon { font-size: 42px; margin-bottom: 10px; }
-
 .modal-overlay {
   position: fixed; inset: 0; z-index: 2000;
   background: rgba(0,0,0,0.5); display: flex;
@@ -153,7 +151,6 @@ body {
   padding: 12px 18px; border-top: 1px solid rgba(0,0,0,0.06);
   display: flex; gap: 10px; justify-content: flex-end;
 }
-
 .upload-area {
   border: 2px dashed rgba(0,0,0,0.12); border-radius: 10px;
   padding: 18px; text-align: center; cursor: pointer;
@@ -190,11 +187,8 @@ body {
 .progress-bar { height: 4px; background: #eee; border-radius: 2px; overflow: hidden; }
 .progress-bar .progress-fill { height: 100%; background: var(--primary); transition: width 0.3s; width: 0%; }
 .progress-text { font-size: 11px; color: var(--text-light); margin-top: 4px; text-align: center; }
-
-/* ✅ 优化：保存时的独立进度条样式 */
 .save-progress { display: none; margin-top: 12px; }
 .save-progress.show { display: block; }
-
 .toast-container {
   position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
   z-index: 9999; display: flex; flex-direction: column; gap: 6px; pointer-events: none;
@@ -208,9 +202,9 @@ body {
 .toast.success { background: var(--success); }
 .toast.error { background: var(--danger); }
 .toast.info { background: var(--primary); }
+.toast.warning { background: var(--warning); }
 @keyframes toastIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
 @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
-
 .confirm-overlay {
   position: fixed; inset: 0; z-index: 3000;
   background: rgba(0,0,0,0.5); display: flex;
@@ -222,9 +216,14 @@ body {
   background: #fff; border-radius: 14px;
   padding: 24px 20px 18px; max-width: 300px; width: 88%; text-align: center;
 }
-.confirm-box p { font-size: 14px; margin-bottom: 18px; line-height: 1.5; }
+.confirm-box p { font-size: 14px; margin-bottom: 18px; line-height: 1.5; white-space: pre-line; }
 .confirm-box .confirm-actions { display: flex; gap: 10px; justify-content: center; }
-
+.token-warning {
+  background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px;
+  padding: 8px 14px; margin-bottom: 12px; font-size: 12px; color: #856404;
+  display: flex; align-items: center; gap: 8px;
+}
+.token-warning .warn-icon { font-size: 16px; }
 .spinner {
   width: 28px; height: 28px; border: 3px solid #eee;
   border-top-color: var(--primary); border-radius: 50%;
@@ -261,6 +260,10 @@ body {
     </div>
   </div>
   <div class="admin-body">
+    <div class="token-warning" id="tokenWarning" style="display:none">
+      <span class="warn-icon">⚠️</span>
+      <span id="tokenWarningText"></span>
+    </div>
     <div class="stats-bar" id="statsBar"></div>
     <div class="product-list" id="productList"></div>
   </div>
@@ -309,7 +312,6 @@ body {
         </div>
         <div class="image-preview-list" id="imagePreviewList"></div>
       </div>
-      <!-- ✅ 优化：保存时独立的进度条，不与上传压缩进度条混用 -->
       <div class="save-progress" id="saveProgress">
         <div class="progress-bar"><div class="progress-fill" id="saveProgressFill"></div></div>
         <div class="progress-text" id="saveProgressText">保存中...</div>
@@ -336,17 +338,22 @@ body {
 
 <script>
 (function () {
+  'use strict';
+
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
   const PRODUCTS_PATH = 'rongyan/products.json';
   const IMAGES_PATH   = 'rongyan/images';
   const API_BASE = 'https://api.github.com';
+  const MAX_FILE_SIZE_MB = 10;
 
   let TOKEN = '';
   let products = [];
   let editingId = null;
   let tempImages = [];
+  let originalImages = [];
+  let hasUnsavedChanges = false;
 
   const $ = id => document.getElementById(id);
   const loginPage = $('loginPage');
@@ -374,10 +381,11 @@ body {
   const confirmMsg = $('confirmMsg');
   const confirmYes = $('confirmYes');
   const confirmNo = $('confirmNo');
-  // ✅ 新增：保存进度条 DOM
   const saveProgress = $('saveProgress');
   const saveProgressFill = $('saveProgressFill');
   const saveProgressText = $('saveProgressText');
+  const tokenWarning = $('tokenWarning');
+  const tokenWarningText = $('tokenWarningText');
 
   function escapeHtml(str) {
     if (str == null) return '';
@@ -386,13 +394,26 @@ body {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+      .replace(/'/g, '&#39;')
+      .replace(/`/g, '&#96;');
   }
 
   function encodeToBase64(str) {
     const bytes = new TextEncoder().encode(str);
     const binStr = Array.from(bytes, b => String.fromCodePoint(b)).join('');
     return btoa(binStr);
+  }
+
+  // ✅ 修复：更健壮的 UTF-8 解码，替代 atob + escape + decodeURIComponent
+  // 旧方案在遇到 emoji 等高位 Unicode 时可能在旧版 Safari 上抛出 URIError
+  function decodeFileContent(content) {
+    const cleaned = content.replace(/\n/g, '');
+    const binary = atob(cleaned);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new TextDecoder('utf-8').decode(bytes);
   }
 
   function toast(msg, type = 'info') {
@@ -432,17 +453,6 @@ body {
     if (res.status === 404) return null;
     if (!res.ok) throw new Error(`API 错误: ${res.status}`);
     return await res.json();
-  }
-
-  // ✅ 优化：安全解码 base64 content，去除可能的换行符
-  function decodeFileContent(content) {
-    const cleaned = content.replace(/\n/g, '');
-    const binary = atob(cleaned);
-    try {
-      return decodeURIComponent(escape(binary));
-    } catch {
-      return binary;
-    }
   }
 
   async function putFile(path, content, message, sha) {
@@ -487,17 +497,72 @@ body {
             const reader2 = new FileReader();
             reader2.onload = () => {
               const base64 = reader2.result.split(',')[1];
-              resolve({ base64, width: w, height: h });
+              resolve({ base64, width: w, height: h, size: blob.size });
             };
+            reader2.onerror = () => reject(new Error('读取压缩结果失败'));
             reader2.readAsDataURL(blob);
           }, 'image/webp', quality);
         };
-        img.onerror = reject;
+        img.onerror = () => reject(new Error('图片加载失败，可能不是有效的图片文件'));
         img.src = e.target.result;
       };
-      reader.onerror = reject;
+      reader.onerror = () => reject(new Error('文件读取失败'));
       reader.readAsDataURL(file);
     });
+  }
+
+  async function checkTokenExpiration() {
+    try {
+      const res = await fetch(`${API_BASE}/user`, { headers: headers() });
+
+      if (res.status === 401) {
+        tokenWarningText.textContent = 'Token 已失效，请重新生成';
+        tokenWarning.style.display = 'flex';
+        tokenWarning.style.background = '#f8d7da';
+        tokenWarning.style.borderColor = '#f5c6cb';
+        tokenWarning.style.color = '#721c24';
+        return;
+      }
+
+      const remaining = res.headers.get('x-ratelimit-remaining');
+
+      if (remaining !== null && parseInt(remaining) < 100) {
+        toast(`API 配额剩余 ${remaining} 次，请注意节约使用`, 'warning');
+      }
+
+      const loginTime = safeSessionGet('_ry_login_time');
+      if (loginTime) {
+        const elapsed = Date.now() - parseInt(loginTime);
+        const daysElapsed = Math.floor(elapsed / (1000 * 60 * 60 * 24));
+        const daysLeft = 30 - daysElapsed;
+
+        if (daysLeft <= 0) {
+          tokenWarningText.textContent = 'Token 可能已过期（登录已超过 30 天），如操作失败请重新生成';
+          tokenWarning.style.display = 'flex';
+          tokenWarning.style.background = '#f8d7da';
+          tokenWarning.style.borderColor = '#f5c6cb';
+          tokenWarning.style.color = '#721c24';
+        } else if (daysLeft <= 7) {
+          tokenWarningText.textContent = `Token 可能在 ${daysLeft} 天后过期，建议提前更新`;
+          tokenWarning.style.display = 'flex';
+        } else {
+          tokenWarning.style.display = 'none';
+        }
+      }
+    } catch (e) {
+      console.warn('Token 检测失败:', e.message);
+    }
+  }
+
+  // ✅ 新增：安全的 sessionStorage 封装，兼容隐私模式
+  function safeSessionSet(key, value) {
+    try { sessionStorage.setItem(key, value); } catch (e) { /* 隐私模式或存储满 */ }
+  }
+  function safeSessionGet(key) {
+    try { return sessionStorage.getItem(key); } catch (e) { return null; }
+  }
+  function safeSessionRemove(key) {
+    try { sessionStorage.removeItem(key); } catch (e) { /* ignore */ }
   }
 
   async function doLogin() {
@@ -511,25 +576,15 @@ body {
     try {
       TOKEN = token;
       const res = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}`, { headers: headers() });
-      if (!res.ok) throw new Error(res.status === 401 ? 'Token 无效' : '连接失败');
+      if (!res.ok) throw new Error(res.status === 401 ? 'Token 无效或已过期' : '连接失败');
 
       const permRes = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${PRODUCTS_PATH}?ref=${GITHUB_BRANCH}`, {
         headers: headers()
       });
       if (permRes.status === 403) throw new Error('Token 没有仓库 Contents 权限');
 
-      // ✅ 优化：检查 fine-grained token 的过期信息
-      try {
-        const tokenInfoRes = await fetch(`${API_BASE}/user`, { headers: headers() });
-        if (tokenInfoRes.ok) {
-          const remaining = tokenInfoRes.headers.get('x-ratelimit-remaining');
-          if (remaining !== null && parseInt(remaining) < 100) {
-            toast(`API 配额剩余 ${remaining} 次，请注意节约使用`, 'info');
-          }
-        }
-      } catch {}
-
-      sessionStorage.setItem('_ry_token', token);
+      safeSessionSet('_ry_token', token);
+      safeSessionSet('_ry_login_time', String(Date.now()));
       showAdmin();
     } catch (err) {
       showLoginError(err.message || '登录失败');
@@ -552,14 +607,17 @@ body {
     loginPage.style.display = 'none';
     adminPanel.style.display = 'block';
     await loadProducts();
+    checkTokenExpiration();
   }
 
   function doLogout() {
-    sessionStorage.removeItem('_ry_token');
+    safeSessionRemove('_ry_token');
+    safeSessionRemove('_ry_login_time');
     TOKEN = '';
     adminPanel.style.display = 'none';
     loginPage.style.display = 'flex';
     tokenInput.value = '';
+    tokenWarning.style.display = 'none';
   }
 
   async function loadProducts() {
@@ -567,7 +625,6 @@ body {
     try {
       const file = await getFile(PRODUCTS_PATH);
       if (file) {
-        // ✅ 优化：使用安全的 content 解码函数
         const decoded = decodeFileContent(file.content);
         const data = JSON.parse(decoded);
         products = Array.isArray(data) ? data : (data.products || []);
@@ -604,7 +661,8 @@ body {
       const imgCount = (p.images || []).length;
       return `
         <div class="product-item" data-id="${p.id}">
-          <div class="item-img"><img src="${safeCover}" alt="${safeName}" loading="lazy" decoding="async"></div>
+          <div class="item-img"><img src="${safeCover}" alt="${safeName}" loading="lazy" decoding="async"
+               onerror="this.style.display='none';this.parentElement.style.background='#e8e4de';this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;color:#ccc;font-size:20px\\'>🖼</div>'"></div>
           <div class="item-info">
             <div class="item-name">${safeName}</div>
             <div class="item-meta">
@@ -626,7 +684,16 @@ body {
     const editB = e.target.closest('.edit-btn');
     const delB = e.target.closest('.del-btn');
     if (editB) openEditModal(parseInt(editB.dataset.id));
-    if (delB) await deleteProduct(parseInt(delB.dataset.id));
+    if (delB) {
+      delB.disabled = true;
+      delB.textContent = '删除中...';
+      try {
+        await deleteProduct(parseInt(delB.dataset.id));
+      } finally {
+        delB.disabled = false;
+        delB.textContent = '删除';
+      }
+    }
   });
 
   function openAddModal() {
@@ -637,6 +704,8 @@ body {
     $('fCategory').value = '发饰';
     $('fDesc').value = '';
     tempImages = [];
+    originalImages = [];
+    hasUnsavedChanges = false;
     renderImagePreviews();
     saveProgress.classList.remove('show');
     editModal.classList.add('show');
@@ -656,16 +725,29 @@ body {
       isCover: url === p.cover,
       existing: true
     }));
+    originalImages = [...(p.images || [])];
+    hasUnsavedChanges = false;
     renderImagePreviews();
     saveProgress.classList.remove('show');
     editModal.classList.add('show');
   }
 
-  function closeEditModal() {
+  async function closeEditModal() {
+    if (hasUnsavedChanges) {
+      const ok = await showConfirm('有未保存的修改，确定要关闭吗？');
+      if (!ok) return;
+    }
     editModal.classList.remove('show');
     tempImages = [];
+    originalImages = [];
+    hasUnsavedChanges = false;
     saveProgress.classList.remove('show');
   }
+
+  ['fName', 'fPrice', 'fCategory', 'fDesc'].forEach(id => {
+    $(id).addEventListener('input', () => { hasUnsavedChanges = true; });
+    $(id).addEventListener('change', () => { hasUnsavedChanges = true; });
+  });
 
   function renderImagePreviews() {
     if (tempImages.length === 0) {
@@ -675,10 +757,10 @@ body {
     imagePreviewList.innerHTML = tempImages.map((img, i) => {
       const src = img.uploadedUrl
         ? escapeHtml(img.uploadedUrl)
-        : ('data:image/webp;base64,' + img.base64);
+        : 'data:image/webp;base64,' + img.base64;
       return `
         <div class="image-preview-item ${img.isCover ? 'is-cover' : ''}" data-index="${i}">
-          <img src="${src}" alt="图${i + 1}">
+          <img src="${src}" alt="图${i + 1}" decoding="async">
           ${img.isCover ? '<div class="cover-badge">封面</div>' : ''}
           <div class="img-actions">
             <button class="img-btn" data-action="remove" data-index="${i}" title="删除">✕</button>
@@ -692,6 +774,7 @@ body {
   imagePreviewList.addEventListener('click', (e) => {
     const btn = e.target.closest('.img-btn');
     if (!btn) return;
+    hasUnsavedChanges = true;
     const idx = parseInt(btn.dataset.index);
     const action = btn.dataset.action;
     if (action === 'remove') {
@@ -703,6 +786,11 @@ body {
     renderImagePreviews();
   });
 
+  // ✅ 修复：过滤非图片文件
+  function isImageFile(file) {
+    return file.type && file.type.startsWith('image/');
+  }
+
   fileInput.addEventListener('change', async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
@@ -710,23 +798,49 @@ body {
 
     uploadProgress.classList.add('show');
     let done = 0;
+    let skipped = 0;
 
     for (const file of files) {
+      // ✅ 新增：校验文件类型
+      if (!isImageFile(file)) {
+        toast(`${file.name} 不是图片文件，已跳过`, 'warning');
+        skipped++;
+        done++;
+        continue;
+      }
+
+      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+        toast(`${file.name} 超过 ${MAX_FILE_SIZE_MB}MB 限制，已跳过`, 'warning');
+        skipped++;
+        done++;
+        continue;
+      }
+
       progressText.textContent = `压缩中 (${done + 1}/${files.length}): ${file.name}`;
       progressFill.style.width = ((done / files.length) * 100) + '%';
       try {
-        const { base64 } = await compressImage(file);
-        tempImages.push({ base64, isCover: tempImages.length === 0 });
-        renderImagePreviews();
+        const result = await compressImage(file);
+        if (result.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+          toast(`${file.name} 压缩后仍过大，已跳过`, 'warning');
+          skipped++;
+        } else {
+          tempImages.push({ base64: result.base64, isCover: tempImages.length === 0 });
+          hasUnsavedChanges = true;
+          renderImagePreviews();
+        }
       } catch (err) {
-        toast('图片处理失败: ' + file.name, 'error');
+        toast('图片处理失败: ' + file.name + ' (' + err.message + ')', 'error');
+        skipped++;
       }
       done++;
       progressFill.style.width = ((done / files.length) * 100) + '%';
     }
 
-    progressText.textContent = `完成，共 ${files.length} 张图片`;
-    setTimeout(() => uploadProgress.classList.remove('show'), 1500);
+    const msg = skipped > 0
+      ? `完成 ${files.length - skipped}/${files.length} 张，${skipped} 张跳过`
+      : `完成，共 ${files.length} 张图片`;
+    progressText.textContent = msg;
+    setTimeout(() => uploadProgress.classList.remove('show'), 2000);
   });
 
   uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
@@ -736,7 +850,19 @@ body {
     uploadArea.classList.remove('dragover');
     const dt = e.dataTransfer;
     if (dt.files.length) {
-      fileInput.files = dt.files;
+      // ✅ 修复：拖拽时也过滤非图片文件
+      const imageFiles = Array.from(dt.files).filter(isImageFile);
+      if (imageFiles.length === 0) {
+        toast('请拖入图片文件', 'warning');
+        return;
+      }
+      if (imageFiles.length < dt.files.length) {
+        toast(`已过滤 ${dt.files.length - imageFiles.length} 个非图片文件`, 'warning');
+      }
+      // 创建新的 DataTransfer 来设置过滤后的文件
+      const newDT = new DataTransfer();
+      imageFiles.forEach(f => newDT.items.add(f));
+      fileInput.files = newDT.files;
       fileInput.dispatchEvent(new Event('change'));
     }
   });
@@ -766,7 +892,6 @@ body {
 
     saveBtn.disabled = true;
     saveBtn.textContent = '保存中...';
-    // ✅ 优化：使用独立的保存进度条
     saveProgress.classList.add('show');
     saveProgressFill.style.width = '0%';
     saveProgressText.textContent = '准备保存...';
@@ -775,7 +900,7 @@ body {
       const uploadedUrls = [];
       const timestamp = Date.now();
       const newImages = tempImages.filter(img => !img.existing || !img.uploadedUrl);
-      const totalSteps = newImages.length + 2; // 图片数 + 清理旧图 + 保存JSON
+      const totalSteps = newImages.length + 2;
       let currentStep = 0;
 
       for (let i = 0; i < tempImages.length; i++) {
@@ -786,7 +911,7 @@ body {
         }
         const filename = `p${timestamp}_${i}.webp`;
         const path = `${IMAGES_PATH}/${filename}`;
-        saveProgressText.textContent = `上传图片 ${newImages.indexOf(img) + 1}/${newImages.length}...`;
+        saveProgressText.textContent = `上传图片 ${currentStep + 1}/${newImages.length}...`;
         saveProgressFill.style.width = ((currentStep / totalSteps) * 100) + '%';
 
         await uploadImageWithRetry(path, img.base64, `upload image: ${filename}`);
@@ -802,25 +927,21 @@ body {
       if (coverIdx < 0) coverIdx = 0;
       const cover = uploadedUrls[coverIdx];
 
-      // 清理旧图片
-      if (editingId !== null) {
-        const oldProduct = products.find(p => p.id === editingId);
-        if (oldProduct && oldProduct.images) {
-          const keepUrls = new Set(uploadedUrls);
-          for (const oldUrl of oldProduct.images) {
-            if (!keepUrls.has(oldUrl)) {
-              const match = oldUrl.match(/rongyan\/images\/([^?]+)/);
-              if (match) {
-                try {
-                  saveProgressText.textContent = `清理旧图片: ${match[1]}`;
-                  const file = await getFile(`${IMAGES_PATH}/${match[1]}`);
-                  if (file) {
-                    await deleteFile(`${IMAGES_PATH}/${match[1]}`, file.sha);
-                    await new Promise(r => setTimeout(r, 500));
-                  }
-                } catch (e) {
-                  console.warn('清理旧图片失败:', match[1], e.message);
+      if (editingId !== null && originalImages.length > 0) {
+        const keepUrls = new Set(uploadedUrls);
+        for (const oldUrl of originalImages) {
+          if (!keepUrls.has(oldUrl)) {
+            const match = oldUrl.match(/rongyan\/images\/([^?]+)/);
+            if (match) {
+              try {
+                saveProgressText.textContent = `清理旧图片: ${match[1]}`;
+                const file = await getFile(`${IMAGES_PATH}/${match[1]}`);
+                if (file) {
+                  await deleteFile(`${IMAGES_PATH}/${match[1]}`, file.sha);
+                  await new Promise(r => setTimeout(r, 500));
                 }
+              } catch (e) {
+                console.warn('清理旧图片失败:', match[1], e.message);
               }
             }
           }
@@ -850,10 +971,13 @@ body {
 
       saveProgressFill.style.width = '100%';
       saveProgressText.textContent = '保存成功！';
+      hasUnsavedChanges = false;
 
       toast('保存成功！', 'success');
-      closeEditModal();
-      setTimeout(loadProducts, 1000);
+      setTimeout(() => {
+        closeEditModal();
+        setTimeout(loadProducts, 500);
+      }, 600);
 
     } catch (err) {
       toast('保存失败: ' + err.message, 'error');
@@ -911,7 +1035,25 @@ body {
     if (e.target === editModal) closeEditModal();
   });
 
-  const savedToken = sessionStorage.getItem('_ry_token');
+  window.addEventListener('beforeunload', (e) => {
+    if (hasUnsavedChanges) {
+      e.preventDefault();
+      e.returnValue = '有未保存的修改，确定要离开吗？';
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && hasUnsavedChanges) {
+      safeSessionSet('_ry_unsaved', '1');
+    }
+  });
+
+  if (safeSessionGet('_ry_unsaved')) {
+    safeSessionRemove('_ry_unsaved');
+    toast('上次编辑可能有未保存的内容', 'warning');
+  }
+
+  const savedToken = safeSessionGet('_ry_token');
   if (savedToken) {
     TOKEN = savedToken;
     showAdmin();

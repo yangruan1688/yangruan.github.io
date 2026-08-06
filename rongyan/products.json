@@ -24,5 +24,18 @@
     ],
     "cover": "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786006083151_0.webp",
     "createdAt": "2026-08-06T08:48:06.405Z"
+  },
+  {
+    "id": 3,
+    "name": "实验",
+    "price": 888,
+    "category": "耳饰",
+    "description": "",
+    "images": [
+      "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786006393430_0.webp",
+      "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786006393430_1.webp"
+    ],
+    "cover": "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786006393430_0.webp",
+    "createdAt": "2026-08-06T08:53:20.680Z"
   }
 ]

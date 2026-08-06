@@ -359,6 +359,17 @@
   const searchClear = document.getElementById('searchClear');
   const toolbar = document.getElementById('toolbar');
 
+  // ✅ 修复：XSS 转义函数，防止 innerHTML 注入
+  function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function updateToolbarPosition() {
     const navH = navbar.offsetHeight;
     const toolH = toolbar.offsetHeight;
@@ -386,7 +397,7 @@
           const data = await res.json();
           allProducts = Array.isArray(data) ? data : (data.products || []);
           dataLoaded = true;
-          break; // 成功加载，跳出循环
+          break;
         }
       } catch (err) {
         console.warn('数据源加载失败，尝试下一个:', url, err.message);
@@ -430,7 +441,7 @@
     sortDropdown.querySelectorAll('.sort-option').forEach(o => o.classList.remove('active'));
     option.classList.add('active');
     currentSort = option.dataset.sort;
-    sortBtn.innerHTML = `<span class="btn-icon">↕</span>${option.textContent}`;
+    sortBtn.innerHTML = `<span class="btn-icon">↕</span>${escapeHtml(option.textContent)}`;
     sortDropdown.classList.remove('show');
     sortBtn.classList.remove('active');
     updateView();
@@ -513,10 +524,11 @@
       case 'newest':     products.sort((a, b) => b.id - a.id); break;
     }
 
+    // ✅ 修复：对搜索词和分类名做 XSS 转义
     if (currentSearch) {
-      sectionTitle.innerHTML = `—— 搜索 "<span>${currentSearch}</span>" 的结果 (${products.length}) ——`;
+      sectionTitle.innerHTML = `—— 搜索 &ldquo;<span>${escapeHtml(currentSearch)}</span>&rdquo; 的结果 (${products.length}) ——`;
     } else {
-      sectionTitle.innerHTML = `—— 为你精选 <span>${currentCategory}</span> 饰品 ——`;
+      sectionTitle.innerHTML = `—— 为你精选 <span>${escapeHtml(currentCategory)}</span> 饰品 ——`;
     }
 
     renderProducts(products);
@@ -531,26 +543,33 @@
         </div>`;
       return;
     }
-    
-    // ✅ 优化：给图片 URL 加上时间戳，防止 CDN 缓存导致新上传的图片不显示
-    const imgTimestamp = Date.now();
-    
+
+    // ✅ 优化：去掉 Date.now() 时间戳，改用稳定的版本号，让图片走浏览器缓存
+    // 版本号基于产品数据摘要，只有数据真正变化时才刷新图片缓存
+    const imgVersion = allProducts.reduce((s, p) => s + (p.id || 0) + (p.cover || '').length, 0);
+
     grid.innerHTML = products.map((p, i) => {
-      let coverUrl = p.cover;
+      // ✅ 修复：对 URL 和文本内容做 XSS 转义
+      let coverUrl = p.cover || '';
+      // 只对不含查询参数的 URL 追加版本号
       if (coverUrl && !coverUrl.includes('?')) {
-        coverUrl += `?_=${imgTimestamp}`;
+        coverUrl += `?v=${imgVersion}`;
       }
-      
+
+      const safeName = escapeHtml(p.name || '');
+      const safeCategory = escapeHtml(p.category || '');
+      const safePrice = Number(p.price || 0).toFixed(1);
+
       return `
-        <a class="product-card" href="detail.html?id=${p.id}"
+        <a class="product-card" href="detail.html?id=${encodeURIComponent(p.id)}"
            style="animation-delay:${i * 0.06}s">
           <div class="card-img-wrap">
-            <img src="${coverUrl}" alt="${p.name}" loading="lazy">
-            <span class="card-tag">${p.category}</span>
+            <img src="${escapeHtml(coverUrl)}" alt="${safeName}" loading="lazy">
+            <span class="card-tag">${safeCategory}</span>
           </div>
           <div class="card-info">
-            <div class="card-name">${p.name}</div>
-            <div class="card-price">${Number(p.price).toFixed(1)}</div>
+            <div class="card-name">${safeName}</div>
+            <div class="card-price">${safePrice}</div>
           </div>
         </a>
       `;

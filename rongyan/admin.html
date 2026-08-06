@@ -28,7 +28,6 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 20px);
 }
 
-/* ===== 通用按钮 ===== */
 .btn {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 9px 18px; border: 1px solid rgba(0,0,0,0.1);
@@ -44,7 +43,6 @@ body {
 .btn-danger:hover { background: rgba(231,76,60,0.06); border-color: var(--danger); }
 .btn-sm { padding: 6px 12px; font-size: 12px; }
 
-/* ===== 登录页 ===== */
 .login-page {
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; min-height: 100vh; padding: 24px;
@@ -66,7 +64,6 @@ body {
 .login-box .hint a { color: var(--primary); }
 .login-error { color: var(--danger); font-size: 13px; margin-top: 8px; display: none; text-align: center; }
 
-/* ===== 管理主界面 ===== */
 .admin-header {
   position: sticky; top: 0; z-index: 100;
   background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
@@ -78,7 +75,6 @@ body {
 .header-actions { display: flex; gap: 8px; align-items: center; }
 .admin-body { max-width: 800px; margin: 0 auto; padding: 16px 14px; }
 
-/* 统计卡片 */
 .stats-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
 .stat-card {
   flex: 1; min-width: 80px; background: var(--card-bg);
@@ -87,7 +83,6 @@ body {
 .stat-card .stat-num { font-size: 22px; font-weight: 700; color: var(--primary); }
 .stat-card .stat-label { font-size: 11px; color: var(--text-light); margin-top: 2px; }
 
-/* 产品列表 */
 .product-list { display: flex; flex-direction: column; gap: 10px; }
 .product-item {
   background: var(--card-bg); border-radius: var(--radius);
@@ -110,7 +105,6 @@ body {
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
 .empty-state .empty-icon { font-size: 42px; margin-bottom: 10px; }
 
-/* ===== 编辑弹窗 ===== */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 2000;
   background: rgba(0,0,0,0.5); display: flex;
@@ -160,14 +154,12 @@ body {
   display: flex; gap: 10px; justify-content: flex-end;
 }
 
-/* 图片上传 */
 .upload-area {
   border: 2px dashed rgba(0,0,0,0.12); border-radius: 10px;
   padding: 18px; text-align: center; cursor: pointer;
   transition: all 0.25s; position: relative;
 }
 .upload-area:hover { border-color: var(--primary); background: rgba(184,134,11,0.03); }
-/* ✅ 修复：添加拖拽悬停时的视觉反馈样式 */
 .upload-area.dragover { border-color: var(--primary); background: rgba(184,134,11,0.08); box-shadow: 0 0 0 4px rgba(184,134,11,0.12); }
 .upload-area .upload-icon { font-size: 28px; margin-bottom: 6px; }
 .upload-area p { font-size: 12px; color: var(--text-light); }
@@ -199,7 +191,10 @@ body {
 .progress-bar .progress-fill { height: 100%; background: var(--primary); transition: width 0.3s; width: 0%; }
 .progress-text { font-size: 11px; color: var(--text-light); margin-top: 4px; text-align: center; }
 
-/* Toast */
+/* ✅ 优化：保存时的独立进度条样式 */
+.save-progress { display: none; margin-top: 12px; }
+.save-progress.show { display: block; }
+
 .toast-container {
   position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
   z-index: 9999; display: flex; flex-direction: column; gap: 6px; pointer-events: none;
@@ -216,7 +211,6 @@ body {
 @keyframes toastIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
 @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
 
-/* 确认弹窗 */
 .confirm-overlay {
   position: fixed; inset: 0; z-index: 3000;
   background: rgba(0,0,0,0.5); display: flex;
@@ -231,7 +225,6 @@ body {
 .confirm-box p { font-size: 14px; margin-bottom: 18px; line-height: 1.5; }
 .confirm-box .confirm-actions { display: flex; gap: 10px; justify-content: center; }
 
-/* Loading spinner */
 .spinner {
   width: 28px; height: 28px; border: 3px solid #eee;
   border-top-color: var(--primary); border-radius: 50%;
@@ -242,7 +235,6 @@ body {
 </head>
 <body>
 
-<!-- ===== 登录页 ===== -->
 <div class="login-page" id="loginPage">
   <h1>✦ 绒颜 ✦</h1>
   <p class="sub">产品管理后台</p>
@@ -259,7 +251,6 @@ body {
   </div>
 </div>
 
-<!-- ===== 管理主界面 ===== -->
 <div id="adminPanel" style="display:none">
   <div class="admin-header">
     <h2>✦ 绒颜管理</h2>
@@ -275,7 +266,6 @@ body {
   </div>
 </div>
 
-<!-- ===== 编辑弹窗 ===== -->
 <div class="modal-overlay" id="editModal">
   <div class="modal-content">
     <div class="modal-header">
@@ -319,6 +309,11 @@ body {
         </div>
         <div class="image-preview-list" id="imagePreviewList"></div>
       </div>
+      <!-- ✅ 优化：保存时独立的进度条，不与上传压缩进度条混用 -->
+      <div class="save-progress" id="saveProgress">
+        <div class="progress-bar"><div class="progress-fill" id="saveProgressFill"></div></div>
+        <div class="progress-text" id="saveProgressText">保存中...</div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn" id="cancelBtn">取消</button>
@@ -327,7 +322,6 @@ body {
   </div>
 </div>
 
-<!-- ===== 确认弹窗 ===== -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
     <p id="confirmMsg">确定删除？</p>
@@ -338,12 +332,10 @@ body {
   </div>
 </div>
 
-<!-- Toast 容器 -->
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
 (function () {
-  // ===== 配置 =====
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
@@ -351,13 +343,11 @@ body {
   const IMAGES_PATH   = 'rongyan/images';
   const API_BASE = 'https://api.github.com';
 
-  // ===== 全局状态 =====
   let TOKEN = '';
   let products = [];
   let editingId = null;
-  let tempImages = []; // { base64, file, uploadedUrl, isCover, existing }
+  let tempImages = [];
 
-  // ===== DOM =====
   const $ = id => document.getElementById(id);
   const loginPage = $('loginPage');
   const adminPanel = $('adminPanel');
@@ -384,8 +374,11 @@ body {
   const confirmMsg = $('confirmMsg');
   const confirmYes = $('confirmYes');
   const confirmNo = $('confirmNo');
+  // ✅ 新增：保存进度条 DOM
+  const saveProgress = $('saveProgress');
+  const saveProgressFill = $('saveProgressFill');
+  const saveProgressText = $('saveProgressText');
 
-  // ✅ 修复：XSS 转义函数
   function escapeHtml(str) {
     if (str == null) return '';
     return String(str)
@@ -396,14 +389,12 @@ body {
       .replace(/'/g, '&#39;');
   }
 
-  // ✅ 优化：使用 TextEncoder 替代 btoa(unescape(encodeURIComponent()))
   function encodeToBase64(str) {
     const bytes = new TextEncoder().encode(str);
     const binStr = Array.from(bytes, b => String.fromCodePoint(b)).join('');
     return btoa(binStr);
   }
 
-  // ===== Toast =====
   function toast(msg, type = 'info') {
     const el = document.createElement('div');
     el.className = 'toast ' + type;
@@ -412,7 +403,6 @@ body {
     setTimeout(() => el.remove(), 3200);
   }
 
-  // ✅ 优化：confirm2 重命名为语义化的 showConfirm
   function showConfirm(msg) {
     return new Promise(resolve => {
       confirmMsg.textContent = msg;
@@ -429,7 +419,6 @@ body {
     });
   }
 
-  // ===== GitHub API 封装 =====
   const headers = () => ({
     'Authorization': `Bearer ${TOKEN}`,
     'Accept': 'application/vnd.github.v3+json',
@@ -443,6 +432,17 @@ body {
     if (res.status === 404) return null;
     if (!res.ok) throw new Error(`API 错误: ${res.status}`);
     return await res.json();
+  }
+
+  // ✅ 优化：安全解码 base64 content，去除可能的换行符
+  function decodeFileContent(content) {
+    const cleaned = content.replace(/\n/g, '');
+    const binary = atob(cleaned);
+    try {
+      return decodeURIComponent(escape(binary));
+    } catch {
+      return binary;
+    }
   }
 
   async function putFile(path, content, message, sha) {
@@ -470,7 +470,6 @@ body {
     return await res.json();
   }
 
-  // ===== 图片压缩（Canvas → webp） =====
   function compressImage(file, maxWidth = 1200, quality = 0.82) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -501,7 +500,6 @@ body {
     });
   }
 
-  // ===== 登录 =====
   async function doLogin() {
     const token = tokenInput.value.trim();
     if (!token) { showLoginError('请输入 Token'); return; }
@@ -515,11 +513,21 @@ body {
       const res = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}`, { headers: headers() });
       if (!res.ok) throw new Error(res.status === 401 ? 'Token 无效' : '连接失败');
 
-      // 检查写入权限
       const permRes = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${PRODUCTS_PATH}?ref=${GITHUB_BRANCH}`, {
         headers: headers()
       });
       if (permRes.status === 403) throw new Error('Token 没有仓库 Contents 权限');
+
+      // ✅ 优化：检查 fine-grained token 的过期信息
+      try {
+        const tokenInfoRes = await fetch(`${API_BASE}/user`, { headers: headers() });
+        if (tokenInfoRes.ok) {
+          const remaining = tokenInfoRes.headers.get('x-ratelimit-remaining');
+          if (remaining !== null && parseInt(remaining) < 100) {
+            toast(`API 配额剩余 ${remaining} 次，请注意节约使用`, 'info');
+          }
+        }
+      } catch {}
 
       sessionStorage.setItem('_ry_token', token);
       showAdmin();
@@ -540,7 +548,6 @@ body {
   loginBtn.addEventListener('click', doLogin);
   tokenInput.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-  // ===== 显示管理面板 =====
   async function showAdmin() {
     loginPage.style.display = 'none';
     adminPanel.style.display = 'block';
@@ -555,13 +562,13 @@ body {
     tokenInput.value = '';
   }
 
-  // ===== 加载产品 =====
   async function loadProducts() {
     productList.innerHTML = '<div class="empty-state"><div class="spinner"></div><p>加载中...</p></div>';
     try {
       const file = await getFile(PRODUCTS_PATH);
       if (file) {
-        const decoded = decodeURIComponent(escape(atob(file.content)));
+        // ✅ 优化：使用安全的 content 解码函数
+        const decoded = decodeFileContent(file.content);
         const data = JSON.parse(decoded);
         products = Array.isArray(data) ? data : (data.products || []);
       } else {
@@ -580,7 +587,6 @@ body {
     products.forEach(p => { cats[p.category] = (cats[p.category] || 0) + 1; });
     let html = `<div class="stat-card"><div class="stat-num">${products.length}</div><div class="stat-label">全部产品</div></div>`;
     Object.entries(cats).forEach(([cat, count]) => {
-      // ✅ 修复：分类名转义
       html += `<div class="stat-card"><div class="stat-num">${count}</div><div class="stat-label">${escapeHtml(cat)}</div></div>`;
     });
     statsBar.innerHTML = html;
@@ -591,7 +597,6 @@ body {
       productList.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>暂无产品，点击上方"＋ 添加"开始</p></div>';
       return;
     }
-    // ✅ 修复：所有动态数据做 XSS 转义
     productList.innerHTML = products.slice().reverse().map(p => {
       const safeName = escapeHtml(p.name || '');
       const safeCategory = escapeHtml(p.category || '');
@@ -599,7 +604,7 @@ body {
       const imgCount = (p.images || []).length;
       return `
         <div class="product-item" data-id="${p.id}">
-          <div class="item-img"><img src="${safeCover}" alt="${safeName}" loading="lazy"></div>
+          <div class="item-img"><img src="${safeCover}" alt="${safeName}" loading="lazy" decoding="async"></div>
           <div class="item-info">
             <div class="item-name">${safeName}</div>
             <div class="item-meta">
@@ -617,7 +622,6 @@ body {
     }).join('');
   }
 
-  // 列表事件代理
   productList.addEventListener('click', async (e) => {
     const editB = e.target.closest('.edit-btn');
     const delB = e.target.closest('.del-btn');
@@ -625,7 +629,6 @@ body {
     if (delB) await deleteProduct(parseInt(delB.dataset.id));
   });
 
-  // ===== 编辑弹窗 =====
   function openAddModal() {
     editingId = null;
     modalTitle.textContent = '添加产品';
@@ -635,6 +638,7 @@ body {
     $('fDesc').value = '';
     tempImages = [];
     renderImagePreviews();
+    saveProgress.classList.remove('show');
     editModal.classList.add('show');
   }
 
@@ -653,12 +657,14 @@ body {
       existing: true
     }));
     renderImagePreviews();
+    saveProgress.classList.remove('show');
     editModal.classList.add('show');
   }
 
   function closeEditModal() {
     editModal.classList.remove('show');
     tempImages = [];
+    saveProgress.classList.remove('show');
   }
 
   function renderImagePreviews() {
@@ -666,7 +672,6 @@ body {
       imagePreviewList.innerHTML = '';
       return;
     }
-    // ✅ 修复：图片 URL 转义
     imagePreviewList.innerHTML = tempImages.map((img, i) => {
       const src = img.uploadedUrl
         ? escapeHtml(img.uploadedUrl)
@@ -698,7 +703,6 @@ body {
     renderImagePreviews();
   });
 
-  // 文件选择
   fileInput.addEventListener('change', async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
@@ -725,7 +729,6 @@ body {
     setTimeout(() => uploadProgress.classList.remove('show'), 1500);
   });
 
-  // 拖拽
   uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
   uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
   uploadArea.addEventListener('drop', (e) => {
@@ -738,7 +741,6 @@ body {
     }
   });
 
-  // ✅ 优化：带重试的上传函数（最多 3 次）
   async function uploadImageWithRetry(path, base64, message, maxRetries = 3) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
@@ -752,7 +754,6 @@ body {
     }
   }
 
-  // ===== 保存产品 =====
   async function saveProduct() {
     const name = $('fName').value.trim();
     const price = parseFloat($('fPrice').value);
@@ -765,11 +766,17 @@ body {
 
     saveBtn.disabled = true;
     saveBtn.textContent = '保存中...';
+    // ✅ 优化：使用独立的保存进度条
+    saveProgress.classList.add('show');
+    saveProgressFill.style.width = '0%';
+    saveProgressText.textContent = '准备保存...';
 
     try {
-      // 1. 上传新图片到 GitHub
       const uploadedUrls = [];
       const timestamp = Date.now();
+      const newImages = tempImages.filter(img => !img.existing || !img.uploadedUrl);
+      const totalSteps = newImages.length + 2; // 图片数 + 清理旧图 + 保存JSON
+      let currentStep = 0;
 
       for (let i = 0; i < tempImages.length; i++) {
         const img = tempImages[i];
@@ -777,31 +784,25 @@ body {
           uploadedUrls.push(img.uploadedUrl);
           continue;
         }
-        // 上传新图片
         const filename = `p${timestamp}_${i}.webp`;
         const path = `${IMAGES_PATH}/${filename}`;
-        uploadProgress.classList.add('show');
-        progressText.textContent = `上传图片 ${i + 1}/${tempImages.length}...`;
-        progressFill.style.width = ((i / tempImages.length) * 100) + '%';
+        saveProgressText.textContent = `上传图片 ${newImages.indexOf(img) + 1}/${newImages.length}...`;
+        saveProgressFill.style.width = ((currentStep / totalSteps) * 100) + '%';
 
-        // ✅ 优化：使用带重试的上传
         await uploadImageWithRetry(path, img.base64, `upload image: ${filename}`);
         const url = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${path}`;
         uploadedUrls.push(url);
         img.uploadedUrl = url;
+        currentStep++;
 
-        // GitHub API 限速，稍等
         await new Promise(r => setTimeout(r, 800));
       }
 
-      progressFill.style.width = '100%';
-
-      // 2. 确定封面
       let coverIdx = tempImages.findIndex(img => img.isCover);
       if (coverIdx < 0) coverIdx = 0;
       const cover = uploadedUrls[coverIdx];
 
-      // ✅ 优化：编辑模式下，清理 GitHub 上不再使用的旧图片
+      // 清理旧图片
       if (editingId !== null) {
         const oldProduct = products.find(p => p.id === editingId);
         if (oldProduct && oldProduct.images) {
@@ -811,6 +812,7 @@ body {
               const match = oldUrl.match(/rongyan\/images\/([^?]+)/);
               if (match) {
                 try {
+                  saveProgressText.textContent = `清理旧图片: ${match[1]}`;
                   const file = await getFile(`${IMAGES_PATH}/${match[1]}`);
                   if (file) {
                     await deleteFile(`${IMAGES_PATH}/${match[1]}`, file.sha);
@@ -824,8 +826,9 @@ body {
           }
         }
       }
+      currentStep++;
+      saveProgressFill.style.width = ((currentStep / totalSteps) * 100) + '%';
 
-      // 3. 更新产品数据
       if (editingId !== null) {
         const idx = products.findIndex(p => p.id === editingId);
         if (idx >= 0) {
@@ -839,12 +842,14 @@ body {
         });
       }
 
-      // 4. 保存 products.json
-      // ✅ 优化：使用 TextEncoder 替代 btoa(unescape(encodeURIComponent()))
+      saveProgressText.textContent = '保存产品数据...';
       const jsonContent = encodeToBase64(JSON.stringify(products, null, 2));
       const existingFile = await getFile(PRODUCTS_PATH);
       const sha = existingFile ? existingFile.sha : null;
       await putFile(PRODUCTS_PATH, jsonContent, `update products: ${name}`, sha);
+
+      saveProgressFill.style.width = '100%';
+      saveProgressText.textContent = '保存成功！';
 
       toast('保存成功！', 'success');
       closeEditModal();
@@ -852,22 +857,20 @@ body {
 
     } catch (err) {
       toast('保存失败: ' + err.message, 'error');
+      saveProgressText.textContent = '保存失败: ' + err.message;
     } finally {
       saveBtn.disabled = false;
       saveBtn.textContent = '保存';
     }
   }
 
-  // ===== 删除产品 =====
   async function deleteProduct(id) {
     const p = products.find(x => x.id === id);
     if (!p) return;
-    // ✅ 使用重命名后的 showConfirm
     const ok = await showConfirm(`确定删除「${p.name}」？\n（产品图片也会一并删除）`);
     if (!ok) return;
 
     try {
-      // 1. 删除图片文件
       for (const imgUrl of (p.images || [])) {
         const match = imgUrl.match(/rongyan\/images\/([^?]+)/);
         if (match) {
@@ -882,11 +885,8 @@ body {
         }
       }
 
-      // 2. 从列表移除
       products = products.filter(x => x.id !== id);
 
-      // 3. 保存 products.json
-      // ✅ 优化：使用 TextEncoder
       const jsonContent = encodeToBase64(JSON.stringify(products, null, 2));
       const existingFile = await getFile(PRODUCTS_PATH);
       const sha = existingFile ? existingFile.sha : null;
@@ -900,7 +900,6 @@ body {
     }
   }
 
-  // ===== 事件绑定 =====
   addBtn.addEventListener('click', openAddModal);
   refreshBtn.addEventListener('click', loadProducts);
   logoutBtn.addEventListener('click', doLogout);
@@ -912,7 +911,6 @@ body {
     if (e.target === editModal) closeEditModal();
   });
 
-  // ===== 自动登录（sessionStorage） =====
   const savedToken = sessionStorage.getItem('_ry_token');
   if (savedToken) {
     TOKEN = savedToken;

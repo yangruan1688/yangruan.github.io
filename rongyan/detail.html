@@ -233,15 +233,15 @@ body {
 
     let bestData = null;
 
-    if (results[0]) {
+    // GitHub Raw 是权威源，只要请求成功（不为 null）就用它的数据，即使是空数组
+    if (results[0] !== null) {
       bestData = Array.isArray(results[0]) ? results[0] : (results[0].products || []);
-    }
-
-    if (!bestData) {
+    } else {
+      // 仅当 Raw 请求失败（网络错误/超时）时才降级使用 CDN
       for (let i = 1; i < results.length; i++) {
-        if (results[i]) {
+        if (results[i] !== null) {
           bestData = Array.isArray(results[i]) ? results[i] : (results[i].products || []);
-          if (bestData.length > 0) break;
+          break;
         }
       }
     }

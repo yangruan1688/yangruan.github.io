@@ -389,7 +389,13 @@ body {
 
   function escapeHtml(str) {
     if (str == null) return '';
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/`/g, '&#96;');
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/`/g, '&#96;');
   }
 
   function encodeToBase64(str) {
@@ -402,7 +408,9 @@ body {
     const cleaned = content.replace(/\n/g, '');
     const binary = atob(cleaned);
     const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
     return new TextDecoder('utf-8').decode(bytes);
   }
 
@@ -437,19 +445,27 @@ body {
   });
 
   async function getFile(path) {
-    const res = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`, { headers: headers() });
+    const res = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`, {
+      headers: headers()
+    });
     if (res.status === 404) return null;
     if (!res.ok) throw new Error(`API 错误: ${res.status}`);
     return await res.json();
   }
 
   async function putFile(path, content, message, sha) {
-    const body = { message, content, branch: GITHUB_BRANCH };
+    const body = {
+      message, content, branch: GITHUB_BRANCH
+    };
     if (sha) body.sha = sha;
     const res = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
-      method: 'PUT', headers: headers(), body: JSON.stringify(body)
+      method: 'PUT', headers: headers(),
+      body: JSON.stringify(body)
     });
-    if (!res.ok) { const err = await res.json(); throw new Error(err.message || '上传失败'); }
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || '上传失败');
+    }
     return await res.json();
   }
 
@@ -462,34 +478,20 @@ body {
     return await res.json();
   }
 
-  // ✅ 修复：purge 用 POST，延迟 3 秒等 jsDelivr 同步，二次确认 purge
-  async function purgeCdnCache() {
-    const purgePaths = [
-      `rongyan/products.json`,
-      `rongyan/images/`
-    ];
-
-    // 第一轮：等 3 秒让 jsDelivr 检测到新 commit，然后 purge
-    await new Promise(r => setTimeout(r, 3000));
-
-    for (const p of purgePaths) {
-      const purgeUrl = `https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${p}`;
-      try {
-        await fetch(purgeUrl, { method: 'POST', mode: 'no-cors' });
-        console.log('[purge 第1轮] POST:', p);
-      } catch (e) { console.warn('[purge 第1轮] 失败:', p, e.message); }
+  // ✅ 新增：刷新 jsDelivr CDN 缓存
+  async function purgeCDN() {
+    const basePath = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
+    const gcorePath = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
+    try {
+      // 并行刷新两个 CDN
+      await Promise.allSettled([
+        fetch(`https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`, { method: 'GET' }),
+        fetch(`https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`, { method: 'GET' })
+      ]);
+      console.log('CDN 缓存已刷新');
+    } catch (e) {
+      console.warn('CDN 缓存刷新失败:', e.message);
     }
-
-    // 第二轮：再等 5 秒做二次确认 purge（确保边缘节点都更新）
-    setTimeout(async () => {
-      for (const p of purgePaths) {
-        const purgeUrl = `https://purge.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${p}`;
-        try {
-          await fetch(purgeUrl, { method: 'POST', mode: 'no-cors' });
-          console.log('[purge 第2轮] POST:', p);
-        } catch (e) { console.warn('[purge 第2轮] 失败:', p, e.message); }
-      }
-    }, 5000);
   }
 
   function compressImage(file, maxWidth = 1200, quality = 0.82) {
@@ -526,6 +528,7 @@ body {
   async function checkTokenExpiration() {
     try {
       const res = await fetch(`${API_BASE}/user`, { headers: headers() });
+
       if (res.status === 401) {
         tokenWarningText.textContent = 'Token 已失效，请重新生成';
         tokenWarning.style.display = 'flex';
@@ -534,15 +537,19 @@ body {
         tokenWarning.style.color = '#721c24';
         return;
       }
+
       const remaining = res.headers.get('x-ratelimit-remaining');
+
       if (remaining !== null && parseInt(remaining) < 100) {
         toast(`API 配额剩余 ${remaining} 次，请注意节约使用`, 'warning');
       }
+
       const loginTime = safeSessionGet('_ry_login_time');
       if (loginTime) {
         const elapsed = Date.now() - parseInt(loginTime);
         const daysElapsed = Math.floor(elapsed / (1000 * 60 * 60 * 24));
         const daysLeft = 30 - daysElapsed;
+
         if (daysLeft <= 0) {
           tokenWarningText.textContent = 'Token 可能已过期（登录已超过 30 天），如操作失败请重新生成';
           tokenWarning.style.display = 'flex';
@@ -556,25 +563,39 @@ body {
           tokenWarning.style.display = 'none';
         }
       }
-    } catch (e) { console.warn('Token 检测失败:', e.message); }
+    } catch (e) {
+      console.warn('Token 检测失败:', e.message);
+    }
   }
 
-  function safeSessionSet(key, value) { try { sessionStorage.setItem(key, value); } catch (e) {} }
-  function safeSessionGet(key) { try { return sessionStorage.getItem(key); } catch (e) { return null; } }
-  function safeSessionRemove(key) { try { sessionStorage.removeItem(key); } catch (e) {} }
+  function safeSessionSet(key, value) {
+    try { sessionStorage.setItem(key, value); } catch (e) { /* 隐私模式或存储满 */ }
+  }
+  function safeSessionGet(key) {
+    try { return sessionStorage.getItem(key); } catch (e) { return null; }
+  }
+  function safeSessionRemove(key) {
+    try { sessionStorage.removeItem(key); } catch (e) { /* ignore */ }
+  }
 
   async function doLogin() {
     const token = tokenInput.value.trim();
     if (!token) { showLoginError('请输入 Token'); return; }
+
     loginBtn.disabled = true;
     loginBtn.textContent = '验证中...';
     showLoginError('');
+
     try {
       TOKEN = token;
       const res = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}`, { headers: headers() });
       if (!res.ok) throw new Error(res.status === 401 ? 'Token 无效或已过期' : '连接失败');
-      const permRes = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${PRODUCTS_PATH}?ref=${GITHUB_BRANCH}`, { headers: headers() });
+
+      const permRes = await fetch(`${API_BASE}/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${PRODUCTS_PATH}?ref=${GITHUB_BRANCH}`, {
+        headers: headers()
+      });
       if (permRes.status === 403) throw new Error('Token 没有仓库 Contents 权限');
+
       safeSessionSet('_ry_token', token);
       safeSessionSet('_ry_login_time', String(Date.now()));
       showAdmin();
@@ -587,17 +608,29 @@ body {
     }
   }
 
-  function showLoginError(msg) { loginError.textContent = msg; loginError.style.display = msg ? 'block' : 'none'; }
+  function showLoginError(msg) {
+    loginError.textContent = msg;
+    loginError.style.display = msg ? 'block' : 'none';
+  }
 
   loginBtn.addEventListener('click', doLogin);
   tokenInput.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
-  async function showAdmin() { loginPage.style.display = 'none'; adminPanel.style.display = 'block'; await loadProducts(); checkTokenExpiration(); }
+  async function showAdmin() {
+    loginPage.style.display = 'none';
+    adminPanel.style.display = 'block';
+    await loadProducts();
+    checkTokenExpiration();
+  }
 
   function doLogout() {
-    safeSessionRemove('_ry_token'); safeSessionRemove('_ry_login_time');
-    TOKEN = ''; adminPanel.style.display = 'none'; loginPage.style.display = 'flex';
-    tokenInput.value = ''; tokenWarning.style.display = 'none';
+    safeSessionRemove('_ry_token');
+    safeSessionRemove('_ry_login_time');
+    TOKEN = '';
+    adminPanel.style.display = 'none';
+    loginPage.style.display = 'flex';
+    tokenInput.value = '';
+    tokenWarning.style.display = 'none';
   }
 
   async function loadProducts() {
@@ -608,9 +641,15 @@ body {
         const decoded = decodeFileContent(file.content);
         const data = JSON.parse(decoded);
         products = Array.isArray(data) ? data : (data.products || []);
-      } else { products = []; }
-    } catch (err) { toast('加载失败: ' + err.message, 'error'); products = []; }
-    renderStats(); renderList();
+      } else {
+        products = [];
+      }
+    } catch (err) {
+      toast('加载失败: ' + err.message, 'error');
+      products = [];
+    }
+    renderStats();
+    renderList();
   }
 
   function renderStats() {
@@ -649,7 +688,8 @@ body {
             <button class="btn btn-sm edit-btn" data-id="${p.id}">编辑</button>
             <button class="btn btn-sm btn-danger del-btn" data-id="${p.id}">删除</button>
           </div>
-        </div>`;
+        </div>
+      `;
     }).join('');
   }
 
@@ -658,18 +698,29 @@ body {
     const delB = e.target.closest('.del-btn');
     if (editB) openEditModal(parseInt(editB.dataset.id));
     if (delB) {
-      delB.disabled = true; delB.textContent = '删除中...';
-      try { await deleteProduct(parseInt(delB.dataset.id)); }
-      finally { delB.disabled = false; delB.textContent = '删除'; }
+      delB.disabled = true;
+      delB.textContent = '删除中...';
+      try {
+        await deleteProduct(parseInt(delB.dataset.id));
+      } finally {
+        delB.disabled = false;
+        delB.textContent = '删除';
+      }
     }
   });
 
   function openAddModal() {
     editingId = null;
     modalTitle.textContent = '添加产品';
-    $('fName').value = ''; $('fPrice').value = ''; $('fCategory').value = '发饰'; $('fDesc').value = '';
-    tempImages = []; originalImages = []; hasUnsavedChanges = false;
-    renderImagePreviews(); saveProgress.classList.remove('show');
+    $('fName').value = '';
+    $('fPrice').value = '';
+    $('fCategory').value = '发饰';
+    $('fDesc').value = '';
+    tempImages = [];
+    originalImages = [];
+    hasUnsavedChanges = false;
+    renderImagePreviews();
+    saveProgress.classList.remove('show');
     editModal.classList.add('show');
   }
 
@@ -678,21 +729,31 @@ body {
     if (!p) return;
     editingId = id;
     modalTitle.textContent = '编辑产品';
-    $('fName').value = p.name; $('fPrice').value = p.price;
-    $('fCategory').value = p.category; $('fDesc').value = p.description || '';
-    tempImages = (p.images || []).map((url) => ({
-      uploadedUrl: url, isCover: url === p.cover, existing: true, base64: null
+    $('fName').value = p.name;
+    $('fPrice').value = p.price;
+    $('fCategory').value = p.category;
+    $('fDesc').value = p.description || '';
+    tempImages = (p.images || []).map((url, i) => ({
+      uploadedUrl: url,
+      isCover: url === p.cover,
+      existing: true
     }));
     originalImages = [...(p.images || [])];
     hasUnsavedChanges = false;
-    renderImagePreviews(); saveProgress.classList.remove('show');
+    renderImagePreviews();
+    saveProgress.classList.remove('show');
     editModal.classList.add('show');
   }
 
   async function closeEditModal() {
-    if (hasUnsavedChanges) { const ok = await showConfirm('有未保存的修改，确定要关闭吗？'); if (!ok) return; }
+    if (hasUnsavedChanges) {
+      const ok = await showConfirm('有未保存的修改，确定要关闭吗？');
+      if (!ok) return;
+    }
     editModal.classList.remove('show');
-    tempImages = []; originalImages = []; hasUnsavedChanges = false;
+    tempImages = [];
+    originalImages = [];
+    hasUnsavedChanges = false;
     saveProgress.classList.remove('show');
   }
 
@@ -702,7 +763,10 @@ body {
   });
 
   function renderImagePreviews() {
-    if (tempImages.length === 0) { imagePreviewList.innerHTML = ''; return; }
+    if (tempImages.length === 0) {
+      imagePreviewList.innerHTML = '';
+      return;
+    }
     imagePreviewList.innerHTML = tempImages.map((img, i) => {
       const src = img.uploadedUrl
         ? escapeHtml(img.uploadedUrl)
@@ -715,7 +779,8 @@ body {
             <button class="img-btn" data-action="remove" data-index="${i}" title="删除">✕</button>
             ${!img.isCover ? `<button class="img-btn set-cover" data-action="cover" data-index="${i}" title="设为封面">★</button>` : ''}
           </div>
-        </div>`;
+        </div>
+      `;
     }).join('');
   }
 
@@ -725,45 +790,85 @@ body {
     hasUnsavedChanges = true;
     const idx = parseInt(btn.dataset.index);
     const action = btn.dataset.action;
-    if (action === 'remove') { tempImages.splice(idx, 1); }
-    else if (action === 'cover') { tempImages.forEach(img => img.isCover = false); tempImages[idx].isCover = true; }
+    if (action === 'remove') {
+      tempImages.splice(idx, 1);
+    } else if (action === 'cover') {
+      tempImages.forEach(img => img.isCover = false);
+      tempImages[idx].isCover = true;
+    }
     renderImagePreviews();
   });
 
-  function isImageFile(file) { return file.type && file.type.startsWith('image/'); }
+  function isImageFile(file) {
+    return file.type && file.type.startsWith('image/');
+  }
 
   fileInput.addEventListener('change', async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
     fileInput.value = '';
+
     uploadProgress.classList.add('show');
-    let done = 0, skipped = 0;
+    let done = 0;
+    let skipped = 0;
+
     for (const file of files) {
-      if (!isImageFile(file)) { toast(`${file.name} 不是图片文件，已跳过`, 'warning'); skipped++; done++; continue; }
-      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) { toast(`${file.name} 超过 ${MAX_FILE_SIZE_MB}MB 限制，已跳过`, 'warning'); skipped++; done++; continue; }
+      if (!isImageFile(file)) {
+        toast(`${file.name} 不是图片文件，已跳过`, 'warning');
+        skipped++;
+        done++;
+        continue;
+      }
+
+      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+        toast(`${file.name} 超过 ${MAX_FILE_SIZE_MB}MB 限制，已跳过`, 'warning');
+        skipped++;
+        done++;
+        continue;
+      }
+
       progressText.textContent = `压缩中 (${done + 1}/${files.length}): ${file.name}`;
       progressFill.style.width = ((done / files.length) * 100) + '%';
       try {
         const result = await compressImage(file);
-        if (result.size > MAX_FILE_SIZE_MB * 1024 * 1024) { toast(`${file.name} 压缩后仍过大，已跳过`, 'warning'); skipped++; }
-        else { tempImages.push({ base64: result.base64, isCover: tempImages.length === 0, existing: false, uploadedUrl: null }); hasUnsavedChanges = true; renderImagePreviews(); }
-      } catch (err) { toast('图片处理失败: ' + file.name + ' (' + err.message + ')', 'error'); skipped++; }
+        if (result.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+          toast(`${file.name} 压缩后仍过大，已跳过`, 'warning');
+          skipped++;
+        } else {
+          tempImages.push({ base64: result.base64, isCover: tempImages.length === 0 });
+          hasUnsavedChanges = true;
+          renderImagePreviews();
+        }
+      } catch (err) {
+        toast('图片处理失败: ' + file.name + ' (' + err.message + ')', 'error');
+        skipped++;
+      }
       done++;
       progressFill.style.width = ((done / files.length) * 100) + '%';
     }
-    progressText.textContent = skipped > 0 ? `完成 ${files.length - skipped}/${files.length} 张，${skipped} 张跳过` : `完成，共 ${files.length} 张图片`;
+
+    const msg = skipped > 0
+      ? `完成 ${files.length - skipped}/${files.length} 张，${skipped} 张跳过`
+      : `完成，共 ${files.length} 张图片`;
+    progressText.textContent = msg;
     setTimeout(() => uploadProgress.classList.remove('show'), 2000);
   });
 
   uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
   uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
   uploadArea.addEventListener('drop', (e) => {
-    e.preventDefault(); uploadArea.classList.remove('dragover');
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
     const dt = e.dataTransfer;
     if (dt.files.length) {
       const imageFiles = Array.from(dt.files).filter(isImageFile);
-      if (imageFiles.length === 0) { toast('请拖入图片文件', 'warning'); return; }
-      if (imageFiles.length < dt.files.length) toast(`已过滤 ${dt.files.length - imageFiles.length} 个非图片文件`, 'warning');
+      if (imageFiles.length === 0) {
+        toast('请拖入图片文件', 'warning');
+        return;
+      }
+      if (imageFiles.length < dt.files.length) {
+        toast(`已过滤 ${dt.files.length - imageFiles.length} 个非图片文件`, 'warning');
+      }
       const newDT = new DataTransfer();
       imageFiles.forEach(f => newDT.items.add(f));
       fileInput.files = newDT.files;
@@ -773,8 +878,9 @@ body {
 
   async function uploadImageWithRetry(path, base64, message, maxRetries = 3) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try { return await putFile(path, base64, message); }
-      catch (err) {
+      try {
+        return await putFile(path, base64, message);
+      } catch (err) {
         if (attempt >= maxRetries) throw err;
         const wait = attempt * 2000;
         toast(`上传失败，${wait / 1000}s 后重试 (${attempt}/${maxRetries})`, 'info');
@@ -788,36 +894,48 @@ body {
     const price = parseFloat($('fPrice').value);
     const category = $('fCategory').value;
     const description = $('fDesc').value.trim();
+
     if (!name) { toast('请输入产品名称', 'error'); return; }
     if (isNaN(price) || price < 0) { toast('请输入有效价格', 'error'); return; }
     if (tempImages.length === 0) { toast('请至少上传一张图片', 'error'); return; }
-    saveBtn.disabled = true; saveBtn.textContent = '保存中...';
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = '保存中...';
     saveProgress.classList.add('show');
     saveProgressFill.style.width = '0%';
     saveProgressText.textContent = '准备保存...';
+
     try {
       const uploadedUrls = [];
       const timestamp = Date.now();
       const newImages = tempImages.filter(img => !img.existing || !img.uploadedUrl);
       const totalSteps = newImages.length + 2;
       let currentStep = 0;
+
       for (let i = 0; i < tempImages.length; i++) {
         const img = tempImages[i];
-        if (img.existing && img.uploadedUrl) { uploadedUrls.push(img.uploadedUrl); continue; }
+        if (img.existing && img.uploadedUrl) {
+          uploadedUrls.push(img.uploadedUrl);
+          continue;
+        }
         const filename = `p${timestamp}_${i}.webp`;
         const path = `${IMAGES_PATH}/${filename}`;
         saveProgressText.textContent = `上传图片 ${currentStep + 1}/${newImages.length}...`;
         saveProgressFill.style.width = ((currentStep / totalSteps) * 100) + '%';
+
         await uploadImageWithRetry(path, img.base64, `upload image: ${filename}`);
         const url = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${path}`;
         uploadedUrls.push(url);
         img.uploadedUrl = url;
         currentStep++;
+
         await new Promise(r => setTimeout(r, 800));
       }
+
       let coverIdx = tempImages.findIndex(img => img.isCover);
       if (coverIdx < 0) coverIdx = 0;
       const cover = uploadedUrls[coverIdx];
+
       if (editingId !== null && originalImages.length > 0) {
         const keepUrls = new Set(uploadedUrls);
         for (const oldUrl of originalImages) {
@@ -827,39 +945,60 @@ body {
               try {
                 saveProgressText.textContent = `清理旧图片: ${match[1]}`;
                 const file = await getFile(`${IMAGES_PATH}/${match[1]}`);
-                if (file) { await deleteFile(`${IMAGES_PATH}/${match[1]}`, file.sha); await new Promise(r => setTimeout(r, 500)); }
-              } catch (e) { console.warn('清理旧图片失败:', match[1], e.message); }
+                if (file) {
+                  await deleteFile(`${IMAGES_PATH}/${match[1]}`, file.sha);
+                  await new Promise(r => setTimeout(r, 500));
+                }
+              } catch (e) {
+                console.warn('清理旧图片失败:', match[1], e.message);
+              }
             }
           }
         }
       }
       currentStep++;
       saveProgressFill.style.width = ((currentStep / totalSteps) * 100) + '%';
+
       if (editingId !== null) {
         const idx = products.findIndex(p => p.id === editingId);
-        if (idx >= 0) products[idx] = { ...products[idx], name, price, category, description, images: uploadedUrls, cover };
+        if (idx >= 0) {
+          products[idx] = { ...products[idx], name, price, category, description, images: uploadedUrls, cover };
+        }
       } else {
         const maxId = products.reduce((max, p) => Math.max(max, p.id || 0), 0);
-        products.push({ id: maxId + 1, name, price, category, description, images: uploadedUrls, cover, createdAt: new Date().toISOString() });
+        products.push({
+          id: maxId + 1, name, price, category, description,
+          images: uploadedUrls, cover, createdAt: new Date().toISOString()
+        });
       }
+
       saveProgressText.textContent = '保存产品数据...';
       const jsonContent = encodeToBase64(JSON.stringify(products, null, 2));
       const existingFile = await getFile(PRODUCTS_PATH);
       const sha = existingFile ? existingFile.sha : null;
       await putFile(PRODUCTS_PATH, jsonContent, `update products: ${name}`, sha);
 
-      // ✅ 修复：保存后 purge CDN 缓存
+      // ✅ 修复：保存成功后刷新 CDN 缓存
+      saveProgressText.textContent = '刷新 CDN 缓存...';
+      await purgeCDN();
+
       saveProgressFill.style.width = '100%';
-      saveProgressText.textContent = '正在刷新CDN缓存...';
-      hasUnsavedChanges = false;
-      await purgeCdnCache();
       saveProgressText.textContent = '保存成功！';
-      toast('保存成功！前台页面刷新后即可看到最新产品', 'success');
-      setTimeout(() => { closeEditModal(); setTimeout(loadProducts, 500); }, 600);
+      hasUnsavedChanges = false;
+
+      toast('保存成功！', 'success');
+      setTimeout(() => {
+        closeEditModal();
+        setTimeout(loadProducts, 500);
+      }, 600);
+
     } catch (err) {
       toast('保存失败: ' + err.message, 'error');
       saveProgressText.textContent = '保存失败: ' + err.message;
-    } finally { saveBtn.disabled = false; saveBtn.textContent = '保存'; }
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = '保存';
+    }
   }
 
   async function deleteProduct(id) {
@@ -867,27 +1006,38 @@ body {
     if (!p) return;
     const ok = await showConfirm(`确定删除「${p.name}」？\n（产品图片也会一并删除）`);
     if (!ok) return;
+
     try {
       for (const imgUrl of (p.images || [])) {
         const match = imgUrl.match(/rongyan\/images\/([^?]+)/);
         if (match) {
+          const filename = match[1];
           try {
-            const file = await getFile(`${IMAGES_PATH}/${match[1]}`);
-            if (file) await deleteFile(`${IMAGES_PATH}/${match[1]}`, file.sha);
+            const file = await getFile(`${IMAGES_PATH}/${filename}`);
+            if (file) await deleteFile(`${IMAGES_PATH}/${filename}`, file.sha);
             await new Promise(r => setTimeout(r, 500));
-          } catch (e) { console.warn('删除图片失败:', match[1], e.message); }
+          } catch (e) {
+            console.warn('删除图片失败:', filename, e.message);
+          }
         }
       }
+
       products = products.filter(x => x.id !== id);
+
       const jsonContent = encodeToBase64(JSON.stringify(products, null, 2));
       const existingFile = await getFile(PRODUCTS_PATH);
       const sha = existingFile ? existingFile.sha : null;
       await putFile(PRODUCTS_PATH, jsonContent, `delete product: ${p.name}`, sha);
-      // ✅ 修复：删除后也 purge
-      await purgeCdnCache();
+
+      // ✅ 修复：删除成功后刷新 CDN 缓存
+      await purgeCDN();
+
       toast('删除成功', 'success');
       setTimeout(loadProducts, 1000);
-    } catch (err) { toast('删除失败: ' + err.message, 'error'); }
+
+    } catch (err) {
+      toast('删除失败: ' + err.message, 'error');
+    }
   }
 
   addBtn.addEventListener('click', openAddModal);
@@ -896,12 +1046,34 @@ body {
   modalClose.addEventListener('click', closeEditModal);
   cancelBtn.addEventListener('click', closeEditModal);
   saveBtn.addEventListener('click', saveProduct);
-  editModal.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
-  window.addEventListener('beforeunload', (e) => { if (hasUnsavedChanges) { e.preventDefault(); e.returnValue = '有未保存的修改，确定要离开吗？'; } });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && hasUnsavedChanges) safeSessionSet('_ry_unsaved', '1'); });
-  if (safeSessionGet('_ry_unsaved')) { safeSessionRemove('_ry_unsaved'); toast('上次编辑可能有未保存的内容', 'warning'); }
+
+  editModal.addEventListener('click', (e) => {
+    if (e.target === editModal) closeEditModal();
+  });
+
+  window.addEventListener('beforeunload', (e) => {
+    if (hasUnsavedChanges) {
+      e.preventDefault();
+      e.returnValue = '有未保存的修改，确定要离开吗？';
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && hasUnsavedChanges) {
+      safeSessionSet('_ry_unsaved', '1');
+    }
+  });
+
+  if (safeSessionGet('_ry_unsaved')) {
+    safeSessionRemove('_ry_unsaved');
+    toast('上次编辑可能有未保存的内容', 'warning');
+  }
+
   const savedToken = safeSessionGet('_ry_token');
-  if (savedToken) { TOKEN = savedToken; showAdmin(); }
+  if (savedToken) {
+    TOKEN = savedToken;
+    showAdmin();
+  }
 })();
 </script>
 </body>

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>绒颜</title>
 <link rel="icon" href="../logo.jpg" type="image/jpeg">
 <style>
@@ -245,12 +245,24 @@
 
 <script>
 (function () {
-  // ⚠️⚠️⚠️ 修改为你自己的 GitHub 配置（只需 owner、repo、branch）⚠️⚠️⚠️
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO  = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
 
-  const PRODUCTS_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
+  // ✅ 优化：配置多个数据源，确保加载成功率
+  const CDN_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/rongyan/products.json`;
+  const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/rongyan/products.json`;
+
+  // ✅ 修复：XSS 转义函数
+  function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
 
   const params = new URLSearchParams(window.location.search);
   const productId = parseInt(params.get('id'));
@@ -274,51 +286,88 @@
   let currentSlide = 0;
   let lightboxIndex = 0;
 
-  // ========== 从 GitHub 加载产品数据 ==========
+  // ✅ 优化：智能多源加载产品数据
   async function loadProduct() {
-    try {
-      const res = await fetch(PRODUCTS_URL + '?t=' + Date.now());
-      if (!res.ok) throw new Error('数据加载失败 (HTTP ' + res.status + ')');
-      const products = await res.json();
-      
-      const product = products.find(p => p.id === productId);
-      if (!product) throw new Error('产品不存在');
+    // ✅ 修复：productId 无效时给出友好提示
+    if (isNaN(productId)) {
+      pageLoading.innerHTML = `
+        <div class="page-error">
+          <p style="font-size:36px">🔗</p>
+          <p>产品链接无效，缺少产品 ID</p>
+          <a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a>
+        </div>`;
+      return;
+    }
 
-      images = product.images;
-      document.title = product.name + ' · 绒颜';
+    const timestamp = Date.now();
+    const urls = [
+      `${CDN_URL}?_=${timestamp}`,
+      `${RAW_URL}?_=${timestamp}`
+    ];
 
-      document.getElementById('detailCategory').textContent = product.category;
-      document.getElementById('detailName').textContent = product.name;
-      document.getElementById('detailPrice').textContent = product.price.toFixed(1);
-      document.getElementById('detailDesc').textContent = product.description || '';
+    let products = null;
 
-      galleryTrack.innerHTML = images.map((src, i) => `
-        <div class="gallery-slide">
-          <img src="${src}" alt="${product.name} - 图${i + 1}"
-               data-index="${i}" draggable="false">
-        </div>
-      `).join('');
+    for (const url of urls) {
+      try {
+        const res = await fetch(url);
+        if (res.ok) {
+          products = await res.json();
+          break;
+        }
+      } catch (err) {
+        console.warn('数据源加载失败，尝试下一个:', url, err.message);
+      }
+    }
 
-      thumbStrip.innerHTML = images.map((src, i) => `
-        <div class="thumb-item${i === 0 ? ' active' : ''}" data-index="${i}">
-          <img src="${src}" alt="缩略图${i + 1}" draggable="false">
-        </div>
-      `).join('');
-
-      slideCounter.textContent = `1 / ${images.length}`;
-
-      pageLoading.style.display = 'none';
-      mainContent.style.display = 'block';
-
-      initGallery();
-    } catch (err) {
+    if (!products) {
       pageLoading.innerHTML = `
         <div class="page-error">
           <p style="font-size:36px">😢</p>
-          <p>${err.message || '加载失败'}</p>
+          <p>数据加载失败，请检查网络或刷新重试</p>
           <a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a>
         </div>`;
+      return;
     }
+
+    const product = products.find(p => p.id === productId);
+    if (!product) {
+      pageLoading.innerHTML = `
+        <div class="page-error">
+          <p style="font-size:36px">🔍</p>
+          <p>产品不存在或已被删除</p>
+          <a href="index.html" style="color:var(--primary);margin-top:8px">← 返回首页</a>
+        </div>`;
+      return;
+    }
+
+    images = product.images || [];
+    document.title = (product.name || '产品详情') + ' · 绒颜';
+
+    document.getElementById('detailCategory').textContent = product.category || '';
+    document.getElementById('detailName').textContent = product.name || '';
+    document.getElementById('detailPrice').textContent = Number(product.price || 0).toFixed(1);
+    document.getElementById('detailDesc').textContent = product.description || '';
+
+    // ✅ 修复：对图片 URL 和产品名做 XSS 转义
+    galleryTrack.innerHTML = images.map((src, i) => `
+      <div class="gallery-slide">
+        <img src="${escapeHtml(src)}" alt="${escapeHtml(product.name)} - 图${i + 1}"
+             data-index="${i}" draggable="false">
+      </div>
+    `).join('');
+
+    thumbStrip.innerHTML = images.map((src, i) => `
+      <div class="thumb-item${i === 0 ? ' active' : ''}" data-index="${i}">
+        <img src="${escapeHtml(src)}" alt="缩略图${i + 1}" draggable="false">
+      </div>
+    `).join('');
+
+    slideCounter.textContent = `1 / ${images.length}`;
+
+    pageLoading.style.display = 'none';
+    mainContent.style.display = 'block';
+
+    initGallery();
   }
 
   loadProduct();
@@ -332,56 +381,62 @@
       if (thumb) goToSlide(parseInt(thumb.dataset.index));
     });
 
+    // ✅ 修复：触摸和鼠标使用独立的拖拽状态变量，避免冲突
+    let mouseDidDrag = false;
+
     galleryTrack.addEventListener('click', (e) => {
-      if (e.target.tagName === 'IMG' && !isDragging) {
+      if (e.target.tagName === 'IMG' && !mouseDidDrag) {
         openLightbox(parseInt(e.target.dataset.index));
       }
     });
 
-    let startX = 0, startY = 0, moveX = 0, isDragging = false, isHorizontal = null;
+    // ===== 触摸事件 =====
+    let touchStartX = 0, touchStartY = 0, touchMoveX = 0, touchDragging = false, touchIsHorizontal = null;
 
     galleryMain.addEventListener('touchstart', (e) => {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      isDragging = true;
-      isHorizontal = null;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchDragging = true;
+      touchIsHorizontal = null;
       galleryTrack.style.transition = 'none';
     }, { passive: true });
 
     galleryMain.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const dx = e.touches[0].clientX - startX;
-      const dy = e.touches[0].clientY - startY;
-      if (isHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
-        isHorizontal = Math.abs(dx) > Math.abs(dy);
+      if (!touchDragging) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      if (touchIsHorizontal === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+        touchIsHorizontal = Math.abs(dx) > Math.abs(dy);
       }
-      if (!isHorizontal) return;
+      if (!touchIsHorizontal) return;
       e.preventDefault();
-      moveX = dx;
-      const offset = -(currentSlide * galleryMain.offsetWidth) + moveX;
+      touchMoveX = dx;
+      const offset = -(currentSlide * galleryMain.offsetWidth) + touchMoveX;
       galleryTrack.style.transform = `translateX(${offset}px)`;
     }, { passive: false });
 
     galleryMain.addEventListener('touchend', () => {
-      if (!isDragging) return;
-      isDragging = false;
+      if (!touchDragging) return;
+      touchDragging = false;
       galleryTrack.style.transition = '';
       const threshold = galleryMain.offsetWidth * 0.2;
-      if (isHorizontal) {
-        if (moveX < -threshold) goToSlide(currentSlide + 1);
-        else if (moveX > threshold) goToSlide(currentSlide - 1);
+      if (touchIsHorizontal) {
+        if (touchMoveX < -threshold) goToSlide(currentSlide + 1);
+        else if (touchMoveX > threshold) goToSlide(currentSlide - 1);
         else goToSlide(currentSlide);
       }
-      moveX = 0;
+      touchMoveX = 0;
     });
 
+    // ===== 鼠标事件（独立变量） =====
     let mouseStartX = 0, mouseMoveX = 0, mouseDown = false;
+    mouseDidDrag = false;
 
     galleryMain.addEventListener('mousedown', (e) => {
       if (e.target.tagName !== 'IMG') return;
       mouseDown = true;
+      mouseDidDrag = false;
       mouseStartX = e.clientX;
-      isDragging = false;
       galleryTrack.style.transition = 'none';
       e.preventDefault();
     });
@@ -389,7 +444,7 @@
     window.addEventListener('mousemove', (e) => {
       if (!mouseDown) return;
       const dx = e.clientX - mouseStartX;
-      if (Math.abs(dx) > 5) isDragging = true;
+      if (Math.abs(dx) > 5) mouseDidDrag = true;
       mouseMoveX = dx;
       const offset = -(currentSlide * galleryMain.offsetWidth) + mouseMoveX;
       galleryTrack.style.transform = `translateX(${offset}px)`;

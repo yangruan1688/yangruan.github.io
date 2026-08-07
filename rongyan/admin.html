@@ -149,8 +149,8 @@ body {
     <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
     <button class="btn btn-primary" id="loginBtn">验证并进入</button>
     <p style="margin-top:16px;font-size:11px;color:#bbb;">
-      需要 repo 权限的 Fine-grained Token<br>
-      <a href="https://github.com/settings/tokens?type=beta" target="_blank" style="color:var(--primary);">前往生成 Token →</a>
+      需要 <b>repo</b> 和 <b>issues: write</b> 权限<br>
+      <a href="https://github.com/settings/tokens?type=beta" target="_blank" style="color:var(--primary);">前往生成 Fine-grained Token →</a>
     </p>
   </div>
 
@@ -205,7 +205,6 @@ body {
 
 <div class="toast" id="toast"></div>
 
-<!-- 保持原有的 CSS 和 HTML 结构不变，仅替换 <script> 部分 -->
 <script>
 (function () {
   'use strict';
@@ -214,12 +213,12 @@ body {
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
-  const SYNC_PATH = 'rongyan/sync.json'; // 用于触发 CDN 刷新的信标文件
+  const SYNC_PATH = 'rongyan/sync.json'; 
   const IMAGES_DIR = 'rongyan/images';
   const WEBP_QUALITY = 0.82;
   const MAX_IMAGE_SIZE = 1200;
 
-  // ========== DOM (保持原样) ==========
+  // ========== DOM ==========
   const $ = (sel) => document.querySelector(sel);
   const loginPanel = $('#loginPanel'), dashboard = $('#dashboard');
   const tokenInput = $('#tokenInput'), loginBtn = $('#loginBtn'), logoutBtn = $('#logoutBtn');
@@ -242,10 +241,11 @@ body {
   }
   function encodeBase64(str) { return btoa(unescape(encodeURIComponent(str))); }
 
-  // ========== Auth (保持原样) ==========
+  // ========== Auth ==========
   function getToken() { return sessionStorage.getItem('_ry_admin_token') || ''; }
   function setToken(t) { sessionStorage.setItem('_ry_admin_token', t); token = t; }
   function clearAuth() { sessionStorage.removeItem('_ry_admin_token'); token = ''; location.reload(); }
+  
   async function verifyToken(t) {
     try {
       const res = await fetch('https://api.github.com/user', { headers: { Authorization: `Bearer ${t}` } });
@@ -254,18 +254,19 @@ body {
       return user.login === GITHUB_OWNER;
     } catch { return false; }
   }
+
   loginBtn.addEventListener('click', async () => {
     const t = tokenInput.value.trim();
     if (!t) return showToast('请输入 Token', 'error');
     loginBtn.disabled = true; loginBtn.textContent = '验证中...';
     const valid = await verifyToken(t);
     loginBtn.disabled = false; loginBtn.textContent = '验证并进入';
-    if (!valid) return showToast('Token 无效', 'error');
+    if (!valid) return showToast('Token 无效或用户名不匹配', 'error');
     setToken(t); initDashboard();
   });
   logoutBtn.addEventListener('click', (e) => { e.preventDefault(); clearAuth(); });
 
-  // ========== GitHub Issues API (核心重构) ==========
+  // ========== GitHub API Core ==========
   async function ghApi(endpoint, options = {}) {
     const url = endpoint.startsWith('http') ? endpoint : `https://api.github.com${endpoint}`;
     const res = await fetch(url, {
@@ -279,21 +280,36 @@ body {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `API ${res.status}`);
+      throw new Error(err.message || `API Error ${res.status}`);
     }
     return res.json();
   }
 
+  // 确保 Label 存在，不存在则创建（避免更新 Issue 时报错）
+  async function ensureLabel(name, color = 'ededed') {
+    try {
+      await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/labels/${encodeURIComponent(name)}`);
+    } catch (e) {
+      // 404 表示不存在，尝试创建
+      try {
+        await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/labels`, {
+          method: 'POST',
+          body: JSON.stringify({ name, color })
+        });
+      } catch (createErr) {
+        console.warn(`Failed to create label ${name}:`, createErr);
+      }
+    }
+  }
+
   // 获取所有 Open 的 Issues (作为产品列表)
   async function fetchAllProducts() {
-    // 简单处理，最多拉取 100 条。如果超过 100 需要分页
     const issues = await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues?state=open&per_page=100&labels=product`);
     return issues.map(issue => {
       try {
-        // Issue Body 存储 JSON 数据
-        const data = JSON.parse(issue.body);
+        const data = JSON.parse(issue.body || '{}');
         return {
-          id: issue.number, // 使用 Issue Number 作为唯一 ID
+          id: issue.number,
           name: issue.title,
           category: issue.labels.find(l => l.name.startsWith('cat:'))?.name.replace('cat:', '') || '',
           ...data
@@ -305,16 +321,20 @@ body {
   // 创建或更新 Issue
   async function saveProductToIssue(id, name, category, data) {
     const bodyStr = JSON.stringify(data);
-    const labels = ['product', `cat:${category}`];
+    const catLabel = `cat:${category}`;
+    
+    // 确保分类 Label 存在
+    await ensureLabel(catLabel, 'b8860b');
+    await ensureLabel('product', '27ae60');
+
+    const labels = ['product', catLabel];
     
     if (id) {
-      // 更新
       return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues/${id}`, {
         method: 'PATCH',
         body: JSON.stringify({ title: name, body: bodyStr, labels })
       });
     } else {
-      // 创建
       return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues`, {
         method: 'POST',
         body: JSON.stringify({ title: name, body: bodyStr, labels })
@@ -330,15 +350,14 @@ body {
     });
   }
 
-  // 触发 CDN 刷新信标 (更新 sync.json 产生新 Commit SHA)
+  // 触发 CDN 刷新信标
   async function triggerCDNRefresh() {
     try {
-      // 获取当前 sync.json 的 SHA
       let sha = null;
       try {
         const file = await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${SYNC_PATH}?ref=${GITHUB_BRANCH}`);
         sha = file.sha;
-      } catch (e) {} // 文件不存在则忽略
+      } catch (e) {} 
 
       const content = encodeBase64(JSON.stringify({ lastUpdated: new Date().toISOString() }));
       await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${SYNC_PATH}`, {
@@ -355,7 +374,7 @@ body {
     }
   }
 
-  // 图片上传 (保持原样)
+  // 图片上传
   async function uploadImageFile(base64Data, fileName) {
     const path = `${IMAGES_DIR}/${fileName}`;
     return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
@@ -368,7 +387,7 @@ body {
     });
   }
 
-  // ========== 图片压缩 (保持原样) ==========
+  // 图片压缩
   async function compressToWebP(file) {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -382,9 +401,10 @@ body {
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
         canvas.toBlob((blob) => {
-          if (!blob) return reject(new Error('WebP failed'));
+          if (!blob) return reject(new Error('WebP compression failed'));
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
           reader.readAsDataURL(blob);
         }, 'image/webp', WEBP_QUALITY);
       };
@@ -393,7 +413,7 @@ body {
     });
   }
 
-  // ========== 渲染与交互逻辑 (保持原样，仅修改数据源) ==========
+  // ========== Dashboard Logic ==========
   async function initDashboard() {
     token = getToken();
     if (!token) return;
@@ -409,12 +429,13 @@ body {
       products = await fetchAllProducts();
       renderProductList();
     } catch (e) {
-      productList.innerHTML = `<p style="color:var(--danger);text-align:center;">加载失败: ${e.message}</p>`;
+      productList.innerHTML = `<p style="color:var(--danger);text-align:center;padding:40px;">加载失败: ${e.message}</p>`;
     }
   }
 
   function getImageUrl(path) {
-    if (!path || path.startsWith('http')) return path;
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
     return `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${path}`;
   }
 
@@ -425,7 +446,7 @@ body {
     }
     productList.innerHTML = products.slice().reverse().map(p => `
       <div class="product-item" data-id="${p.id}">
-        <img src="${p.cover}" alt="" onerror="this.style.background='#f0ece6'">
+        <img src="${getImageUrl(p.cover)}" alt="" onerror="this.style.background='#f0ece6'">
         <div class="info">
           <div class="name">${escapeHtml(p.name)}</div>
           <div class="meta">¥${Number(p.price).toFixed(1)} · ${escapeHtml(p.category)} · #${p.id}</div>
@@ -438,15 +459,28 @@ body {
     `).join('');
 
     productList.querySelectorAll('.edit-btn').forEach(btn => {
-      btn.addEventListener('click', () => openEditModal(products.find(p => p.id === parseInt(btn.closest('.product-item').dataset.id))));
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.closest('.product-item').dataset.id);
+        openEditModal(products.find(p => p.id === id));
+      });
     });
     productList.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', () => deleteProduct(parseInt(btn.closest('.product-item').dataset.id)));
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.closest('.product-item').dataset.id);
+        deleteProduct(id);
+      });
     });
+  }
+
+  function updateCategorySuggestions() {
+    const cats = [...new Set(products.map(p => p.category).filter(Boolean))];
+    $('#categorySuggestions').innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">`).join('');
   }
 
   function openEditModal(product = null) {
     editingImages = [];
+    updateCategorySuggestions();
+    
     if (product) {
       modalTitle.textContent = '编辑产品';
       $('#editId').value = product.id;
@@ -454,7 +488,9 @@ body {
       $('#editPrice').value = product.price;
       $('#editCategory').value = product.category;
       $('#editDesc').value = product.description || '';
-      (product.images || []).forEach(url => editingImages.push({ base64: url, isNew: false }));
+      (product.images || []).forEach(url => {
+        editingImages.push({ base64: url, isNew: false });
+      });
     } else {
       modalTitle.textContent = '新增产品';
       ['editId','editName','editPrice','editCategory','editDesc'].forEach(id => $(`#${id}`).value = '');
@@ -482,7 +518,7 @@ body {
       try {
         editingImages.push({ base64: await compressToWebP(file), isNew: true });
         renderImagePreviews();
-      } catch (e) { showToast('图片压缩失败', 'error'); }
+      } catch (e) { showToast(`图片压缩失败: ${file.name}`, 'error'); }
     }
   }
 
@@ -494,11 +530,14 @@ body {
       </div>
     `).join('');
     imagePreviewList.querySelectorAll('.remove-img').forEach(btn => {
-      btn.addEventListener('click', () => { editingImages.splice(parseInt(btn.dataset.index), 1); renderImagePreviews(); });
+      btn.addEventListener('click', () => { 
+        editingImages.splice(parseInt(btn.dataset.index), 1); 
+        renderImagePreviews(); 
+      });
     });
   }
 
-  // 保存逻辑 (核心重构)
+  // 保存逻辑
   saveProductBtn.addEventListener('click', async () => {
     if (isSaving) return;
     const name = $('#editName').value.trim();
@@ -507,9 +546,10 @@ body {
     const desc = $('#editDesc').value.trim();
     const existingId = $('#editId').value;
 
-    if (!name || isNaN(price) || !category || editingImages.length === 0) {
-      return showToast('请完善必填项并上传图片', 'error');
-    }
+    if (!name) return showToast('请输入产品名称', 'error');
+    if (isNaN(price) || price < 0) return showToast('请输入有效价格', 'error');
+    if (!category) return showToast('请输入分类', 'error');
+    if (editingImages.length === 0) return showToast('请至少上传一张图片', 'error');
 
     isSaving = true; saveProductBtn.disabled = true; saveProductBtn.textContent = '保存中...';
 
@@ -521,23 +561,28 @@ body {
         if (img.isNew) {
           const fileName = `${Date.now()}_${i}.webp`;
           await uploadImageFile(img.base64, fileName);
-          imageUrls.push(getImageUrl(`${IMAGES_DIR}/${fileName}`));
+          imageUrls.push(`${IMAGES_DIR}/${fileName}`);
         } else {
-          imageUrls.push(img.base64);
+          // 兼容旧数据：如果是完整URL则提取路径，否则直接使用
+          let path = img.base64;
+          if (path.startsWith('http')) {
+            path = path.replace(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`, '');
+          }
+          imageUrls.push(path);
         }
       }
 
-      // 2. 保存到 Issue (天然防冲突)
+      // 2. 构造数据并保存到 Issue
       const data = {
         price, description: desc,
-        cover: imageUrls[0],
-        images: imageUrls,
+        cover: getImageUrl(imageUrls[0]),
+        images: imageUrls.map(u => getImageUrl(u)),
         updatedAt: new Date().toISOString()
       };
       
       await saveProductToIssue(existingId ? parseInt(existingId) : null, name, category, data);
 
-      // 3. 触发 CDN 刷新 (更新 sync.json 产生新 Commit)
+      // 3. 触发 CDN 刷新
       await triggerCDNRefresh();
 
       // 4. 通知其他标签页
@@ -555,12 +600,12 @@ body {
 
   async function deleteProduct(id) {
     const p = products.find(x => x.id === id);
-    if (!p || !confirm(`确定删除「${p.name}」？`)) return;
+    if (!p || !confirm(`确定删除「${p.name}」？\n此操作将关闭对应 Issue。`)) return;
     try {
       await deleteProductIssue(id);
       await triggerCDNRefresh();
       localStorage.setItem('_ry_sync_version', Date.now().toString());
-      showToast('已删除');
+      showToast('产品已删除');
       await loadProducts();
     } catch (e) { showToast(`删除失败: ${e.message}`, 'error'); }
   }

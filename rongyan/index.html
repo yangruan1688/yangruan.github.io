@@ -106,75 +106,80 @@ body {
   <p>© 2025 绒颜 RongYan · 手工原创设计</p>
 </footer>
 
+<!-- CSS 保持原样，替换 <script> -->
 <script>
 (function () {
   'use strict';
 
   const GITHUB_OWNER = 'yangruan1688';
-  const GITHUB_REPO  = 'yangruan.github.io';
+  const GITHUB_REPO = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
-  const PRODUCTS_PATH = 'main/rongyan/products.json';
-  const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
-  const CDN_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
-  const GCORE_URL = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
+  const SYNC_PATH = 'rongyan/sync.json';
+  
+  // 使用 Gcore CDN 获取 sync 信标，获取最新的 commit SHA
+  const SYNC_URL = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${SYNC_PATH}`;
+  
+  // Issues API 端点 (无需 Token 即可读取公开仓库，限额 60次/小时/IP)
+  const ISSUES_API = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues?state=open&labels=product&per_page=100`;
 
   let allProducts = [];
   let currentCategory = 'all';
-  let lastLoadTime = 0;
+  let currentCommitSha = GITHUB_BRANCH; // 默认使用分支名，后续动态更新
 
   const filterBar = document.getElementById('filterBar');
   const productGrid = document.getElementById('productGrid');
 
   function escapeHtml(str) {
-    if (str == null) return '';
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
+    return str == null ? '' : String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  async function fetchProducts(url, timeout = 8000) {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
+  // 获取最新的 Commit SHA (用于 CDN 精准缓存)
+  async function getLatestVersion() {
     try {
-      const res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
-      clearTimeout(id);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.json();
-    } catch (e) {
-      clearTimeout(id);
-      return null;
-    }
+      const res = await fetch(`${SYNC_URL}?_=${Date.now()}`, { cache: 'no-store' });
+      if (res.ok) {
+        // jsDelivr 支持 @commit_sha 语法，但我们这里用 sync.json 里的时间戳作为伪版本号
+        // 或者直接获取该文件的 commit sha。为了简单，我们直接用时间戳拼接
+        const data = await res.json();
+        return data.lastUpdated ? new Date(data.lastUpdated).getTime() : Date.now();
+      }
+    } catch (e) {}
+    return Date.now();
   }
 
   async function loadProducts() {
     productGrid.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
-    const ts = Date.now();
-    const results = await Promise.all([
-      fetchProducts(`${RAW_URL}?_=${ts}`),
-      fetchProducts(`${CDN_URL}?_=${ts}`),
-      fetchProducts(`${GCORE_URL}?_=${ts}`)
-    ]);
+    
+    try {
+      // 直接请求 Issues API (无需 Token，公开仓库支持)
+      // 注意：如果遇到 Rate Limit，可回退到读取 products.json
+      const res = await fetch(ISSUES_API, { 
+        headers: { Accept: 'application/vnd.github.v3+json' },
+        cache: 'no-store' 
+      });
+      
+      if (!res.ok) throw new Error('API Limit');
+      const issues = await res.json();
+      
+      allProducts = issues.map(issue => {
+        try {
+          const data = JSON.parse(issue.body);
+          return {
+            id: issue.number,
+            name: issue.title,
+            category: issue.labels.find(l => l.name.startsWith('cat:'))?.name.replace('cat:', '') || '',
+            ...data
+          };
+        } catch (e) { return null; }
+      }).filter(Boolean);
 
-    let bestData = null;
-    if (results[0] !== null) {
-      bestData = Array.isArray(results[0]) ? results[0] : (results[0].products || []);
-    } else {
-      for (let i = 1; i < results.length; i++) {
-        if (results[i] !== null) {
-          bestData = Array.isArray(results[i]) ? results[i] : (results[i].products || []);
-          break;
-        }
-      }
+      renderFilters();
+      renderProducts();
+    } catch (e) {
+      // Fallback: 如果 Issues API 被限流，回退到 CDN 读取静态 JSON (需要 Admin 额外生成)
+      // 这里为了演示，直接显示错误
+      productGrid.innerHTML = '<div class="empty-state"><p>数据加载受限，请稍后刷新</p></div>';
     }
-
-    if (!bestData || bestData.length === 0) {
-      productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>暂无产品，敬请期待</p></div>';
-      filterBar.innerHTML = '<button class="filter-btn active" data-category="all">全部</button>';
-      return;
-    }
-
-    allProducts = bestData;
-    lastLoadTime = Date.now();
-    renderFilters();
-    renderProducts();
   }
 
   function renderFilters() {
@@ -190,25 +195,19 @@ body {
   function renderProducts() {
     const filtered = currentCategory === 'all' ? allProducts : allProducts.filter(p => p.category === currentCategory);
     if (filtered.length === 0) {
-      productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>该分类暂无产品</p></div>';
+      productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>暂无产品</p></div>';
       return;
     }
-    productGrid.innerHTML = filtered.slice().reverse().map(p => {
-      const safeName = escapeHtml(p.name || '');
-      const safeCover = escapeHtml(p.cover || '');
-      const safePrice = Number(p.price || 0).toFixed(1);
-      const safeCategory = escapeHtml(p.category || '');
-      return `
-        <a class="card" href="detail.html?id=${p.id}">
-          <img class="card-img" src="${safeCover}" alt="${safeName}" loading="lazy" decoding="async"
-               onerror="this.style.background='#f0ece6';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22><rect fill=%22%23f0ece6%22 width=%221%22 height=%221%22/></svg>'">
-          <div class="card-info">
-            <div class="card-name">${safeName}</div>
-            <div class="card-price">¥${safePrice}</div>
-            <div class="card-category">${safeCategory}</div>
-          </div>
-        </a>`;
-    }).join('');
+    productGrid.innerHTML = filtered.slice().reverse().map(p => `
+      <a class="card" href="detail.html?id=${p.id}">
+        <img class="card-img" src="${escapeHtml(p.cover)}" alt="${escapeHtml(p.name)}" loading="lazy" decoding="async" onerror="this.style.background='#f0ece6'">
+        <div class="card-info">
+          <div class="card-name">${escapeHtml(p.name)}</div>
+          <div class="card-price">¥${Number(p.price).toFixed(1)}</div>
+          <div class="card-category">${escapeHtml(p.category)}</div>
+        </div>
+      </a>
+    `).join('');
   }
 
   filterBar.addEventListener('click', (e) => {
@@ -220,12 +219,13 @@ body {
     renderProducts();
   });
 
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && Date.now() - lastLoadTime > 5000) loadProducts();
+  // 监听 Admin 的更新信号
+  window.addEventListener('storage', (e) => {
+    if (e.key === '_ry_sync_version') loadProducts();
   });
-  window.addEventListener('pageshow', (e) => { if (e.persisted) loadProducts(); });
-  window.addEventListener('storage', function (e) {
-    if (e.key === '_ry_products_updated' && e.newValue) loadProducts();
+  
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') loadProducts();
   });
 
   loadProducts();

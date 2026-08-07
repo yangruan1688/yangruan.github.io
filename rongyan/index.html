@@ -113,14 +113,6 @@ body {
 
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO = 'yangruan.github.io';
-  const GITHUB_BRANCH = 'main';
-  const SYNC_PATH = 'rongyan/sync.json';
-  const PRODUCTS_JSON_PATH = 'rongyan/products.json'; // 降级数据源
-  
-  // CDN 信标 URL (用于获取最新版本)
-  const SYNC_URL = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${SYNC_PATH}`;
-  // 降级 JSON CDN URL
-  const FALLBACK_JSON_URL = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_JSON_PATH}`;
   
   // Issues API 端点 (无需 Token，限额 60次/h/IP)
   const ISSUES_API = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues?state=open&labels=product&per_page=100`;
@@ -135,18 +127,17 @@ body {
     return str == null ? '' : String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // ========== 核心：带降级的数据加载 ==========
+  // ========== 核心：纯 Issues API 加载 ==========
   async function loadProducts() {
     productGrid.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
     
     try {
-      // 1. 优先请求 Issues API
       const res = await fetch(ISSUES_API, { 
         headers: { Accept: 'application/vnd.github.v3+json' },
         cache: 'no-store' 
       });
       
-      if (!res.ok) throw new Error(`Issues API ${res.status}`);
+      if (!res.ok) throw new Error(`API ${res.status}`);
       
       const issues = await res.json();
       allProducts = issues.map(issue => {
@@ -162,27 +153,21 @@ body {
       }).filter(Boolean);
 
     } catch (e) {
-      // 2. 降级：Issues API 失败时读取 products.json
-      console.warn('Issues API failed, falling back to products.json:', e.message);
-      try {
-        const fallbackRes = await fetch(`${FALLBACK_JSON_URL}?_=${Date.now()}`, { cache: 'no-store' });
-        if (!fallbackRes.ok) throw new Error('Fallback JSON also failed');
-        
-        const jsonData = await fallbackRes.json();
-        // 兼容数组或 {products: []} 两种格式
-        allProducts = Array.isArray(jsonData) ? jsonData : (jsonData.products || []);
-      } catch (fallbackErr) {
-        console.error('All data sources failed:', fallbackErr);
-        productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">😵</div><p>数据加载失败，请检查网络后刷新</p></div>';
-        return;
-      }
+      console.error('Load products failed:', e);
+      // 无降级源，直接提示用户刷新重试
+      const isRateLimit = e.message.includes('403');
+      const msg = isRateLimit 
+        ? '访问过于频繁，请等待几分钟后刷新' 
+        : '数据加载失败，请检查网络后刷新页面';
+      productGrid.innerHTML = `<div class="empty-state"><div class="empty-icon">${isRateLimit ? '⏳' : '😵'}</div><p>${msg}</p></div>`;
+      return;
     }
 
     renderFilters();
     renderProducts();
   }
 
-  // ========== 渲染逻辑 ==========
+  // ========== 渲染逻辑（保持不变）==========
   function renderFilters() {
     const categories = {};
     allProducts.forEach(p => { 
@@ -219,7 +204,7 @@ body {
     `).join('');
   }
 
-  // ========== 事件监听 ==========
+  // ========== 事件监听（保持不变）==========
   filterBar.addEventListener('click', (e) => {
     const btn = e.target.closest('.filter-btn');
     if (!btn) return;
@@ -229,17 +214,14 @@ body {
     renderProducts();
   });
 
-  // Admin 更新信号
   window.addEventListener('storage', (e) => {
     if (e.key === '_ry_sync_version') loadProducts();
   });
   
-  // 页面可见性恢复时刷新
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') loadProducts();
   });
 
-  // 初始化
   loadProducts();
 })();
 </script>

@@ -119,71 +119,78 @@ body {
   </div>
 </div>
 
+<!-- CSS 保持原样，替换 <script> -->
 <script>
 (function () {
   'use strict';
 
   const GITHUB_OWNER = 'yangruan1688';
-  const GITHUB_REPO  = 'yangruan.github.io';
-  const GITHUB_BRANCH = 'main';
-  const PRODUCTS_PATH = 'main/rongyan/products.json';
-  const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
-  const CDN_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
-  const GCORE_URL = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${PRODUCTS_PATH}`;
-
+  const GITHUB_REPO = 'yangruan.github.io';
   const container = document.getElementById('detailContainer');
 
   function escapeHtml(str) {
-    if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replace(/`/g, '&#96;');
-  }
-
-  async function fetchProducts(url, timeout = 8000) {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
-    try {
-      const res = await fetch(url, {
-        signal: controller.signal,
-        cache: 'no-store'
-      });
-      clearTimeout(id);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.json();
-    } catch (e) {
-      clearTimeout(id);
-      return null;
-    }
+    return str == null ? '' : String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   function getProductId() {
     const params = new URLSearchParams(window.location.search);
-    return parseInt(params.get('id')) || null;
+    return params.get('id'); // Issue Number 是字符串或数字均可
+  }
+
+  async function loadAndRender() {
+    const id = getProductId();
+    if (!id) {
+      container.innerHTML = '<div class="error-state"><div class="error-icon">❌</div><p>无效的产品链接</p><p><a href="index.html">返回首页</a></p></div>';
+      return;
+    }
+
+    container.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
+
+    try {
+      // 核心优化：只请求单个 Issue，极速加载
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues/${id}`, {
+        headers: { Accept: 'application/vnd.github.v3+json' },
+        cache: 'no-store'
+      });
+
+      if (!res.ok) throw new Error('Not Found');
+      
+      const issue = await res.json();
+      
+      // 解析数据
+      let data = {};
+      try { data = JSON.parse(issue.body); } catch (e) {}
+      
+      const product = {
+        id: issue.number,
+        name: issue.title,
+        category: issue.labels.find(l => l.name.startsWith('cat:'))?.name.replace('cat:', '') || '',
+        ...data
+      };
+
+      renderDetail(product);
+    } catch (e) {
+      container.innerHTML = '<div class="error-state"><div class="error-icon">🔍</div><p>产品不存在或已下架</p><p><a href="index.html">返回首页</a></p></div>';
+    }
   }
 
   function renderDetail(product) {
-    const safeName = escapeHtml(product.name || '');
+    const safeName = escapeHtml(product.name);
     const safePrice = Number(product.price || 0).toFixed(1);
-    const safeCategory = escapeHtml(product.category || '');
-    const safeDesc = escapeHtml(product.description || '');
+    const safeCategory = escapeHtml(product.category);
+    const safeDesc = escapeHtml(product.description || '').replace(/\n/g, '<br>'); // 支持换行
     const images = product.images || [];
-    const safeImages = images.map(url => escapeHtml(url));
 
     let galleryHtml = '';
-    if (safeImages.length > 0) {
+    if (images.length > 0) {
       galleryHtml = `
         <div class="gallery">
-          <img class="gallery-main" id="galleryMain" src="${safeImages[0]}" alt="${safeName}" decoding="async">
+          <img class="gallery-main" id="galleryMain" src="${escapeHtml(images[0])}" alt="${safeName}" decoding="async">
         </div>
-        ${safeImages.length > 1 ? `
+        ${images.length > 1 ? `
           <div class="gallery-thumbs" id="galleryThumbs">
-            ${safeImages.map((url, i) => `
-              <img class="gallery-thumb ${i === 0 ? 'active' : ''}" data-index="${i}" src="${url}" alt="图${i + 1}" decoding="async" loading="lazy">
+            ${images.map((url, i) => `
+              <img class="gallery-thumb ${i === 0 ? 'active' : ''}" data-index="${i}" src="${escapeHtml(url)}" alt="图${i + 1}" decoding="async" loading="lazy">
             `).join('')}
           </div>
         ` : ''}
@@ -196,66 +203,26 @@ body {
         <h2 class="product-name">${safeName}</h2>
         <div class="product-price">¥${safePrice}</div>
         <span class="product-category">${safeCategory}</span>
-        <div class="product-desc">${safeDesc}</div>
+        <div class="product-desc">${safeDesc || '暂无详细描述'}</div>
         <a class="buy-btn" href="https://weidian.com/s/xxxxxxxxx" target="_blank" rel="noopener">前往微店购买</a>
         <a class="back-link" href="index.html">← 返回产品列表</a>
       </div>
     `;
 
-    if (safeImages.length > 1) {
+    if (images.length > 1) {
       const thumbs = document.getElementById('galleryThumbs');
       thumbs.addEventListener('click', (e) => {
         const thumb = e.target.closest('.gallery-thumb');
         if (!thumb) return;
         const idx = parseInt(thumb.dataset.index);
-        document.getElementById('galleryMain').src = safeImages[idx];
+        document.getElementById('galleryMain').src = images[idx];
         thumbs.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
         thumb.classList.add('active');
       });
     }
-  }
-
-  async function loadAndRender() {
-    const id = getProductId();
-    if (!id) {
-      container.innerHTML = '<div class="error-state"><div class="error-icon">❌</div><p>无效的产品链接</p><p><a href="index.html">返回首页</a></p></div>';
-      return;
-    }
-
-    container.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
-
-    const ts = Date.now();
-    const results = await Promise.all([
-      fetchProducts(`${RAW_URL}?_=${ts}`),
-      fetchProducts(`${CDN_URL}?_=${ts}`),
-      fetchProducts(`${GCORE_URL}?_=${ts}`)
-    ]);
-
-    let bestData = null;
-
-    if (results[0] !== null) {
-      bestData = Array.isArray(results[0]) ? results[0] : (results[0].products || []);
-    } else {
-      for (let i = 1; i < results.length; i++) {
-        if (results[i] !== null) {
-          bestData = Array.isArray(results[i]) ? results[i] : (results[i].products || []);
-          break;
-        }
-      }
-    }
-
-    if (!bestData || bestData.length === 0) {
-      container.innerHTML = '<div class="error-state"><div class="error-icon">📦</div><p>数据加载失败</p><p><a href="index.html">返回首页</a></p></div>';
-      return;
-    }
-
-    const product = bestData.find(p => p.id === id);
-    if (!product) {
-      container.innerHTML = '<div class="error-state"><div class="error-icon">🔍</div><p>未找到该产品</p><p><a href="index.html">返回首页</a></p></div>';
-      return;
-    }
-
-    renderDetail(product);
+    
+    // 动态修改页面 Title
+    document.title = `${product.name} - 绒颜`;
   }
 
   loadAndRender();

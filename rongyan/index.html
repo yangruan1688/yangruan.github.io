@@ -7,8 +7,7 @@
 <meta name="description" content="绒颜 - 原创手工发饰品牌，每一件都是独一无二的手作好物。">
 <link rel="icon" href="https://raw.githubusercontent.com/yangruan1688/yangruan.github.io/main/logo.jpg" type="image/jpeg">
 <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="preconnect" href="https://gcore.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://api.github.com" crossorigin>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -76,6 +75,13 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 .footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-light); border-top: 1px solid rgba(0,0,0,0.05); }
 .footer a { color: var(--primary); text-decoration: none; }
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  padding: 10px 24px; border-radius: 24px; color: #fff; font-size: 13px;
+  font-weight: 500; z-index: 300; opacity: 0; transition: opacity 0.3s;
+  pointer-events: none; white-space: nowrap; background: var(--danger, #e74c3c);
+}
+.toast.show { opacity: 1; }
 </style>
 </head>
 <body>
@@ -106,39 +112,55 @@ body {
   <p>© 2025 绒颜 RongYan · 手工原创设计</p>
 </footer>
 
-<!-- CSS 保持原样，替换 <script> -->
+<div class="toast" id="toast"></div>
+
 <script>
 (function () {
   'use strict';
 
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO = 'yangruan.github.io';
-  
-  // Issues API 端点 (无需 Token，限额 60次/h/IP)
   const ISSUES_API = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues?state=open&labels=product&per_page=100`;
+  const CACHE_KEY = '_ry_products_cache';
+  const FETCH_INTERVAL = 30000; // 30秒节流
 
   let allProducts = [];
   let currentCategory = 'all';
+  let lastFetchTime = 0;
 
   const filterBar = document.getElementById('filterBar');
   const productGrid = document.getElementById('productGrid');
+  const toastEl = document.getElementById('toast');
 
   function escapeHtml(str) {
     return str == null ? '' : String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // ========== 核心：纯 Issues API 加载 ==========
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(() => toastEl.classList.remove('show'), 2500);
+  }
+
+  function resolveImageUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${url}`;
+  }
+
   async function loadProducts() {
+    lastFetchTime = Date.now();
     productGrid.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
-    
+
     try {
-      const res = await fetch(ISSUES_API, { 
+      const res = await fetch(ISSUES_API, {
         headers: { Accept: 'application/vnd.github.v3+json' },
-        cache: 'no-store' 
+        cache: 'no-store'
       });
-      
+
+      if (res.status === 403) throw new Error('403 Rate Limit');
       if (!res.ok) throw new Error(`API ${res.status}`);
-      
+
       const issues = await res.json();
       allProducts = issues.map(issue => {
         try {
@@ -152,12 +174,27 @@ body {
         } catch (e) { return null; }
       }).filter(Boolean);
 
+      // ✅ 成功后写入本地缓存
+      localStorage.setItem(CACHE_KEY, JSON.stringify(allProducts));
+
     } catch (e) {
       console.error('Load products failed:', e);
-      // 无降级源，直接提示用户刷新重试
+
+      // ✅ 尝试使用本地缓存降级
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        try {
+          allProducts = JSON.parse(cached);
+          renderFilters();
+          renderProducts();
+          showToast('网络异常，显示离线数据');
+          return;
+        } catch (_) {}
+      }
+
       const isRateLimit = e.message.includes('403');
-      const msg = isRateLimit 
-        ? '访问过于频繁，请等待几分钟后刷新' 
+      const msg = isRateLimit
+        ? '访问过于频繁，请等待几分钟后刷新'
         : '数据加载失败，请检查网络后刷新页面';
       productGrid.innerHTML = `<div class="empty-state"><div class="empty-icon">${isRateLimit ? '⏳' : '😵'}</div><p>${msg}</p></div>`;
       return;
@@ -167,13 +204,12 @@ body {
     renderProducts();
   }
 
-  // ========== 渲染逻辑（保持不变）==========
   function renderFilters() {
     const categories = {};
-    allProducts.forEach(p => { 
-      if (p.category) categories[p.category] = (categories[p.category] || 0) + 1; 
+    allProducts.forEach(p => {
+      if (p.category) categories[p.category] = (categories[p.category] || 0) + 1;
     });
-    
+
     let html = '<button class="filter-btn active" data-category="all">全部</button>';
     Object.keys(categories).sort().forEach(cat => {
       html += `<button class="filter-btn" data-category="${escapeHtml(cat)}">${escapeHtml(cat)} (${categories[cat]})</button>`;
@@ -182,18 +218,18 @@ body {
   }
 
   function renderProducts() {
-    const filtered = currentCategory === 'all' 
-      ? allProducts 
+    const filtered = currentCategory === 'all'
+      ? allProducts
       : allProducts.filter(p => p.category === currentCategory);
-      
+
     if (filtered.length === 0) {
       productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>暂无产品</p></div>';
       return;
     }
-    
+
     productGrid.innerHTML = filtered.slice().reverse().map(p => `
       <a class="card" href="detail.html?id=${p.id}">
-        <img class="card-img" src="${escapeHtml(p.cover)}" alt="${escapeHtml(p.name)}" 
+        <img class="card-img" src="${escapeHtml(resolveImageUrl(p.cover))}" alt="${escapeHtml(p.name)}"
              loading="lazy" decoding="async" onerror="this.style.background='#f0ece6'">
         <div class="card-info">
           <div class="card-name">${escapeHtml(p.name)}</div>
@@ -204,7 +240,6 @@ body {
     `).join('');
   }
 
-  // ========== 事件监听（保持不变）==========
   filterBar.addEventListener('click', (e) => {
     const btn = e.target.closest('.filter-btn');
     if (!btn) return;
@@ -217,9 +252,12 @@ body {
   window.addEventListener('storage', (e) => {
     if (e.key === '_ry_sync_version') loadProducts();
   });
-  
+
+  // ✅ visibilitychange 节流，防止频繁切换耗尽 API
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') loadProducts();
+    if (document.visibilityState === 'visible' && Date.now() - lastFetchTime > FETCH_INTERVAL) {
+      loadProducts();
+    }
   });
 
   loadProducts();

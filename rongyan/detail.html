@@ -50,7 +50,9 @@ body {
 }
 .gallery-main {
   width: 100%; aspect-ratio: 1; object-fit: cover; display: block;
+  cursor: zoom-in; transition: opacity 0.2s;
 }
+.gallery-main:active { opacity: 0.9; }
 .gallery-thumbs {
   display: flex; gap: 8px; padding: 10px 12px; overflow-x: auto;
   -webkit-overflow-scrolling: touch; scrollbar-width: none;
@@ -102,12 +104,59 @@ body {
 .error-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
 .error-state .error-icon { font-size: 48px; margin-bottom: 12px; }
 .error-state a { color: var(--primary); }
+
+/* ===== 图片灯箱样式 ===== */
+.lightbox-overlay {
+  display: none; position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.92); align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.3s ease;
+}
+.lightbox-overlay.active { display: flex; opacity: 1; }
+.lightbox-img-wrap {
+  position: relative; max-width: 95vw; max-height: 90vh;
+  display: flex; align-items: center; justify-content: center;
+}
+.lightbox-img-wrap img {
+  max-width: 95vw; max-height: 90vh; object-fit: contain;
+  border-radius: 4px; user-select: none; -webkit-user-drag: none;
+  transform-origin: center center; transition: transform 0.3s ease;
+}
+.lightbox-close {
+  position: fixed; top: 16px; right: 16px; z-index: 1001;
+  width: 40px; height: 40px; border: none; border-radius: 50%;
+  background: rgba(255,255,255,0.15); color: #fff; font-size: 22px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.25s; backdrop-filter: blur(8px);
+}
+.lightbox-close:hover { background: rgba(255,255,255,0.3); }
+.lightbox-nav {
+  position: fixed; top: 50%; transform: translateY(-50%); z-index: 1001;
+  width: 44px; height: 44px; border: none; border-radius: 50%;
+  background: rgba(255,255,255,0.12); color: #fff; font-size: 20px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.25s; backdrop-filter: blur(8px);
+}
+.lightbox-nav:hover { background: rgba(255,255,255,0.25); }
+.lightbox-prev { left: 12px; }
+.lightbox-next { right: 12px; }
+.lightbox-counter {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  z-index: 1001; color: rgba(255,255,255,0.7); font-size: 13px;
+  font-weight: 500; letter-spacing: 2px;
+}
+.lightbox-hint {
+  position: fixed; bottom: 48px; left: 50%; transform: translateX(-50%);
+  z-index: 1001; color: rgba(255,255,255,0.4); font-size: 11px;
+  white-space: nowrap; pointer-events: none;
+  animation: fadeHint 3s ease forwards;
+}
+@keyframes fadeHint { 0%,60% { opacity: 1; } 100% { opacity: 0; } }
 </style>
 </head>
 <body>
 <header class="header">
-  <h1><a href="index.html">✦ 绒颜 ✦</a></h1>
-  <a class="back-btn" href="index.html">← 返回首页</a>
+  <h1><a href="./index.html">✦ 绒颜 ✦</a></h1>
+  <a class="back-btn" href="./index.html">← 返回首页</a>
 </header>
 
 <div class="detail-container" id="detailContainer">
@@ -115,6 +164,18 @@ body {
     <div class="spinner"></div>
     <p>加载中...</p>
   </div>
+</div>
+
+<!-- 灯箱容器 -->
+<div class="lightbox-overlay" id="lightbox">
+  <button class="lightbox-close" id="lbClose" aria-label="关闭">×</button>
+  <button class="lightbox-nav lightbox-prev" id="lbPrev" aria-label="上一张">‹</button>
+  <button class="lightbox-nav lightbox-next" id="lbNext" aria-label="下一张">›</button>
+  <div class="lightbox-img-wrap" id="lbWrap">
+    <img id="lbImg" src="" alt="">
+  </div>
+  <div class="lightbox-counter" id="lbCounter"></div>
+  <div class="lightbox-hint">双击或捏合缩放 · 左右滑动切换</div>
 </div>
 
 <script>
@@ -129,7 +190,6 @@ body {
     return str == null ? '' : String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  // ✅ 统一处理图片 URL，兼容相对路径和绝对路径
   function resolveImageUrl(url) {
     if (!url) return '';
     if (url.startsWith('http')) return url;
@@ -144,7 +204,7 @@ body {
   async function loadAndRender() {
     const id = getProductId();
     if (!id) {
-      container.innerHTML = '<div class="error-state"><div class="error-icon">❌</div><p>无效的产品链接</p><p><a href="index.html">返回首页</a></p></div>';
+      container.innerHTML = '<div class="error-state"><div class="error-icon">❌</div><p>无效的产品链接</p><p><a href="./index.html">返回首页</a></p></div>';
       return;
     }
 
@@ -172,28 +232,210 @@ body {
 
       renderDetail(product);
     } catch (e) {
-      container.innerHTML = '<div class="error-state"><div class="error-icon">🔍</div><p>产品不存在或已下架</p><p><a href="index.html">返回首页</a></p></div>';
+      container.innerHTML = '<div class="error-state"><div class="error-icon">🔍</div><p>产品不存在或已下架</p><p><a href="./index.html">返回首页</a></p></div>';
     }
   }
 
+  /* ========== 灯箱逻辑 ========== */
+  let lbImages = [];
+  let lbIndex = 0;
+  let lbScale = 1;
+  let lbTranslate = { x: 0, y: 0 };
+  let lbDragging = false;
+  let lbDragStart = { x: 0, y: 0 };
+  let lbLastTap = 0;
+
+  const lbOverlay = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lbImg');
+  const lbWrap = document.getElementById('lbWrap');
+  const lbCounter = document.getElementById('lbCounter');
+  const lbPrev = document.getElementById('lbPrev');
+  const lbNext = document.getElementById('lbNext');
+
+  function openLightbox(index) {
+    lbIndex = index;
+    resetZoom();
+    updateLbImage();
+    lbOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lbOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+    resetZoom();
+  }
+
+  function updateLbImage() {
+    lbImg.src = lbImages[lbIndex];
+    lbCounter.textContent = `${lbIndex + 1} / ${lbImages.length}`;
+    lbPrev.style.display = lbImages.length > 1 ? '' : 'none';
+    lbNext.style.display = lbImages.length > 1 ? '' : 'none';
+    resetZoom();
+  }
+
+  function resetZoom() {
+    lbScale = 1;
+    lbTranslate = { x: 0, y: 0 };
+    applyTransform();
+    lbImg.style.cursor = lbImages.length > 0 ? 'zoom-in' : 'default';
+  }
+
+  function applyTransform() {
+    lbImg.style.transform = `translate(${lbTranslate.x}px, ${lbTranslate.y}px) scale(${lbScale})`;
+  }
+
+  function toggleZoom(e) {
+    if (lbScale > 1) {
+      resetZoom();
+    } else {
+      lbScale = 2.5;
+      // 以点击位置为中心缩放
+      const rect = lbImg.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const px = (e.clientX || e.touches?.[0]?.clientX || cx) - cx;
+      const py = (e.clientY || e.touches?.[0]?.clientY || cy) - cy;
+      lbTranslate = { x: -px * 0.6, y: -py * 0.6 };
+      applyTransform();
+      lbImg.style.cursor = 'grab';
+    }
+  }
+
+  function navigateLb(dir) {
+    if (lbImages.length <= 1) return;
+    lbIndex = (lbIndex + dir + lbImages.length) % lbImages.length;
+    updateLbImage();
+  }
+
+  // 关闭按钮
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  lbPrev.addEventListener('click', (e) => { e.stopPropagation(); navigateLb(-1); });
+  lbNext.addEventListener('click', (e) => { e.stopPropagation(); navigateLb(1); });
+
+  // 点击遮罩关闭（仅在未缩放时）
+  lbOverlay.addEventListener('click', (e) => {
+    if (e.target === lbOverlay || e.target === lbWrap) {
+      if (lbScale <= 1) closeLightbox();
+    }
+  });
+
+  // 键盘支持
+  document.addEventListener('keydown', (e) => {
+    if (!lbOverlay.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') navigateLb(-1);
+    if (e.key === 'ArrowRight') navigateLb(1);
+  });
+
+  // 双击缩放
+  lbImg.addEventListener('dblclick', (e) => {
+    e.preventDefault();
+    toggleZoom(e);
+  });
+
+  // 触摸手势：双击检测 + 拖拽平移 + 左右滑动切换
+  let touchStartDist = 0;
+  let touchStartScale = 1;
+
+  lbImg.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      // 双指捏合开始
+      touchStartDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      touchStartScale = lbScale;
+    } else if (e.touches.length === 1) {
+      // 双击检测
+      const now = Date.now();
+      if (now - lbLastTap < 300) {
+        e.preventDefault();
+        toggleZoom(e);
+      }
+      lbLastTap = now;
+
+      // 拖拽开始
+      if (lbScale > 1) {
+        lbDragging = true;
+        lbDragStart = { x: e.touches[0].clientX - lbTranslate.x, y: e.touches[0].clientY - lbTranslate.y };
+        lbImg.style.cursor = 'grabbing';
+      }
+    }
+  }, { passive: false });
+
+  lbImg.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      // 双指缩放
+      e.preventDefault();
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      lbScale = Math.min(Math.max(touchStartScale * (dist / touchStartDist), 1), 5);
+      if (lbScale <= 1.05) { lbScale = 1; lbTranslate = { x: 0, y: 0 }; }
+      applyTransform();
+    } else if (lbDragging && e.touches.length === 1) {
+      // 拖拽平移
+      e.preventDefault();
+      lbTranslate = {
+        x: e.touches[0].clientX - lbDragStart.x,
+        y: e.touches[0].clientY - lbDragStart.y
+      };
+      applyTransform();
+    }
+  }, { passive: false });
+
+  lbImg.addEventListener('touchend', (e) => {
+    lbDragging = false;
+    lbImg.style.cursor = lbScale > 1 ? 'grab' : 'zoom-in';
+    // 回弹：如果缩放接近1则归位
+    if (lbScale <= 1.05) resetZoom();
+  });
+
+  // 鼠标拖拽平移（桌面端）
+  lbImg.addEventListener('mousedown', (e) => {
+    if (lbScale <= 1) return;
+    e.preventDefault();
+    lbDragging = true;
+    lbDragStart = { x: e.clientX - lbTranslate.x, y: e.clientY - lbTranslate.y };
+    lbImg.style.cursor = 'grabbing';
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!lbDragging) return;
+    lbTranslate = { x: e.clientX - lbDragStart.x, y: e.clientY - lbDragStart.y };
+    applyTransform();
+  });
+
+  window.addEventListener('mouseup', () => {
+    lbDragging = false;
+    if (lbOverlay.classList.contains('active')) {
+      lbImg.style.cursor = lbScale > 1 ? 'grab' : 'zoom-in';
+    }
+  });
+
+  /* ========== 渲染详情页 ========== */
   function renderDetail(product) {
     const safeName = escapeHtml(product.name);
     const safePrice = Number(product.price || 0).toFixed(1);
     const safeCategory = escapeHtml(product.category);
     const safeDesc = escapeHtml(product.description || '').replace(/\n/g, '<br>');
-    // ✅ 使用 resolveImageUrl 映射所有图片
     const images = (product.images || []).map(resolveImageUrl);
     const coverUrl = resolveImageUrl(product.cover);
 
+    // 将完整图片列表存入灯箱
+    lbImages = images.length > 0 ? images : (coverUrl ? [coverUrl] : []);
+
     let galleryHtml = '';
-    if (images.length > 0) {
+    if (lbImages.length > 0) {
       galleryHtml = `
         <div class="gallery">
-          <img class="gallery-main" id="galleryMain" src="${escapeHtml(images[0])}" alt="${safeName}" decoding="async">
+          <img class="gallery-main" id="galleryMain" src="${escapeHtml(lbImages[0])}" alt="${safeName}" decoding="async">
         </div>
-        ${images.length > 1 ? `
+        ${lbImages.length > 1 ? `
           <div class="gallery-thumbs" id="galleryThumbs">
-            ${images.map((url, i) => `
+            ${lbImages.map((url, i) => `
               <img class="gallery-thumb ${i === 0 ? 'active' : ''}" data-index="${i}" src="${escapeHtml(url)}" alt="图${i + 1}" decoding="async" loading="lazy">
             `).join('')}
           </div>
@@ -209,19 +451,33 @@ body {
         <span class="product-category">${safeCategory}</span>
         <div class="product-desc">${safeDesc || '暂无详细描述'}</div>
         <a class="buy-btn" href="https://weidian.com/s/xxxxxxxxx" target="_blank" rel="noopener">前往微店购买</a>
-        <a class="back-link" href="index.html">← 返回产品列表</a>
+        <a class="back-link" href="./index.html">← 返回产品列表</a>
       </div>
     `;
 
-    if (images.length > 1) {
+    // 主图点击打开灯箱
+    const mainImg = document.getElementById('galleryMain');
+    if (mainImg) {
+      mainImg.addEventListener('click', () => openLightbox(0));
+    }
+
+    // 缩略图切换 + 点击打开灯箱
+    if (lbImages.length > 1) {
       const thumbs = document.getElementById('galleryThumbs');
       thumbs.addEventListener('click', (e) => {
         const thumb = e.target.closest('.gallery-thumb');
         if (!thumb) return;
         const idx = parseInt(thumb.dataset.index);
-        document.getElementById('galleryMain').src = images[idx];
+        document.getElementById('galleryMain').src = lbImages[idx];
         thumbs.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
         thumb.classList.add('active');
+      });
+
+      // 缩略图也可长按/双击打开灯箱（这里用 click 主图触发即可）
+      mainImg.addEventListener('click', () => {
+        const activeThumb = thumbs.querySelector('.gallery-thumb.active');
+        const idx = activeThumb ? parseInt(activeThumb.dataset.index) : 0;
+        openLightbox(idx);
       });
     }
 

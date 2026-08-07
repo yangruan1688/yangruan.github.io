@@ -5,11 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>绒颜 · 手工发饰</title>
 <meta name="description" content="绒颜 - 原创手工发饰品牌，每一件都是独一无二的手作好物。">
-<!-- ✅ 修正：favicon 指向 rongyan 文件夹内的 logo -->
 <link rel="icon" href="https://raw.githubusercontent.com/yangruan1688/yangruan.github.io/main/rongyan/logo.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://api.github.com" crossorigin>
 <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="preconnect" href="https://gcore.jsdelivr.net" crossorigin>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -84,7 +82,6 @@ body {
 <header class="header">
   <h1>✦ 绒颜 ✦</h1>
   <nav>
-    <!-- ✅ 修正：添加 ./ 前缀 -->
     <a href="./index.html" class="active">首页</a>
     <a href="#about">关于</a>
     <a href="https://weidian.com/s/xxxxxxxxx" target="_blank" rel="noopener">微店</a>
@@ -114,16 +111,9 @@ body {
 
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO  = 'yangruan.github.io';
-  const GITHUB_BRANCH = 'main';
-
-  // ✅ 修正：路径不再包含 main/，避免双重拼接
-  const PRODUCTS_FILE = 'products.json';
-  const RONGYAN_DIR = 'rongyan';
-
-  // ✅ 修正：三个 URL 都正确拼接为 .../main/rongyan/products.json
-  const RAW_URL   = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${RONGYAN_DIR}/${PRODUCTS_FILE}`;
-  const CDN_URL   = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${RONGYAN_DIR}/${PRODUCTS_FILE}`;
-  const GCORE_URL = `https://gcore.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${GITHUB_BRANCH}/${RONGYAN_DIR}/${PRODUCTS_FILE}`;
+  
+  // ✅ 使用 GitHub Search API 获取带有 product 标签的 open issues
+  const SEARCH_API = `https://api.github.com/search/issues?q=repo:${GITHUB_OWNER}/${GITHUB_REPO}+is:issue+state:open+label:product&per_page=100&sort=created&order=desc`;
 
   let allProducts = [];
   let currentCategory = 'all';
@@ -137,49 +127,63 @@ body {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
   }
 
-  async function fetchProducts(url, timeout = 8000) {
+  // ✅ 统一处理图片 URL，兼容相对路径和绝对路径
+  function resolveImageUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${url}`;
+  }
+
+  async function fetchProducts() {
     const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
+    const id = setTimeout(() => controller.abort(), 10000);
     try {
-      const res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+      const res = await fetch(SEARCH_API, {
+        signal: controller.signal,
+        cache: 'no-store',
+        headers: { Accept: 'application/vnd.github.v3+json' }
+      });
       clearTimeout(id);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.json();
+      const data = await res.json();
+      
+      // 解析 issues 为产品对象
+      return (data.items || []).map(issue => {
+        let bodyData = {};
+        try { bodyData = JSON.parse(issue.body || '{}'); } catch(e) {}
+        
+        const catLabel = issue.labels.find(l => l.name.startsWith('cat:'));
+        return {
+          id: issue.number,
+          name: issue.title,
+          category: catLabel ? catLabel.name.replace('cat:', '') : '',
+          ...bodyData
+        };
+      });
     } catch (e) {
       clearTimeout(id);
+      console.error('Failed to fetch products:', e);
       return null;
     }
   }
 
   async function loadProducts() {
     productGrid.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
-    const ts = Date.now();
-    const results = await Promise.all([
-      fetchProducts(`${RAW_URL}?_=${ts}`),
-      fetchProducts(`${CDN_URL}?_=${ts}`),
-      fetchProducts(`${GCORE_URL}?_=${ts}`)
-    ]);
+    
+    const products = await fetchProducts();
 
-    let bestData = null;
-    // 优先使用 GitHub Raw（最实时）
-    if (results[0] !== null) {
-      bestData = Array.isArray(results[0]) ? results[0] : (results[0].products || []);
-    } else {
-      for (let i = 1; i < results.length; i++) {
-        if (results[i] !== null) {
-          bestData = Array.isArray(results[i]) ? results[i] : (results[i].products || []);
-          break;
-        }
-      }
+    if (products === null) {
+      productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>加载失败，请刷新页面重试</p></div>';
+      return;
     }
 
-    if (!bestData || bestData.length === 0) {
+    if (products.length === 0) {
       productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>暂无产品，敬请期待</p></div>';
       filterBar.innerHTML = '<button class="filter-btn active" data-category="all">全部</button>';
       return;
     }
 
-    allProducts = bestData;
+    allProducts = products;
     lastLoadTime = Date.now();
     renderFilters();
     renderProducts();
@@ -201,12 +205,12 @@ body {
       productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>该分类暂无产品</p></div>';
       return;
     }
-    productGrid.innerHTML = filtered.slice().reverse().map(p => {
+    // Search API 已经按 created desc 排序，最新的在前面
+    productGrid.innerHTML = filtered.map(p => {
       const safeName = escapeHtml(p.name || '');
-      const safeCover = escapeHtml(p.cover || '');
+      const safeCover = escapeHtml(resolveImageUrl(p.cover) || '');
       const safePrice = Number(p.price || 0).toFixed(1);
       const safeCategory = escapeHtml(p.category || '');
-      // ✅ 修正：详情页链接添加 ./ 前缀
       return `
         <a class="card" href="./detail.html?id=${p.id}">
           <img class="card-img" src="${safeCover}" alt="${safeName}" loading="lazy" decoding="async"
@@ -233,9 +237,6 @@ body {
     if (document.visibilityState === 'visible' && Date.now() - lastLoadTime > 5000) loadProducts();
   });
   window.addEventListener('pageshow', (e) => { if (e.persisted) loadProducts(); });
-  window.addEventListener('storage', function (e) {
-    if (e.key === '_ry_products_updated' && e.newValue) loadProducts();
-  });
 
   loadProducts();
 })();

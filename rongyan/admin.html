@@ -89,8 +89,9 @@ body {
 .form-group input, .form-group textarea, .form-group select {
   width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px;
   font-size: 14px; outline: none; transition: border-color 0.25s; font-family: inherit;
+  background: #fff;
 }
-.form-group input:focus, .form-group textarea:focus { border-color: var(--primary); }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--primary); }
 .form-group textarea { resize: vertical; min-height: 80px; }
 .image-upload-area {
   border: 2px dashed #ddd; border-radius: 8px; padding: 20px; text-align: center;
@@ -132,7 +133,7 @@ body {
 <header class="header">
   <h1>✦ 绒颜 ✦ 管理</h1>
   <nav>
-    <a href="index.html" target="_blank">查看产品</a>
+    <a href="./index.html" target="_blank">查看产品</a>
     <a href="#" id="logoutBtn" style="display:none;">退出登录</a>
   </nav>
 </header>
@@ -172,10 +173,16 @@ body {
       <label>价格 (¥) *</label>
       <input type="number" id="editPrice" step="0.1" min="0" placeholder="29.9">
     </div>
+    <!-- ✅ 修改：改为固定选项的 select，与 index.html 分类完全一致 -->
     <div class="form-group">
       <label>分类 *</label>
-      <input type="text" id="editCategory" placeholder="例：发夹 / 发圈 / 发簪" list="categorySuggestions">
-      <datalist id="categorySuggestions"></datalist>
+      <select id="editCategory">
+        <option value="">请选择分类</option>
+        <option value="发饰">发饰</option>
+        <option value="耳饰">耳饰</option>
+        <option value="胸饰">胸饰</option>
+        <option value="其他">其他</option>
+      </select>
     </div>
     <div class="form-group">
       <label>产品描述</label>
@@ -233,7 +240,6 @@ body {
   function setToken(t) { sessionStorage.setItem('_ry_admin_token', t); token = t; }
   function clearAuth() { sessionStorage.removeItem('_ry_admin_token'); token = ''; location.reload(); }
 
-  // ✅ 增强 Token 验证：同时检查用户名和 repo 权限
   async function verifyToken(t) {
     try {
       const res = await fetch('https://api.github.com/user', {
@@ -243,7 +249,6 @@ body {
       const user = await res.json();
       if (user.login !== GITHUB_OWNER) return false;
 
-      // 验证是否有 repo 访问权限
       const scopeRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`, {
         headers: { Authorization: `Bearer ${t}` }
       });
@@ -336,8 +341,6 @@ body {
       body: JSON.stringify({ state: 'closed' })
     });
   }
-
-  // ✅ triggerCDNRefresh 已移除，不再需要
 
   async function uploadImageFile(base64Data, fileName) {
     const path = `${IMAGES_DIR}/${fileName}`;
@@ -434,28 +437,30 @@ body {
     });
   }
 
-  function updateCategorySuggestions() {
-    const cats = [...new Set(products.map(p => p.category).filter(Boolean))];
-    $('#categorySuggestions').innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">`).join('');
-  }
+  // ✅ 修改：不再需要动态更新 datalist，分类已固定为 select
+  // function updateCategorySuggestions() { ... } // 已移除
 
   function openEditModal(product = null) {
     editingImages = [];
-    updateCategorySuggestions();
 
     if (product) {
       modalTitle.textContent = '编辑产品';
       $('#editId').value = product.id;
       $('#editName').value = product.name;
       $('#editPrice').value = product.price;
-      $('#editCategory').value = product.category;
+      // ✅ 修改：设置 select 的值
+      $('#editCategory').value = product.category || '';
       $('#editDesc').value = product.description || '';
       (product.images || []).forEach(url => {
         editingImages.push({ base64: url, isNew: false });
       });
     } else {
       modalTitle.textContent = '新增产品';
-      ['editId','editName','editPrice','editCategory','editDesc'].forEach(id => $(`#${id}`).value = '');
+      $('#editId').value = '';
+      $('#editName').value = '';
+      $('#editPrice').value = '';
+      $('#editCategory').value = ''; // 重置为默认选项
+      $('#editDesc').value = '';
     }
     renderImagePreviews();
     editModal.classList.add('active');
@@ -503,13 +508,13 @@ body {
     if (isSaving) return;
     const name = $('#editName').value.trim();
     const price = parseFloat($('#editPrice').value);
-    const category = $('#editCategory').value.trim();
+    const category = $('#editCategory').value; // ✅ select 直接用 .value
     const desc = $('#editDesc').value.trim();
     const existingId = $('#editId').value;
 
     if (!name) return showToast('请输入产品名称', 'error');
     if (isNaN(price) || price < 0) return showToast('请输入有效价格', 'error');
-    if (!category) return showToast('请输入分类', 'error');
+    if (!category) return showToast('请选择分类', 'error'); // ✅ 提示语改为"选择"
     if (editingImages.length === 0) return showToast('请至少上传一张图片', 'error');
 
     isSaving = true; saveProductBtn.disabled = true; saveProductBtn.textContent = '保存中...';
@@ -540,8 +545,6 @@ body {
 
       await saveProductToIssue(existingId ? parseInt(existingId) : null, name, category, data);
 
-      // ✅ triggerCDNRefresh 调用已移除
-
       localStorage.setItem('_ry_sync_version', Date.now().toString());
       showToast(existingId ? '产品已更新' : '产品已添加');
       closeEditModal();
@@ -558,7 +561,6 @@ body {
     if (!p || !confirm(`确定删除「${p.name}」？\n此操作将关闭对应 Issue。`)) return;
     try {
       await deleteProductIssue(id);
-      // ✅ triggerCDNRefresh 调用已移除
       localStorage.setItem('_ry_sync_version', Date.now().toString());
       showToast('产品已删除');
       await loadProducts();

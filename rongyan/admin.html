@@ -30,7 +30,6 @@ body {
 
 .container { max-width: 900px; margin: 0 auto; padding: 20px 16px 80px; }
 
-/* Login Panel */
 .login-panel {
   background: var(--card-bg); border-radius: var(--radius); padding: 40px 30px;
   box-shadow: var(--shadow); text-align: center; max-width: 480px; margin: 60px auto;
@@ -55,7 +54,6 @@ body {
 .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: 16px; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Admin Dashboard */
 .dashboard { display: none; }
 .dashboard.active { display: block; }
 .toolbar {
@@ -76,7 +74,6 @@ body {
 .product-item .meta { font-size: 12px; color: var(--text-light); }
 .product-item .actions { display: flex; gap: 8px; flex-shrink: 0; }
 
-/* Modal */
 .modal-overlay {
   display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
   z-index: 200; align-items: center; justify-content: center; padding: 16px;
@@ -142,7 +139,6 @@ body {
 </header>
 
 <div class="container">
-  <!-- 登录面板 -->
   <div class="login-panel" id="loginPanel">
     <h2>🔐 管理员验证</h2>
     <p>请输入 GitHub Personal Access Token<br>Token 仅保存在当前会话中，关闭页面即自动清除<br><small style="color:#e74c3c;">⚠️ 请勿在公共设备上保存 Token</small></p>
@@ -154,7 +150,6 @@ body {
     </p>
   </div>
 
-  <!-- 管理面板 -->
   <div class="dashboard" id="dashboard">
     <div class="toolbar">
       <h2 style="font-size:18px;">产品列表</h2>
@@ -166,7 +161,6 @@ body {
   </div>
 </div>
 
-<!-- 编辑弹窗 -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
     <h3 id="modalTitle">新增产品</h3>
@@ -209,16 +203,13 @@ body {
 (function () {
   'use strict';
 
-  // ========== 配置 ==========
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
-  const SYNC_PATH = 'rongyan/sync.json'; 
   const IMAGES_DIR = 'rongyan/images';
   const WEBP_QUALITY = 0.82;
   const MAX_IMAGE_SIZE = 1200;
 
-  // ========== DOM ==========
   const $ = (sel) => document.querySelector(sel);
   const loginPanel = $('#loginPanel'), dashboard = $('#dashboard');
   const tokenInput = $('#tokenInput'), loginBtn = $('#loginBtn'), logoutBtn = $('#logoutBtn');
@@ -230,7 +221,6 @@ body {
 
   let token = '', products = [], editingImages = [], isSaving = false;
 
-  // ========== 工具函数 ==========
   function showToast(msg, type = 'success') {
     toastEl.textContent = msg;
     toastEl.className = `toast ${type} show`;
@@ -239,19 +229,26 @@ body {
   function escapeHtml(str) {
     return str == null ? '' : String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
-  function encodeBase64(str) { return btoa(unescape(encodeURIComponent(str))); }
 
-  // ========== Auth ==========
   function getToken() { return sessionStorage.getItem('_ry_admin_token') || ''; }
   function setToken(t) { sessionStorage.setItem('_ry_admin_token', t); token = t; }
   function clearAuth() { sessionStorage.removeItem('_ry_admin_token'); token = ''; location.reload(); }
-  
+
+  // ✅ 增强 Token 验证：同时检查用户名和 repo 权限
   async function verifyToken(t) {
     try {
-      const res = await fetch('https://api.github.com/user', { headers: { Authorization: `Bearer ${t}` } });
+      const res = await fetch('https://api.github.com/user', {
+        headers: { Authorization: `Bearer ${t}` }
+      });
       if (!res.ok) return false;
       const user = await res.json();
-      return user.login === GITHUB_OWNER;
+      if (user.login !== GITHUB_OWNER) return false;
+
+      // 验证是否有 repo 访问权限
+      const scopeRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`, {
+        headers: { Authorization: `Bearer ${t}` }
+      });
+      return scopeRes.ok;
     } catch { return false; }
   }
 
@@ -261,12 +258,11 @@ body {
     loginBtn.disabled = true; loginBtn.textContent = '验证中...';
     const valid = await verifyToken(t);
     loginBtn.disabled = false; loginBtn.textContent = '验证并进入';
-    if (!valid) return showToast('Token 无效或用户名不匹配', 'error');
+    if (!valid) return showToast('Token 无效或权限不足', 'error');
     setToken(t); initDashboard();
   });
   logoutBtn.addEventListener('click', (e) => { e.preventDefault(); clearAuth(); });
 
-  // ========== GitHub API Core ==========
   async function ghApi(endpoint, options = {}) {
     const url = endpoint.startsWith('http') ? endpoint : `https://api.github.com${endpoint}`;
     const res = await fetch(url, {
@@ -285,12 +281,10 @@ body {
     return res.json();
   }
 
-  // 确保 Label 存在，不存在则创建（避免更新 Issue 时报错）
   async function ensureLabel(name, color = 'ededed') {
     try {
       await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/labels/${encodeURIComponent(name)}`);
     } catch (e) {
-      // 404 表示不存在，尝试创建
       try {
         await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/labels`, {
           method: 'POST',
@@ -302,7 +296,6 @@ body {
     }
   }
 
-  // 获取所有 Open 的 Issues (作为产品列表)
   async function fetchAllProducts() {
     const issues = await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues?state=open&per_page=100&labels=product`);
     return issues.map(issue => {
@@ -318,17 +311,13 @@ body {
     }).filter(Boolean);
   }
 
-  // 创建或更新 Issue
   async function saveProductToIssue(id, name, category, data) {
     const bodyStr = JSON.stringify(data);
     const catLabel = `cat:${category}`;
-    
-    // 确保分类 Label 存在
     await ensureLabel(catLabel, 'b8860b');
     await ensureLabel('product', '27ae60');
-
     const labels = ['product', catLabel];
-    
+
     if (id) {
       return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues/${id}`, {
         method: 'PATCH',
@@ -342,7 +331,6 @@ body {
     }
   }
 
-  // 删除产品 (关闭 Issue)
   async function deleteProductIssue(id) {
     return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues/${id}`, {
       method: 'PATCH',
@@ -350,31 +338,8 @@ body {
     });
   }
 
-  // 触发 CDN 刷新信标
-  async function triggerCDNRefresh() {
-    try {
-      let sha = null;
-      try {
-        const file = await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${SYNC_PATH}?ref=${GITHUB_BRANCH}`);
-        sha = file.sha;
-      } catch (e) {} 
+  // ✅ triggerCDNRefresh 已移除，不再需要
 
-      const content = encodeBase64(JSON.stringify({ lastUpdated: new Date().toISOString() }));
-      await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${SYNC_PATH}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          message: `chore: sync cdn ${Date.now()}`,
-          content,
-          sha,
-          branch: GITHUB_BRANCH
-        })
-      });
-    } catch (e) {
-      console.warn('CDN refresh trigger failed:', e);
-    }
-  }
-
-  // 图片上传
   async function uploadImageFile(base64Data, fileName) {
     const path = `${IMAGES_DIR}/${fileName}`;
     return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
@@ -387,7 +352,6 @@ body {
     });
   }
 
-  // 图片压缩
   async function compressToWebP(file) {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -413,7 +377,6 @@ body {
     });
   }
 
-  // ========== Dashboard Logic ==========
   async function initDashboard() {
     token = getToken();
     if (!token) return;
@@ -480,7 +443,7 @@ body {
   function openEditModal(product = null) {
     editingImages = [];
     updateCategorySuggestions();
-    
+
     if (product) {
       modalTitle.textContent = '编辑产品';
       $('#editId').value = product.id;
@@ -530,14 +493,13 @@ body {
       </div>
     `).join('');
     imagePreviewList.querySelectorAll('.remove-img').forEach(btn => {
-      btn.addEventListener('click', () => { 
-        editingImages.splice(parseInt(btn.dataset.index), 1); 
-        renderImagePreviews(); 
+      btn.addEventListener('click', () => {
+        editingImages.splice(parseInt(btn.dataset.index), 1);
+        renderImagePreviews();
       });
     });
   }
 
-  // 保存逻辑
   saveProductBtn.addEventListener('click', async () => {
     if (isSaving) return;
     const name = $('#editName').value.trim();
@@ -554,7 +516,6 @@ body {
     isSaving = true; saveProductBtn.disabled = true; saveProductBtn.textContent = '保存中...';
 
     try {
-      // 1. 上传图片
       const imageUrls = [];
       for (let i = 0; i < editingImages.length; i++) {
         const img = editingImages[i];
@@ -563,7 +524,6 @@ body {
           await uploadImageFile(img.base64, fileName);
           imageUrls.push(`${IMAGES_DIR}/${fileName}`);
         } else {
-          // 兼容旧数据：如果是完整URL则提取路径，否则直接使用
           let path = img.base64;
           if (path.startsWith('http')) {
             path = path.replace(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`, '');
@@ -572,22 +532,18 @@ body {
         }
       }
 
-      // 2. 构造数据并保存到 Issue
       const data = {
         price, description: desc,
         cover: getImageUrl(imageUrls[0]),
         images: imageUrls.map(u => getImageUrl(u)),
         updatedAt: new Date().toISOString()
       };
-      
+
       await saveProductToIssue(existingId ? parseInt(existingId) : null, name, category, data);
 
-      // 3. 触发 CDN 刷新
-      await triggerCDNRefresh();
+      // ✅ triggerCDNRefresh 调用已移除
 
-      // 4. 通知其他标签页
       localStorage.setItem('_ry_sync_version', Date.now().toString());
-
       showToast(existingId ? '产品已更新' : '产品已添加');
       closeEditModal();
       await loadProducts();
@@ -603,7 +559,7 @@ body {
     if (!p || !confirm(`确定删除「${p.name}」？\n此操作将关闭对应 Issue。`)) return;
     try {
       await deleteProductIssue(id);
-      await triggerCDNRefresh();
+      // ✅ triggerCDNRefresh 调用已移除
       localStorage.setItem('_ry_sync_version', Date.now().toString());
       showToast('产品已删除');
       await loadProducts();

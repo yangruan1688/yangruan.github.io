@@ -97,17 +97,38 @@ body {
   border: 2px dashed #ddd; border-radius: 8px; padding: 20px; text-align: center;
   cursor: pointer; transition: all 0.25s; color: var(--text-light); font-size: 13px;
 }
-.image-upload-area:hover { border-color: var(--primary); color: var(--primary); }
+.image-upload-area:hover, .image-upload-area.dragover { border-color: var(--primary); color: var(--primary); background: rgba(184,134,11,0.03); }
 .image-preview-list { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .image-preview-item {
   position: relative; width: 72px; height: 72px; border-radius: 8px; overflow: hidden;
+  cursor: grab; border: 2px solid transparent; transition: border-color 0.2s;
 }
-.image-preview-item img { width: 100%; height: 100%; object-fit: cover; }
-.image-preview-item .remove-img {
+.image-preview-item:active { cursor: grabbing; }
+.image-preview-item.is-cover { border-color: var(--primary); }
+.image-preview-item img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.cover-badge {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--primary); color: #fff; font-size: 10px;
+  text-align: center; padding: 2px 0; font-weight: 600; letter-spacing: 1px;
+}
+.remove-img {
   position: absolute; top: 2px; right: 2px; width: 20px; height: 20px;
   background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%;
   font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  z-index: 2;
 }
+.set-cover-btn {
+  position: absolute; bottom: 2px; right: 2px; width: 20px; height: 20px;
+  background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%;
+  font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  z-index: 2; opacity: 0; transition: opacity 0.2s;
+}
+.image-preview-item:hover .set-cover-btn { opacity: 1; }
+.image-preview-item.is-cover .set-cover-btn { display: none; }
+.upload-progress {
+  margin-top: 8px; font-size: 12px; color: var(--primary); display: none;
+}
+.upload-progress.active { display: block; }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
 
 .toast {
@@ -141,13 +162,9 @@ body {
 <div class="container">
   <div class="login-panel" id="loginPanel">
     <h2>🔐 管理员验证</h2>
-    <p>请输入 GitHub Personal Access Token<br>Token 仅保存在当前会话中，关闭页面即自动清除<br><small style="color:#e74c3c;">⚠️ 请勿在公共设备上保存 Token</small></p>
+    <p>请输入 GitHub Personal Access Token<br><small style="color:#e74c3c;">⚠️ Token 仅存于当前会话，请勿在公共设备使用</small></p>
     <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
     <button class="btn btn-primary" id="loginBtn">验证并进入</button>
-    <p style="margin-top:16px;font-size:11px;color:#bbb;">
-      需要 <b>repo</b> 和 <b>issues: write</b> 权限<br>
-      <a href="https://github.com/settings/tokens?type=beta" target="_blank" style="color:var(--primary);">前往生成 Fine-grained Token →</a>
-    </p>
   </div>
 
   <div class="dashboard" id="dashboard">
@@ -173,7 +190,6 @@ body {
       <label>价格 (¥) *</label>
       <input type="number" id="editPrice" step="0.1" min="0" placeholder="29.9">
     </div>
-    <!-- ✅ 修改：改为固定选项的 select，与 index.html 分类完全一致 -->
     <div class="form-group">
       <label>分类 *</label>
       <select id="editCategory">
@@ -189,11 +205,12 @@ body {
       <textarea id="editDesc" placeholder="产品材质、尺寸、工艺等描述..."></textarea>
     </div>
     <div class="form-group">
-      <label>产品图片（自动压缩为 WebP）</label>
+      <label>产品图片（第一张为封面，可拖拽排序）</label>
       <div class="image-upload-area" id="imageUploadArea">
-        📷 点击或拖拽上传图片<br><small>支持 JPG/PNG/WebP，建议正方形</small>
+        📷 点击或拖拽批量上传图片<br><small>支持 JPG/PNG/WebP，自动压缩，建议正方形</small>
       </div>
       <input type="file" id="imageFileInput" accept="image/*" multiple style="display:none;">
+      <div class="upload-progress" id="uploadProgress"></div>
       <div class="image-preview-list" id="imagePreviewList"></div>
     </div>
     <div class="modal-actions">
@@ -215,6 +232,7 @@ body {
   const IMAGES_DIR = 'rongyan/images';
   const WEBP_QUALITY = 0.82;
   const MAX_IMAGE_SIZE = 1200;
+  const COMPRESS_CONCURRENCY = 3;
 
   const $ = (sel) => document.querySelector(sel);
   const loginPanel = $('#loginPanel'), dashboard = $('#dashboard');
@@ -224,8 +242,10 @@ body {
   const cancelEditBtn = $('#cancelEditBtn'), saveProductBtn = $('#saveProductBtn');
   const imageUploadArea = $('#imageUploadArea'), imageFileInput = $('#imageFileInput');
   const imagePreviewList = $('#imagePreviewList'), toastEl = $('#toast');
+  const uploadProgress = $('#uploadProgress');
 
   let token = '', products = [], editingImages = [], isSaving = false;
+  let dragSrcIndex = null;
 
   function showToast(msg, type = 'success') {
     toastEl.textContent = msg;
@@ -242,17 +262,12 @@ body {
 
   async function verifyToken(t) {
     try {
-      const res = await fetch('https://api.github.com/user', {
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`, {
         headers: { Authorization: `Bearer ${t}` }
       });
       if (!res.ok) return false;
-      const user = await res.json();
-      if (user.login !== GITHUB_OWNER) return false;
-
-      const scopeRes = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`, {
-        headers: { Authorization: `Bearer ${t}` }
-      });
-      return scopeRes.ok;
+      const repo = await res.json();
+      return !!(repo.permissions?.push || repo.permissions?.admin);
     } catch { return false; }
   }
 
@@ -291,12 +306,9 @@ body {
     } catch (e) {
       try {
         await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/labels`, {
-          method: 'POST',
-          body: JSON.stringify({ name, color })
+          method: 'POST', body: JSON.stringify({ name, color })
         });
-      } catch (createErr) {
-        console.warn(`Failed to create label ${name}:`, createErr);
-      }
+      } catch (createErr) { console.warn(`Failed to create label ${name}:`, createErr); }
     }
   }
 
@@ -306,8 +318,7 @@ body {
       try {
         const data = JSON.parse(issue.body || '{}');
         return {
-          id: issue.number,
-          name: issue.title,
+          id: issue.number, name: issue.title,
           category: issue.labels.find(l => l.name.startsWith('cat:'))?.name.replace('cat:', '') || '',
           ...data
         };
@@ -321,24 +332,20 @@ body {
     await ensureLabel(catLabel, 'b8860b');
     await ensureLabel('product', '27ae60');
     const labels = ['product', catLabel];
-
     if (id) {
       return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ title: name, body: bodyStr, labels })
+        method: 'PATCH', body: JSON.stringify({ title: name, body: bodyStr, labels })
       });
     } else {
       return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues`, {
-        method: 'POST',
-        body: JSON.stringify({ title: name, body: bodyStr, labels })
+        method: 'POST', body: JSON.stringify({ title: name, body: bodyStr, labels })
       });
     }
   }
 
   async function deleteProductIssue(id) {
     return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ state: 'closed' })
+      method: 'PATCH', body: JSON.stringify({ state: 'closed' })
     });
   }
 
@@ -348,8 +355,7 @@ body {
       method: 'PUT',
       body: JSON.stringify({
         message: `chore: upload image ${fileName}`,
-        content: base64Data.split(',')[1],
-        branch: GITHUB_BRANCH
+        content: base64Data.split(',')[1], branch: GITHUB_BRANCH
       })
     });
   }
@@ -377,6 +383,26 @@ body {
       img.onerror = reject;
       img.src = URL.createObjectURL(file);
     });
+  }
+
+  // ✅ 并发控制：最多同时压缩 N 张图片
+  async function compressBatch(files) {
+    const results = [];
+    let idx = 0;
+    async function worker() {
+      while (idx < files.length) {
+        const i = idx++;
+        try {
+          results[i] = { base64: await compressToWebP(files[i]), isNew: true };
+        } catch (e) {
+          showToast(`压缩失败: ${files[i].name}`, 'error');
+          results[i] = null;
+        }
+      }
+    }
+    const workers = Array.from({ length: Math.min(COMPRESS_CONCURRENCY, files.length) }, () => worker());
+    await Promise.all(workers);
+    return results.filter(Boolean);
   }
 
   async function initDashboard() {
@@ -437,18 +463,13 @@ body {
     });
   }
 
-  // ✅ 修改：不再需要动态更新 datalist，分类已固定为 select
-  // function updateCategorySuggestions() { ... } // 已移除
-
   function openEditModal(product = null) {
     editingImages = [];
-
     if (product) {
       modalTitle.textContent = '编辑产品';
       $('#editId').value = product.id;
       $('#editName').value = product.name;
       $('#editPrice').value = product.price;
-      // ✅ 修改：设置 select 的值
       $('#editCategory').value = product.category || '';
       $('#editDesc').value = product.description || '';
       (product.images || []).forEach(url => {
@@ -459,7 +480,7 @@ body {
       $('#editId').value = '';
       $('#editName').value = '';
       $('#editPrice').value = '';
-      $('#editCategory').value = ''; // 重置为默认选项
+      $('#editCategory').value = '';
       $('#editDesc').value = '';
     }
     renderImagePreviews();
@@ -471,35 +492,86 @@ body {
   editModal.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
   addProductBtn.addEventListener('click', () => openEditModal());
 
+  // ✅ 拖拽高亮
   imageUploadArea.addEventListener('click', () => imageFileInput.click());
-  imageUploadArea.addEventListener('dragover', (e) => { e.preventDefault(); imageUploadArea.style.borderColor = 'var(--primary)'; });
-  imageUploadArea.addEventListener('dragleave', () => { imageUploadArea.style.borderColor = '#ddd'; });
+  imageUploadArea.addEventListener('dragover', (e) => { e.preventDefault(); imageUploadArea.classList.add('dragover'); });
+  imageUploadArea.addEventListener('dragleave', () => { imageUploadArea.classList.remove('dragover'); });
   imageUploadArea.addEventListener('drop', (e) => {
-    e.preventDefault(); imageUploadArea.style.borderColor = '#ddd'; handleFiles(e.dataTransfer.files);
+    e.preventDefault(); imageUploadArea.classList.remove('dragover'); handleFiles(e.dataTransfer.files);
   });
   imageFileInput.addEventListener('change', () => { handleFiles(imageFileInput.files); imageFileInput.value = ''; });
 
-  async function handleFiles(files) {
-    for (const file of files) {
-      if (!file.type.startsWith('image/')) continue;
-      try {
-        editingImages.push({ base64: await compressToWebP(file), isNew: true });
-        renderImagePreviews();
-      } catch (e) { showToast(`图片压缩失败: ${file.name}`, 'error'); }
-    }
+  // ✅ 批量并发压缩 + 进度提示
+  async function handleFiles(fileList) {
+    const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+    if (files.length === 0) return;
+
+    uploadProgress.textContent = `⏳ 正在压缩 ${files.length} 张图片...`;
+    uploadProgress.classList.add('active');
+
+    const compressed = await compressBatch(files);
+    editingImages.push(...compressed);
+
+    uploadProgress.textContent = `✅ 已添加 ${compressed.length} 张图片`;
+    setTimeout(() => uploadProgress.classList.remove('active'), 1500);
+
+    renderImagePreviews();
   }
 
+  // ✅ 设置封面
+  function setCover(index) {
+    if (index === 0) return;
+    const item = editingImages.splice(index, 1)[0];
+    editingImages.unshift(item);
+    renderImagePreviews();
+  }
+
+  // ✅ 渲染预览 + 拖拽排序 + 封面标记
   function renderImagePreviews() {
     imagePreviewList.innerHTML = editingImages.map((img, i) => `
-      <div class="image-preview-item">
+      <div class="image-preview-item ${i === 0 ? 'is-cover' : ''}" draggable="true" data-index="${i}">
         <img src="${img.base64}" alt="">
-        <button class="remove-img" data-index="${i}">×</button>
+        ${i === 0 ? '<div class="cover-badge">封面</div>' : `<button class="set-cover-btn" data-set-cover="${i}" title="设为封面">★</button>`}
+        <button class="remove-img" data-remove="${i}">×</button>
       </div>
     `).join('');
-    imagePreviewList.querySelectorAll('.remove-img').forEach(btn => {
-      btn.addEventListener('click', () => {
-        editingImages.splice(parseInt(btn.dataset.index), 1);
+
+    // 删除按钮
+    imagePreviewList.querySelectorAll('[data-remove]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        editingImages.splice(parseInt(btn.dataset.remove), 1);
         renderImagePreviews();
+      });
+    });
+
+    // 设为封面按钮
+    imagePreviewList.querySelectorAll('[data-set-cover]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setCover(parseInt(btn.dataset.setCover));
+      });
+    });
+
+    // 拖拽排序
+    const items = imagePreviewList.querySelectorAll('.image-preview-item');
+    items.forEach(item => {
+      item.addEventListener('dragstart', (e) => {
+        dragSrcIndex = parseInt(item.dataset.index);
+        item.style.opacity = '0.4';
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      item.addEventListener('dragend', () => { item.style.opacity = '1'; });
+      item.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+      item.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const targetIndex = parseInt(item.dataset.index);
+        if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+          const moved = editingImages.splice(dragSrcIndex, 1)[0];
+          editingImages.splice(targetIndex, 0, moved);
+          renderImagePreviews();
+        }
+        dragSrcIndex = null;
       });
     });
   }
@@ -508,25 +580,32 @@ body {
     if (isSaving) return;
     const name = $('#editName').value.trim();
     const price = parseFloat($('#editPrice').value);
-    const category = $('#editCategory').value; // ✅ select 直接用 .value
+    const category = $('#editCategory').value;
     const desc = $('#editDesc').value.trim();
     const existingId = $('#editId').value;
 
     if (!name) return showToast('请输入产品名称', 'error');
     if (isNaN(price) || price < 0) return showToast('请输入有效价格', 'error');
-    if (!category) return showToast('请选择分类', 'error'); // ✅ 提示语改为"选择"
+    if (!category) return showToast('请选择分类', 'error');
     if (editingImages.length === 0) return showToast('请至少上传一张图片', 'error');
 
     isSaving = true; saveProductBtn.disabled = true; saveProductBtn.textContent = '保存中...';
 
     try {
       const imageUrls = [];
+      const totalNew = editingImages.filter(img => img.isNew).length;
+      let uploadedCount = 0;
+
       for (let i = 0; i < editingImages.length; i++) {
         const img = editingImages[i];
         if (img.isNew) {
           const fileName = `${Date.now()}_${i}.webp`;
           await uploadImageFile(img.base64, fileName);
           imageUrls.push(`${IMAGES_DIR}/${fileName}`);
+          uploadedCount++;
+          if (totalNew > 1) {
+            saveProductBtn.textContent = `上传中 ${uploadedCount}/${totalNew}...`;
+          }
         } else {
           let path = img.base64;
           if (path.startsWith('http')) {
@@ -544,7 +623,6 @@ body {
       };
 
       await saveProductToIssue(existingId ? parseInt(existingId) : null, name, category, data);
-
       localStorage.setItem('_ry_sync_version', Date.now().toString());
       showToast(existingId ? '产品已更新' : '产品已添加');
       closeEditModal();

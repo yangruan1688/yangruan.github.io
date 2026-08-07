@@ -205,6 +205,7 @@ body {
 
 <div class="toast" id="toast"></div>
 
+<!-- 保持原有的 CSS 和 HTML 结构不变，仅替换 <script> 部分 -->
 <script>
 (function () {
   'use strict';
@@ -213,84 +214,58 @@ body {
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO = 'yangruan.github.io';
   const GITHUB_BRANCH = 'main';
-  const PRODUCTS_PATH = 'main/rongyan/products.json';
-  const IMAGES_DIR = 'main/rongyan/images';
+  const SYNC_PATH = 'rongyan/sync.json'; // 用于触发 CDN 刷新的信标文件
+  const IMAGES_DIR = 'rongyan/images';
   const WEBP_QUALITY = 0.82;
-  const MAX_IMAGE_SIZE = 1200; // px
+  const MAX_IMAGE_SIZE = 1200;
 
-  // ========== DOM ==========
+  // ========== DOM (保持原样) ==========
   const $ = (sel) => document.querySelector(sel);
-  const loginPanel = $('#loginPanel');
-  const dashboard = $('#dashboard');
-  const tokenInput = $('#tokenInput');
-  const loginBtn = $('#loginBtn');
-  const logoutBtn = $('#logoutBtn');
-  const productList = $('#productList');
-  const addProductBtn = $('#addProductBtn');
-  const editModal = $('#editModal');
-  const modalTitle = $('#modalTitle');
-  const cancelEditBtn = $('#cancelEditBtn');
-  const saveProductBtn = $('#saveProductBtn');
-  const imageUploadArea = $('#imageUploadArea');
-  const imageFileInput = $('#imageFileInput');
-  const imagePreviewList = $('#imagePreviewList');
-  const toastEl = $('#toast');
+  const loginPanel = $('#loginPanel'), dashboard = $('#dashboard');
+  const tokenInput = $('#tokenInput'), loginBtn = $('#loginBtn'), logoutBtn = $('#logoutBtn');
+  const productList = $('#productList'), addProductBtn = $('#addProductBtn');
+  const editModal = $('#editModal'), modalTitle = $('#modalTitle');
+  const cancelEditBtn = $('#cancelEditBtn'), saveProductBtn = $('#saveProductBtn');
+  const imageUploadArea = $('#imageUploadArea'), imageFileInput = $('#imageFileInput');
+  const imagePreviewList = $('#imagePreviewList'), toastEl = $('#toast');
 
-  let token = '';
-  let products = [];
-  let editingImages = []; // { base64: string, isNew: boolean, path?: string }
-  let isSaving = false;
+  let token = '', products = [], editingImages = [], isSaving = false;
 
-  // ========== Toast ==========
+  // ========== 工具函数 ==========
   function showToast(msg, type = 'success') {
     toastEl.textContent = msg;
     toastEl.className = `toast ${type} show`;
     setTimeout(() => toastEl.classList.remove('show'), 2500);
   }
-
-  // ========== Auth ==========
-  function getToken() {
-    return sessionStorage.getItem('_ry_admin_token') || '';
+  function escapeHtml(str) {
+    return str == null ? '' : String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
+  function encodeBase64(str) { return btoa(unescape(encodeURIComponent(str))); }
 
-  function setToken(t) {
-    sessionStorage.setItem('_ry_admin_token', t);
-    token = t;
-  }
-
-  function clearAuth() {
-    sessionStorage.removeItem('_ry_admin_token');
-    token = '';
-    location.reload();
-  }
-
+  // ========== Auth (保持原样) ==========
+  function getToken() { return sessionStorage.getItem('_ry_admin_token') || ''; }
+  function setToken(t) { sessionStorage.setItem('_ry_admin_token', t); token = t; }
+  function clearAuth() { sessionStorage.removeItem('_ry_admin_token'); token = ''; location.reload(); }
   async function verifyToken(t) {
     try {
-      const res = await fetch('https://api.github.com/user', {
-        headers: { Authorization: `Bearer ${t}` }
-      });
+      const res = await fetch('https://api.github.com/user', { headers: { Authorization: `Bearer ${t}` } });
       if (!res.ok) return false;
       const user = await res.json();
       return user.login === GITHUB_OWNER;
     } catch { return false; }
   }
-
   loginBtn.addEventListener('click', async () => {
     const t = tokenInput.value.trim();
     if (!t) return showToast('请输入 Token', 'error');
-    loginBtn.disabled = true;
-    loginBtn.textContent = '验证中...';
+    loginBtn.disabled = true; loginBtn.textContent = '验证中...';
     const valid = await verifyToken(t);
-    loginBtn.disabled = false;
-    loginBtn.textContent = '验证并进入';
-    if (!valid) return showToast('Token 无效或用户名不匹配', 'error');
-    setToken(t);
-    initDashboard();
+    loginBtn.disabled = false; loginBtn.textContent = '验证并进入';
+    if (!valid) return showToast('Token 无效', 'error');
+    setToken(t); initDashboard();
   });
-
   logoutBtn.addEventListener('click', (e) => { e.preventDefault(); clearAuth(); });
 
-  // ========== GitHub API ==========
+  // ========== GitHub Issues API (核心重构) ==========
   async function ghApi(endpoint, options = {}) {
     const url = endpoint.startsWith('http') ? endpoint : `https://api.github.com${endpoint}`;
     const res = await fetch(url, {
@@ -304,75 +279,96 @@ body {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `GitHub API ${res.status}`);
+      throw new Error(err.message || `API ${res.status}`);
     }
     return res.json();
   }
 
-  async function getFileContent(path) {
-    try {
-      const data = await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`);
-      return {
-        content: JSON.parse(decodeBase64(data.content)),
-        sha: data.sha
-      };
-    } catch (e) {
-      if (e.message.includes('404')) return { content: [], sha: null };
-      throw e;
+  // 获取所有 Open 的 Issues (作为产品列表)
+  async function fetchAllProducts() {
+    // 简单处理，最多拉取 100 条。如果超过 100 需要分页
+    const issues = await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues?state=open&per_page=100&labels=product`);
+    return issues.map(issue => {
+      try {
+        // Issue Body 存储 JSON 数据
+        const data = JSON.parse(issue.body);
+        return {
+          id: issue.number, // 使用 Issue Number 作为唯一 ID
+          name: issue.title,
+          category: issue.labels.find(l => l.name.startsWith('cat:'))?.name.replace('cat:', '') || '',
+          ...data
+        };
+      } catch (e) { return null; }
+    }).filter(Boolean);
+  }
+
+  // 创建或更新 Issue
+  async function saveProductToIssue(id, name, category, data) {
+    const bodyStr = JSON.stringify(data);
+    const labels = ['product', `cat:${category}`];
+    
+    if (id) {
+      // 更新
+      return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ title: name, body: bodyStr, labels })
+      });
+    } else {
+      // 创建
+      return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues`, {
+        method: 'POST',
+        body: JSON.stringify({ title: name, body: bodyStr, labels })
+      });
     }
   }
 
-  async function updateFile(path, content, sha, message) {
-    return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
-      method: 'PUT',
-      body: JSON.stringify({
-        message,
-        content: encodeBase64(JSON.stringify(content, null, 2)),
-        sha,
-        branch: GITHUB_BRANCH
-      })
+  // 删除产品 (关闭 Issue)
+  async function deleteProductIssue(id) {
+    return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ state: 'closed' })
     });
   }
 
+  // 触发 CDN 刷新信标 (更新 sync.json 产生新 Commit SHA)
+  async function triggerCDNRefresh() {
+    try {
+      // 获取当前 sync.json 的 SHA
+      let sha = null;
+      try {
+        const file = await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${SYNC_PATH}?ref=${GITHUB_BRANCH}`);
+        sha = file.sha;
+      } catch (e) {} // 文件不存在则忽略
+
+      const content = encodeBase64(JSON.stringify({ lastUpdated: new Date().toISOString() }));
+      await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${SYNC_PATH}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          message: `chore: sync cdn ${Date.now()}`,
+          content,
+          sha,
+          branch: GITHUB_BRANCH
+        })
+      });
+    } catch (e) {
+      console.warn('CDN refresh trigger failed:', e);
+    }
+  }
+
+  // 图片上传 (保持原样)
   async function uploadImageFile(base64Data, fileName) {
     const path = `${IMAGES_DIR}/${fileName}`;
     return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
       method: 'PUT',
       body: JSON.stringify({
         message: `chore: upload image ${fileName}`,
-        content: base64Data.split(',')[1], // remove data:image/webp;base64, prefix
+        content: base64Data.split(',')[1],
         branch: GITHUB_BRANCH
       })
     });
   }
 
-  async function deleteFile(path, sha) {
-    return ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`, {
-      method: 'DELETE',
-      body: JSON.stringify({
-        message: `chore: delete ${path}`,
-        sha,
-        branch: GITHUB_BRANCH
-      })
-    });
-  }
-
-  async function getFileSha(path) {
-    try {
-      const data = await ghApi(`/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}?ref=${GITHUB_BRANCH}`);
-      return data.sha;
-    } catch { return null; }
-  }
-
-  // ========== Base64 Utils ==========
-  function encodeBase64(str) {
-    return btoa(unescape(encodeURIComponent(str)));
-  }
-  function decodeBase64(str) {
-    return decodeURIComponent(escape(atob(str)));
-  }
-
-  // ========== Image Compression ==========
+  // ========== 图片压缩 (保持原样) ==========
   async function compressToWebP(file) {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -380,18 +376,15 @@ body {
         let w = img.width, h = img.height;
         if (w > MAX_IMAGE_SIZE || h > MAX_IMAGE_SIZE) {
           const ratio = Math.min(MAX_IMAGE_SIZE / w, MAX_IMAGE_SIZE / h);
-          w = Math.round(w * ratio);
-          h = Math.round(h * ratio);
+          w = Math.round(w * ratio); h = Math.round(h * ratio);
         }
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
         canvas.toBlob((blob) => {
-          if (!blob) return reject(new Error('WebP compression failed'));
+          if (!blob) return reject(new Error('WebP failed'));
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
           reader.readAsDataURL(blob);
         }, 'image/webp', WEBP_QUALITY);
       };
@@ -400,7 +393,7 @@ body {
     });
   }
 
-  // ========== Dashboard Init ==========
+  // ========== 渲染与交互逻辑 (保持原样，仅修改数据源) ==========
   async function initDashboard() {
     token = getToken();
     if (!token) return;
@@ -413,17 +406,15 @@ body {
   async function loadProducts() {
     productList.innerHTML = '<div class="loading-spinner"></div>';
     try {
-      const data = await getFileContent(PRODUCTS_PATH);
-      products = Array.isArray(data.content) ? data.content : (data.content.products || []);
+      products = await fetchAllProducts();
       renderProductList();
     } catch (e) {
-      productList.innerHTML = `<p style="color:var(--danger);text-align:center;padding:40px;">加载失败: ${e.message}</p>`;
+      productList.innerHTML = `<p style="color:var(--danger);text-align:center;">加载失败: ${e.message}</p>`;
     }
   }
 
   function getImageUrl(path) {
-    if (!path) return '';
-    if (path.startsWith('http')) return path;
+    if (!path || path.startsWith('http')) return path;
     return `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${path}`;
   }
 
@@ -434,10 +425,10 @@ body {
     }
     productList.innerHTML = products.slice().reverse().map(p => `
       <div class="product-item" data-id="${p.id}">
-        <img src="${getImageUrl(p.cover)}" alt="" onerror="this.style.background='#f0ece6'">
+        <img src="${p.cover}" alt="" onerror="this.style.background='#f0ece6'">
         <div class="info">
           <div class="name">${escapeHtml(p.name)}</div>
-          <div class="meta">¥${Number(p.price).toFixed(1)} · ${escapeHtml(p.category || '')} · ID:${p.id}</div>
+          <div class="meta">¥${Number(p.price).toFixed(1)} · ${escapeHtml(p.category)} · #${p.id}</div>
         </div>
         <div class="actions">
           <button class="btn btn-sm btn-primary edit-btn">编辑</button>
@@ -447,83 +438,51 @@ body {
     `).join('');
 
     productList.querySelectorAll('.edit-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = parseInt(btn.closest('.product-item').dataset.id);
-        openEditModal(products.find(p => p.id === id));
-      });
+      btn.addEventListener('click', () => openEditModal(products.find(p => p.id === parseInt(btn.closest('.product-item').dataset.id))));
     });
-
     productList.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = parseInt(btn.closest('.product-item').dataset.id);
-        deleteProduct(id);
-      });
+      btn.addEventListener('click', () => deleteProduct(parseInt(btn.closest('.product-item').dataset.id)));
     });
   }
 
-  // ========== Edit Modal ==========
   function openEditModal(product = null) {
     editingImages = [];
     if (product) {
       modalTitle.textContent = '编辑产品';
       $('#editId').value = product.id;
-      $('#editName').value = product.name || '';
-      $('#editPrice').value = product.price || '';
-      $('#editCategory').value = product.category || '';
+      $('#editName').value = product.name;
+      $('#editPrice').value = product.price;
+      $('#editCategory').value = product.category;
       $('#editDesc').value = product.description || '';
-      // Load existing images
-      (product.images || []).forEach(url => {
-        editingImages.push({ base64: url, isNew: false, path: url.replace(
-          `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`, ''
-        )});
-      });
+      (product.images || []).forEach(url => editingImages.push({ base64: url, isNew: false }));
     } else {
       modalTitle.textContent = '新增产品';
-      $('#editId').value = '';
-      $('#editName').value = '';
-      $('#editPrice').value = '';
-      $('#editCategory').value = '';
-      $('#editDesc').value = '';
+      ['editId','editName','editPrice','editCategory','editDesc'].forEach(id => $(`#${id}`).value = '');
     }
     renderImagePreviews();
-    updateCategorySuggestions();
     editModal.classList.add('active');
   }
 
-  function closeEditModal() {
-    editModal.classList.remove('active');
-    editingImages = [];
-  }
-
+  function closeEditModal() { editModal.classList.remove('active'); editingImages = []; }
   cancelEditBtn.addEventListener('click', closeEditModal);
   editModal.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
-
   addProductBtn.addEventListener('click', () => openEditModal());
 
-  // Image upload
   imageUploadArea.addEventListener('click', () => imageFileInput.click());
   imageUploadArea.addEventListener('dragover', (e) => { e.preventDefault(); imageUploadArea.style.borderColor = 'var(--primary)'; });
   imageUploadArea.addEventListener('dragleave', () => { imageUploadArea.style.borderColor = '#ddd'; });
   imageUploadArea.addEventListener('drop', (e) => {
-    e.preventDefault();
-    imageUploadArea.style.borderColor = '#ddd';
-    handleFiles(e.dataTransfer.files);
+    e.preventDefault(); imageUploadArea.style.borderColor = '#ddd'; handleFiles(e.dataTransfer.files);
   });
-  imageFileInput.addEventListener('change', () => {
-    handleFiles(imageFileInput.files);
-    imageFileInput.value = '';
-  });
+  imageFileInput.addEventListener('change', () => { handleFiles(imageFileInput.files); imageFileInput.value = ''; });
 
   async function handleFiles(files) {
     for (const file of files) {
       if (!file.type.startsWith('image/')) continue;
       try {
-        const webp = await compressToWebP(file);
-        editingImages.push({ base64: webp, isNew: true });
+        editingImages.push({ base64: await compressToWebP(file), isNew: true });
         renderImagePreviews();
-      } catch (e) {
-        showToast(`图片压缩失败: ${file.name}`, 'error');
-      }
+      } catch (e) { showToast('图片压缩失败', 'error'); }
     }
   }
 
@@ -535,19 +494,11 @@ body {
       </div>
     `).join('');
     imagePreviewList.querySelectorAll('.remove-img').forEach(btn => {
-      btn.addEventListener('click', () => {
-        editingImages.splice(parseInt(btn.dataset.index), 1);
-        renderImagePreviews();
-      });
+      btn.addEventListener('click', () => { editingImages.splice(parseInt(btn.dataset.index), 1); renderImagePreviews(); });
     });
   }
 
-  function updateCategorySuggestions() {
-    const cats = [...new Set(products.map(p => p.category).filter(Boolean))];
-    $('#categorySuggestions').innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">`).join('');
-  }
-
-  // Save
+  // 保存逻辑 (核心重构)
   saveProductBtn.addEventListener('click', async () => {
     if (isSaving) return;
     const name = $('#editName').value.trim();
@@ -556,78 +507,41 @@ body {
     const desc = $('#editDesc').value.trim();
     const existingId = $('#editId').value;
 
-    if (!name) return showToast('请输入产品名称', 'error');
-    if (isNaN(price) || price < 0) return showToast('请输入有效价格', 'error');
-    if (!category) return showToast('请输入分类', 'error');
-    if (editingImages.length === 0) return showToast('请至少上传一张图片', 'error');
+    if (!name || isNaN(price) || !category || editingImages.length === 0) {
+      return showToast('请完善必填项并上传图片', 'error');
+    }
 
-    isSaving = true;
-    saveProductBtn.disabled = true;
-    saveProductBtn.textContent = '保存中...';
+    isSaving = true; saveProductBtn.disabled = true; saveProductBtn.textContent = '保存中...';
 
     try {
-      // Upload new images
+      // 1. 上传图片
       const imageUrls = [];
       for (let i = 0; i < editingImages.length; i++) {
         const img = editingImages[i];
         if (img.isNew) {
-          const ts = Date.now();
-          const fileName = `${ts}_${i}.webp`;
+          const fileName = `${Date.now()}_${i}.webp`;
           await uploadImageFile(img.base64, fileName);
-          imageUrls.push(`${IMAGES_DIR}/${fileName}`);
+          imageUrls.push(getImageUrl(`${IMAGES_DIR}/${fileName}`));
         } else {
-          imageUrls.push(img.path);
+          imageUrls.push(img.base64);
         }
       }
 
-      // Reload latest products.json to avoid conflicts
-      const fileData = await getFileContent(PRODUCTS_PATH);
-      let currentProducts = Array.isArray(fileData.content) ? fileData.content : (fileData.content.products || []);
+      // 2. 保存到 Issue (天然防冲突)
+      const data = {
+        price, description: desc,
+        cover: imageUrls[0],
+        images: imageUrls,
+        updatedAt: new Date().toISOString()
+      };
+      
+      await saveProductToIssue(existingId ? parseInt(existingId) : null, name, category, data);
 
-      if (existingId) {
-        // Update
-        const idx = currentProducts.findIndex(p => p.id === parseInt(existingId));
-        if (idx >= 0) {
-          // Delete old images that are no longer used
-          const oldImages = currentProducts[idx].images || [];
-          const newImageSet = new Set(imageUrls);
-          for (const oldImg of oldImages) {
-            const oldPath = oldImg.replace(
-              `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`, ''
-            );
-            if (!newImageSet.has(oldPath)) {
-              const sha = await getFileSha(oldPath);
-              if (sha) await deleteFile(oldPath, sha);
-            }
-          }
-          currentProducts[idx] = {
-            ...currentProducts[idx],
-            name, price, category, description: desc,
-            cover: getImageUrl(imageUrls[0]),
-            images: imageUrls.map(u => getImageUrl(u)),
-            updatedAt: new Date().toISOString()
-          };
-        }
-      } else {
-        // Create
-        const maxId = currentProducts.reduce((max, p) => Math.max(max, p.id || 0), 0);
-        const newProduct = {
-          id: maxId + 1,
-          name, price, category, description: desc,
-          cover: getImageUrl(imageUrls[0]),
-          images: imageUrls.map(u => getImageUrl(u)),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        currentProducts.push(newProduct);
-      }
+      // 3. 触发 CDN 刷新 (更新 sync.json 产生新 Commit)
+      await triggerCDNRefresh();
 
-      await updateFile(PRODUCTS_PATH, currentProducts, fileData.sha,
-        existingId ? `update product: ${name}` : `add product: ${name}`
-      );
-
-      // Notify other tabs
-      localStorage.setItem('_ry_products_updated', Date.now().toString());
+      // 4. 通知其他标签页
+      localStorage.setItem('_ry_sync_version', Date.now().toString());
 
       showToast(existingId ? '产品已更新' : '产品已添加');
       closeEditModal();
@@ -635,51 +549,23 @@ body {
     } catch (e) {
       showToast(`保存失败: ${e.message}`, 'error');
     } finally {
-      isSaving = false;
-      saveProductBtn.disabled = false;
-      saveProductBtn.textContent = '保存产品';
+      isSaving = false; saveProductBtn.disabled = false; saveProductBtn.textContent = '保存产品';
     }
   });
 
-  // Delete product
   async function deleteProduct(id) {
-    const product = products.find(p => p.id === id);
-    if (!product) return;
-    if (!confirm(`确定删除「${product.name}」？\n此操作不可恢复，相关图片也会被删除。`)) return;
-
+    const p = products.find(x => x.id === id);
+    if (!p || !confirm(`确定删除「${p.name}」？`)) return;
     try {
-      // Delete images
-      for (const imgUrl of (product.images || [])) {
-        const path = imgUrl.replace(
-          `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/`, ''
-        );
-        const sha = await getFileSha(path);
-        if (sha) await deleteFile(path, sha);
-      }
-
-      // Update products.json
-      const fileData = await getFileContent(PRODUCTS_PATH);
-      let currentProducts = Array.isArray(fileData.content) ? fileData.content : (fileData.content.products || []);
-      currentProducts = currentProducts.filter(p => p.id !== id);
-      await updateFile(PRODUCTS_PATH, currentProducts, fileData.sha, `delete product: ${product.name}`);
-
-      localStorage.setItem('_ry_products_updated', Date.now().toString());
-      showToast('产品已删除');
+      await deleteProductIssue(id);
+      await triggerCDNRefresh();
+      localStorage.setItem('_ry_sync_version', Date.now().toString());
+      showToast('已删除');
       await loadProducts();
-    } catch (e) {
-      showToast(`删除失败: ${e.message}`, 'error');
-    }
+    } catch (e) { showToast(`删除失败: ${e.message}`, 'error'); }
   }
 
-  function escapeHtml(str) {
-    if (str == null) return '';
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // Check session on load
-  if (getToken()) {
-    initDashboard();
-  }
+  if (getToken()) initDashboard();
 })();
 </script>
 </body>

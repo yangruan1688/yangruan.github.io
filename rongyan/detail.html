@@ -6,8 +6,7 @@
 <title>绒颜 · 产品详情</title>
 <link rel="icon" href="https://raw.githubusercontent.com/yangruan1688/yangruan.github.io/main/logo.jpg" type="image/jpeg">
 <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="preconnect" href="https://gcore.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://api.github.com" crossorigin>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -119,7 +118,6 @@ body {
   </div>
 </div>
 
-<!-- CSS 保持原样，替换 <script> -->
 <script>
 (function () {
   'use strict';
@@ -132,9 +130,16 @@ body {
     return str == null ? '' : String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  // ✅ 统一处理图片 URL，兼容相对路径和绝对路径
+  function resolveImageUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${url}`;
+  }
+
   function getProductId() {
     const params = new URLSearchParams(window.location.search);
-    return params.get('id'); // Issue Number 是字符串或数字均可
+    return params.get('id');
   }
 
   async function loadAndRender() {
@@ -147,20 +152,18 @@ body {
     container.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
 
     try {
-      // 核心优化：只请求单个 Issue，极速加载
       const res = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues/${id}`, {
         headers: { Accept: 'application/vnd.github.v3+json' },
         cache: 'no-store'
       });
 
       if (!res.ok) throw new Error('Not Found');
-      
+
       const issue = await res.json();
-      
-      // 解析数据
+
       let data = {};
       try { data = JSON.parse(issue.body); } catch (e) {}
-      
+
       const product = {
         id: issue.number,
         name: issue.title,
@@ -178,8 +181,10 @@ body {
     const safeName = escapeHtml(product.name);
     const safePrice = Number(product.price || 0).toFixed(1);
     const safeCategory = escapeHtml(product.category);
-    const safeDesc = escapeHtml(product.description || '').replace(/\n/g, '<br>'); // 支持换行
-    const images = product.images || [];
+    const safeDesc = escapeHtml(product.description || '').replace(/\n/g, '<br>');
+    // ✅ 使用 resolveImageUrl 映射所有图片
+    const images = (product.images || []).map(resolveImageUrl);
+    const coverUrl = resolveImageUrl(product.cover);
 
     let galleryHtml = '';
     if (images.length > 0) {
@@ -220,8 +225,7 @@ body {
         thumb.classList.add('active');
       });
     }
-    
-    // 动态修改页面 Title
+
     document.title = `${product.name} - 绒颜`;
   }
 

@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "1",
+    "price": 168,
+    "category": "耳饰",
+    "description": "",
+    "images": [
+      "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786086785601_0.webp",
+      "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786086785601_1.webp",
+      "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786086785601_2.webp"
+    ],
+    "cover": "https://cdn.jsdelivr.net/gh/yangruan1688/yangruan.github.io@main/rongyan/images/p1786086785601_0.webp",
+    "createdAt": "2026-08-07T07:13:16.639Z"
+  }
+]

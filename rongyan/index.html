@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>绒颜 · 手工发饰</title>
-<meta name="description" content="绒颜 - 原创手工发饰品牌，每一件都是独一无二的手作好物。">
-<link rel="icon" href="https://raw.githubusercontent.com/yangruan1688/yangruan.github.io/main/rongyan/logo.jpg" type="image/jpeg">
+<meta name="description" content="绒颜">
+<link rel="icon" href="https://raw.githubusercontent.com/yangruan1688/yangruan.github.io/main/logo.jpg" type="image/jpeg">
 <link rel="preconnect" href="https://api.github.com" crossorigin>
 <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
 <style>
@@ -26,7 +26,10 @@ body {
                'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   background: var(--bg); color: var(--text);
   -webkit-font-smoothing: antialiased; min-height: 100vh;
+  padding-bottom: 80px; /* 为底部导航留出空间 */
 }
+
+/* 顶部标题栏 */
 .header {
   position: sticky; top: 0; z-index: 100;
   background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
@@ -34,25 +37,92 @@ body {
   border-bottom: 1px solid rgba(0,0,0,0.06);
   padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
 }
-.header h1 { font-size: 18px; color: var(--primary); letter-spacing: 4px; font-weight: 600; }
-.header nav { display: flex; gap: 16px; align-items: center; }
-.header nav a {
+.header h1 { 
+  font-size: 18px; color: var(--primary); letter-spacing: 4px; font-weight: 600;
+  position: absolute; left: 50%; transform: translateX(-50%);
+}
+.header-nav-btn {
   color: var(--text); text-decoration: none; font-size: 13px; font-weight: 500;
   padding: 5px 10px; border-radius: 18px; transition: all 0.25s;
+  background: none; border: none; cursor: pointer;
 }
-.header nav a:hover, .header nav a.active { background: rgba(184,134,11,0.1); color: var(--primary); }
-.hero { text-align: center; padding: 40px 16px 28px; background: linear-gradient(180deg, #fdfcfa 0%, var(--bg) 100%); }
-.hero h2 { font-size: 24px; letter-spacing: 6px; color: var(--primary); font-weight: 300; margin-bottom: 8px; }
-.hero p { font-size: 13px; color: var(--text-light); letter-spacing: 2px; }
-.filter-bar { display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-.filter-bar::-webkit-scrollbar { display: none; }
-.filter-btn {
-  padding: 7px 18px; border: 1px solid rgba(0,0,0,0.1); background: #fff; border-radius: 20px;
-  font-size: 13px; color: var(--text); cursor: pointer; transition: all 0.25s; white-space: nowrap; font-weight: 500;
+.header-nav-btn:hover { background: rgba(184,134,11,0.1); color: var(--primary); }
+
+/* 底部悬浮导航栏 */
+.bottom-nav {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 28px; padding: 12px 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  display: flex; gap: 12px; align-items: center;
+  z-index: 200; max-width: 90%;
 }
-.filter-btn:hover { border-color: var(--primary); color: var(--primary); }
-.filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 8px 16px 80px; }
+.nav-item {
+  position: relative; display: flex; flex-direction: column; align-items: center;
+  gap: 4px; color: var(--text); text-decoration: none; font-size: 11px;
+  padding: 6px 10px; border-radius: 16px; transition: all 0.25s;
+  cursor: pointer; border: none; background: none;
+}
+.nav-item:hover { background: rgba(184,134,11,0.1); color: var(--primary); }
+.nav-item.active { color: var(--primary); }
+.nav-icon { font-size: 20px; }
+
+/* 下拉菜单 */
+.dropdown {
+  position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+  margin-bottom: 12px; background: #fff; border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12); padding: 8px 0;
+  min-width: 120px; display: none; flex-direction: column;
+}
+.dropdown.show { display: flex; }
+.dropdown::after {
+  content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0; border-left: 6px solid transparent;
+  border-right: 6px solid transparent; border-top: 6px solid #fff;
+}
+.dropdown-item {
+  padding: 10px 16px; font-size: 13px; color: var(--text);
+  text-decoration: none; transition: background 0.2s; cursor: pointer;
+  border: none; background: none; text-align: left; width: 100%;
+}
+.dropdown-item:hover { background: rgba(184,134,11,0.08); color: var(--primary); }
+.dropdown-item.active { color: var(--primary); font-weight: 600; }
+
+/* 搜索框 */
+.search-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 300; display: none; align-items: flex-start; justify-content: center;
+  padding-top: 80px;
+}
+.search-overlay.show { display: flex; }
+.search-box {
+  background: #fff; border-radius: 16px; padding: 20px;
+  width: 90%; max-width: 500px; box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+}
+.search-input-wrapper {
+  display: flex; align-items: center; gap: 12px;
+  border: 2px solid #eee; border-radius: 24px; padding: 12px 20px;
+  transition: border-color 0.25s;
+}
+.search-input-wrapper:focus-within { border-color: var(--primary); }
+.search-input-wrapper svg { flex-shrink: 0; color: var(--text-light); }
+.search-input {
+  flex: 1; border: none; outline: none; font-size: 15px;
+  font-family: inherit; background: transparent;
+}
+.search-input::placeholder { color: #ccc; }
+.search-close {
+  margin-top: 16px; text-align: center;
+}
+.search-close-btn {
+  background: none; border: none; color: var(--text-light);
+  font-size: 13px; cursor: pointer; padding: 8px 16px;
+}
+.search-close-btn:hover { color: var(--primary); }
+
+/* 产品网格 */
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 16px; }
 @media (min-width: 600px) { .grid { grid-template-columns: repeat(3, 1fr); } }
 @media (min-width: 900px) { .grid { grid-template-columns: repeat(4, 1fr); } }
 .card {
@@ -65,6 +135,8 @@ body {
 .card-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .card-price { font-size: 14px; color: var(--primary); font-weight: 600; }
 .card-category { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+/* 空状态 */
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
 .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
 .loading { text-align: center; padding: 60px 20px; color: var(--text-light); }
@@ -73,37 +145,77 @@ body {
   border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-.footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-light); border-top: 1px solid rgba(0,0,0,0.05); }
-.footer a { color: var(--primary); text-decoration: none; }
+
+/* 响应式调整 */
+@media (max-width: 480px) {
+  .bottom-nav { padding: 10px 16px; gap: 8px; }
+  .nav-item { padding: 6px 8px; font-size: 10px; }
+  .nav-icon { font-size: 18px; }
+}
 </style>
 </head>
 <body>
 
+<!-- 顶部标题栏 -->
 <header class="header">
+  <a href="./index.html" class="header-nav-btn">首页</a>
   <h1>✦ 绒颜 ✦</h1>
-  <nav>
-    <a href="./index.html" class="active">首页</a>
-    <a href="#about">关于</a>
-    <a href="https://weidian.com/s/xxxxxxxxx" target="_blank" rel="noopener">微店</a>
-  </nav>
+  <a href="./admin.html" class="header-nav-btn">管理</a>
 </header>
 
-<section class="hero">
-  <h2>绒 颜</h2>
-  <p>原创手工发饰 · 每一件都是独一无二</p>
-</section>
-
-<div class="filter-bar" id="filterBar">
-  <button class="filter-btn active" data-category="all">全部</button>
-</div>
-
+<!-- 产品网格 -->
 <div class="grid" id="productGrid">
   <div class="loading"><div class="spinner"></div><p>加载中...</p></div>
 </div>
 
-<footer class="footer">
-  <p>© 2025 绒颜 RongYan · 手工原创设计</p>
-</footer>
+<!-- 底部悬浮导航栏 -->
+<nav class="bottom-nav">
+  <!-- 分类按钮 -->
+  <div class="nav-item" id="categoryBtn">
+    <span class="nav-icon">📂</span>
+    <span>分类</span>
+    <div class="dropdown" id="categoryDropdown">
+      <button class="dropdown-item active" data-category="all">全部</button>
+      <button class="dropdown-item" data-category="发饰">发饰</button>
+      <button class="dropdown-item" data-category="耳饰">耳饰</button>
+      <button class="dropdown-item" data-category="胸饰">胸饰</button>
+      <button class="dropdown-item" data-category="其他">其他</button>
+    </div>
+  </div>
+
+  <!-- 搜索按钮 -->
+  <div class="nav-item" id="searchBtn">
+    <span class="nav-icon">🔍</span>
+    <span>搜索</span>
+  </div>
+
+  <!-- 排序按钮 -->
+  <div class="nav-item" id="sortBtn">
+    <span class="nav-icon">↕️</span>
+    <span>排序</span>
+    <div class="dropdown" id="sortDropdown">
+      <button class="dropdown-item active" data-sort="newest">最新发布</button>
+      <button class="dropdown-item" data-sort="price-asc">价格升序</button>
+      <button class="dropdown-item" data-sort="price-desc">价格降序</button>
+    </div>
+  </div>
+</nav>
+
+<!-- 搜索遮罩 -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-box">
+    <div class="search-input-wrapper">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索产品名称...">
+    </div>
+    <div class="search-close">
+      <button class="search-close-btn" id="searchCloseBtn">关闭</button>
+    </div>
+  </div>
+</div>
 
 <script>
 (function () {
@@ -117,10 +229,19 @@ body {
 
   let allProducts = [];
   let currentCategory = 'all';
+  let currentSort = 'newest';
+  let currentSearch = '';
   let lastLoadTime = 0;
 
-  const filterBar = document.getElementById('filterBar');
   const productGrid = document.getElementById('productGrid');
+  const categoryBtn = document.getElementById('categoryBtn');
+  const categoryDropdown = document.getElementById('categoryDropdown');
+  const searchBtn = document.getElementById('searchBtn');
+  const searchOverlay = document.getElementById('searchOverlay');
+  const searchInput = document.getElementById('searchInput');
+  const searchCloseBtn = document.getElementById('searchCloseBtn');
+  const sortBtn = document.getElementById('sortBtn');
+  const sortDropdown = document.getElementById('sortDropdown');
 
   function escapeHtml(str) {
     if (str == null) return '';
@@ -157,6 +278,7 @@ body {
           id: issue.number,
           name: issue.title,
           category: catLabel ? catLabel.name.replace('cat:', '') : '',
+          createdAt: issue.created_at,
           ...bodyData
         };
       });
@@ -179,33 +301,51 @@ body {
 
     if (products.length === 0) {
       productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>暂无产品，敬请期待</p></div>';
-      filterBar.innerHTML = '<button class="filter-btn active" data-category="all">全部</button>';
       return;
     }
 
     allProducts = products;
     lastLoadTime = Date.now();
-    renderFilters();
     renderProducts();
   }
 
-  function renderFilters() {
-    const categories = {};
-    allProducts.forEach(p => { if (p.category) categories[p.category] = (categories[p.category] || 0) + 1; });
-    let html = '<button class="filter-btn active" data-category="all">全部</button>';
-    Object.keys(categories).sort().forEach(cat => {
-      html += `<button class="filter-btn" data-category="${escapeHtml(cat)}">${escapeHtml(cat)} (${categories[cat]})</button>`;
-    });
-    filterBar.innerHTML = html;
+  function filterAndSortProducts() {
+    let filtered = allProducts;
+
+    // 分类过滤
+    if (currentCategory !== 'all') {
+      filtered = filtered.filter(p => p.category === currentCategory);
+    }
+
+    // 搜索过滤
+    if (currentSearch) {
+      const searchLower = currentSearch.toLowerCase();
+      filtered = filtered.filter(p => 
+        (p.name || '').toLowerCase().includes(searchLower) ||
+        (p.description || '').toLowerCase().includes(searchLower)
+      );
+    }
+
+    // 排序
+    if (currentSort === 'price-asc') {
+      filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else if (currentSort === 'price-desc') {
+      filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+    } else if (currentSort === 'newest') {
+      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    return filtered;
   }
 
   function renderProducts() {
-    const filtered = currentCategory === 'all' ? allProducts : allProducts.filter(p => p.category === currentCategory);
+    const filtered = filterAndSortProducts();
+    
     if (filtered.length === 0) {
-      productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>该分类暂无产品</p></div>';
+      productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>未找到匹配的产品</p></div>';
       return;
     }
-    // Search API 已经按 created desc 排序，最新的在前面
+    
     productGrid.innerHTML = filtered.map(p => {
       const safeName = escapeHtml(p.name || '');
       const safeCover = escapeHtml(resolveImageUrl(p.cover) || '');
@@ -224,15 +364,75 @@ body {
     }).join('');
   }
 
-  filterBar.addEventListener('click', (e) => {
-    const btn = e.target.closest('.filter-btn');
-    if (!btn) return;
-    currentCategory = btn.dataset.category;
-    filterBar.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  // 分类下拉菜单
+  categoryBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    categoryDropdown.classList.toggle('show');
+    sortDropdown.classList.remove('show');
+  });
+
+  categoryDropdown.addEventListener('click', (e) => {
+    const item = e.target.closest('.dropdown-item');
+    if (!item) return;
+    e.stopPropagation();
+    
+    currentCategory = item.dataset.category;
+    categoryDropdown.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    categoryDropdown.classList.remove('show');
     renderProducts();
   });
 
+  // 搜索功能
+  searchBtn.addEventListener('click', () => {
+    searchOverlay.classList.add('show');
+    searchInput.focus();
+  });
+
+  searchCloseBtn.addEventListener('click', () => {
+    searchOverlay.classList.remove('show');
+    searchInput.value = '';
+    currentSearch = '';
+    renderProducts();
+  });
+
+  searchInput.addEventListener('input', (e) => {
+    currentSearch = e.target.value.trim();
+    renderProducts();
+  });
+
+  searchOverlay.addEventListener('click', (e) => {
+    if (e.target === searchOverlay) {
+      searchOverlay.classList.remove('show');
+    }
+  });
+
+  // 排序下拉菜单
+  sortBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sortDropdown.classList.toggle('show');
+    categoryDropdown.classList.remove('show');
+  });
+
+  sortDropdown.addEventListener('click', (e) => {
+    const item = e.target.closest('.dropdown-item');
+    if (!item) return;
+    e.stopPropagation();
+    
+    currentSort = item.dataset.sort;
+    sortDropdown.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    sortDropdown.classList.remove('show');
+    renderProducts();
+  });
+
+  // 点击其他地方关闭下拉菜单
+  document.addEventListener('click', () => {
+    categoryDropdown.classList.remove('show');
+    sortDropdown.classList.remove('show');
+  });
+
+  // 页面可见性变化时重新加载
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && Date.now() - lastLoadTime > 5000) loadProducts();
   });

@@ -1,0 +1,27 @@
+# 允许百度蜘蛛抓取全站内容
+User-agent: Baiduspider
+Allow: /
+
+# 允许百度蜘蛛抓取图片等静态资源
+User-agent: Baiduspider-image
+Allow: /
+
+# 允许百度蜘蛛抓取视频等静态资源
+User-agent: Baiduspider-video
+Allow: /
+
+# 允许百度蜘蛛抓取新闻等静态资源
+User-agent: Baiduspider-news
+Allow: /
+
+# 允许百度蜘蛛抓取移动端页面
+User-agent: Baiduspider-mobile
+Allow: /
+
+# 其他所有搜索引擎（如必应、谷歌等）默认允许抓取全站
+User-agent: *
+Allow: /
+
+# 禁止所有蜘蛛抓取后台或私有目录（如有）
+# Disallow: /admin/
+# Disallow: /private/

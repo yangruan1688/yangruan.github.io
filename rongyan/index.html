@@ -27,7 +27,7 @@ body {
                'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   background: var(--bg); color: var(--text);
   -webkit-font-smoothing: antialiased; min-height: 100vh;
-  padding-bottom: 80px; /* 为底部导航留出空间 */
+  padding-bottom: 80px; outline: none; /* 防止body聚焦时出现边框 */
 }
 
 /* 顶部标题栏 */
@@ -90,32 +90,45 @@ body {
 .dropdown-item:hover { background: rgba(184,134,11,0.08); color: var(--primary); }
 .dropdown-item.active { color: var(--primary); font-weight: 600; }
 
-/* 搜索框 */
+/* ✅ 搜索框 - 增加过渡动画 */
 .search-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  z-index: 300; display: none; align-items: flex-start; justify-content: center;
+  z-index: 300; display: flex; align-items: flex-start; justify-content: center;
   padding-top: 80px;
+  opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease;
 }
-.search-overlay.show { display: flex; }
+.search-overlay.show { opacity: 1; visibility: visible; }
 .search-box {
   background: #fff; border-radius: 16px; padding: 20px;
   width: 90%; max-width: 500px; box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  transform: translateY(-20px); transition: transform 0.25s ease;
 }
+.search-overlay.show .search-box { transform: translateY(0); }
+
 .search-input-wrapper {
-  display: flex; align-items: center; gap: 12px;
-  border: 2px solid #eee; border-radius: 24px; padding: 12px 20px;
+  display: flex; align-items: center; gap: 10px;
+  border: 2px solid #eee; border-radius: 24px; padding: 8px 8px 8px 20px;
   transition: border-color 0.25s;
 }
 .search-input-wrapper:focus-within { border-color: var(--primary); }
 .search-input-wrapper svg { flex-shrink: 0; color: var(--text-light); }
 .search-input {
   flex: 1; border: none; outline: none; font-size: 15px;
-  font-family: inherit; background: transparent;
+  font-family: inherit; background: transparent; min-width: 0;
 }
 .search-input::placeholder { color: #ccc; }
-.search-close {
-  margin-top: 16px; text-align: center;
+
+/* ✅ 新增搜索按钮样式 */
+.search-submit-btn {
+  flex-shrink: 0; background: var(--primary); color: #fff;
+  border: none; border-radius: 18px; padding: 8px 18px;
+  font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: background 0.25s, transform 0.1s; white-space: nowrap;
 }
+.search-submit-btn:hover { background: var(--primary-light); }
+.search-submit-btn:active { transform: scale(0.96); }
+
+.search-close { margin-top: 16px; text-align: center; }
 .search-close-btn {
   background: none; border: none; color: var(--text-light);
   font-size: 13px; cursor: pointer; padding: 8px 16px;
@@ -147,7 +160,6 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* 响应式调整 */
 @media (max-width: 480px) {
   .bottom-nav { padding: 10px 16px; gap: 8px; }
   .nav-item { padding: 6px 8px; font-size: 10px; }
@@ -155,7 +167,7 @@ body {
 }
 </style>
 </head>
-<body>
+<body tabindex="-1">
 
 <!-- 顶部标题栏 -->
 <header class="header">
@@ -171,7 +183,6 @@ body {
 
 <!-- 底部悬浮导航栏 -->
 <nav class="bottom-nav">
-  <!-- 分类按钮 -->
   <div class="nav-item" id="categoryBtn">
     <span class="nav-icon">📂</span>
     <span>分类</span>
@@ -184,13 +195,11 @@ body {
     </div>
   </div>
 
-  <!-- 搜索按钮 -->
   <div class="nav-item" id="searchBtn">
     <span class="nav-icon">🔍</span>
     <span>搜索</span>
   </div>
 
-  <!-- 排序按钮 -->
   <div class="nav-item" id="sortBtn">
     <span class="nav-icon">↕️</span>
     <span>排序</span>
@@ -210,7 +219,9 @@ body {
         <circle cx="11" cy="11" r="8"></circle>
         <path d="m21 21-4.35-4.35"></path>
       </svg>
+      <!-- ✅ 新增搜索按钮 -->
       <input type="text" class="search-input" id="searchInput" placeholder="搜索产品名称...">
+      <button class="search-submit-btn" id="searchSubmitBtn">搜索</button>
     </div>
     <div class="search-close">
       <button class="search-close-btn" id="searchCloseBtn">关闭</button>
@@ -224,8 +235,6 @@ body {
 
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO  = 'yangruan.github.io';
-  
-  // ✅ 使用 GitHub Search API 获取带有 product 标签的 open issues
   const SEARCH_API = `https://api.github.com/search/issues?q=repo:${GITHUB_OWNER}/${GITHUB_REPO}+is:issue+state:open+label:product&per_page=100&sort=created&order=desc`;
 
   let allProducts = [];
@@ -240,6 +249,7 @@ body {
   const searchBtn = document.getElementById('searchBtn');
   const searchOverlay = document.getElementById('searchOverlay');
   const searchInput = document.getElementById('searchInput');
+  const searchSubmitBtn = document.getElementById('searchSubmitBtn');
   const searchCloseBtn = document.getElementById('searchCloseBtn');
   const sortBtn = document.getElementById('sortBtn');
   const sortDropdown = document.getElementById('sortDropdown');
@@ -249,7 +259,6 @@ body {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
   }
 
-  // ✅ 统一处理图片 URL，兼容相对路径和绝对路径
   function resolveImageUrl(url) {
     if (!url) return '';
     if (url.startsWith('http')) return url;
@@ -261,26 +270,20 @@ body {
     const id = setTimeout(() => controller.abort(), 10000);
     try {
       const res = await fetch(SEARCH_API, {
-        signal: controller.signal,
-        cache: 'no-store',
+        signal: controller.signal, cache: 'no-store',
         headers: { Accept: 'application/vnd.github.v3+json' }
       });
       clearTimeout(id);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      
-      // 解析 issues 为产品对象
       return (data.items || []).map(issue => {
         let bodyData = {};
         try { bodyData = JSON.parse(issue.body || '{}'); } catch(e) {}
-        
         const catLabel = issue.labels.find(l => l.name.startsWith('cat:'));
         return {
-          id: issue.number,
-          name: issue.title,
+          id: issue.number, name: issue.title,
           category: catLabel ? catLabel.name.replace('cat:', '') : '',
-          createdAt: issue.created_at,
-          ...bodyData
+          createdAt: issue.created_at, ...bodyData
         };
       });
     } catch (e) {
@@ -292,19 +295,15 @@ body {
 
   async function loadProducts() {
     productGrid.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
-    
     const products = await fetchProducts();
-
     if (products === null) {
       productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>加载失败，请刷新页面重试</p></div>';
       return;
     }
-
     if (products.length === 0) {
       productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><p>暂无产品，敬请期待</p></div>';
       return;
     }
-
     allProducts = products;
     lastLoadTime = Date.now();
     renderProducts();
@@ -312,13 +311,9 @@ body {
 
   function filterAndSortProducts() {
     let filtered = allProducts;
-
-    // 分类过滤
     if (currentCategory !== 'all') {
       filtered = filtered.filter(p => p.category === currentCategory);
     }
-
-    // 搜索过滤
     if (currentSearch) {
       const searchLower = currentSearch.toLowerCase();
       filtered = filtered.filter(p => 
@@ -326,8 +321,6 @@ body {
         (p.description || '').toLowerCase().includes(searchLower)
       );
     }
-
-    // 排序
     if (currentSort === 'price-asc') {
       filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
     } else if (currentSort === 'price-desc') {
@@ -335,18 +328,15 @@ body {
     } else if (currentSort === 'newest') {
       filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
-
     return filtered;
   }
 
   function renderProducts() {
     const filtered = filterAndSortProducts();
-    
     if (filtered.length === 0) {
       productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>未找到匹配的产品</p></div>';
       return;
     }
-    
     productGrid.innerHTML = filtered.map(p => {
       const safeName = escapeHtml(p.name || '');
       const safeCover = escapeHtml(resolveImageUrl(p.cover) || '');
@@ -365,18 +355,16 @@ body {
     }).join('');
   }
 
-  // 分类下拉菜单
+  // ========== 分类 ==========
   categoryBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     categoryDropdown.classList.toggle('show');
     sortDropdown.classList.remove('show');
   });
-
   categoryDropdown.addEventListener('click', (e) => {
     const item = e.target.closest('.dropdown-item');
     if (!item) return;
     e.stopPropagation();
-    
     currentCategory = item.dataset.category;
     categoryDropdown.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
     item.classList.add('active');
@@ -384,10 +372,24 @@ body {
     renderProducts();
   });
 
-  // 搜索功能
+  // ========== ✅ 搜索功能（按钮触发 + 自动关闭） ==========
+  function doSearch() {
+    currentSearch = searchInput.value.trim();
+    renderProducts();
+    // 搜索后自动关闭弹窗，直接展示结果
+    searchOverlay.classList.remove('show');
+    document.body.focus(); // 释放焦点，收起移动端键盘
+  }
+
   searchBtn.addEventListener('click', () => {
     searchOverlay.classList.add('show');
-    searchInput.focus();
+    setTimeout(() => searchInput.focus(), 100);
+  });
+
+  searchSubmitBtn.addEventListener('click', doSearch);
+
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); doSearch(); }
   });
 
   searchCloseBtn.addEventListener('click', () => {
@@ -395,31 +397,34 @@ body {
     searchInput.value = '';
     currentSearch = '';
     renderProducts();
-  });
-
-  searchInput.addEventListener('input', (e) => {
-    currentSearch = e.target.value.trim();
-    renderProducts();
+    document.body.focus();
   });
 
   searchOverlay.addEventListener('click', (e) => {
     if (e.target === searchOverlay) {
       searchOverlay.classList.remove('show');
+      document.body.focus();
     }
   });
 
-  // 排序下拉菜单
+  // ESC 键关闭搜索
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && searchOverlay.classList.contains('show')) {
+      searchOverlay.classList.remove('show');
+      document.body.focus();
+    }
+  });
+
+  // ========== 排序 ==========
   sortBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     sortDropdown.classList.toggle('show');
     categoryDropdown.classList.remove('show');
   });
-
   sortDropdown.addEventListener('click', (e) => {
     const item = e.target.closest('.dropdown-item');
     if (!item) return;
     e.stopPropagation();
-    
     currentSort = item.dataset.sort;
     sortDropdown.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
     item.classList.add('active');
@@ -427,13 +432,11 @@ body {
     renderProducts();
   });
 
-  // 点击其他地方关闭下拉菜单
   document.addEventListener('click', () => {
     categoryDropdown.classList.remove('show');
     sortDropdown.classList.remove('show');
   });
 
-  // 页面可见性变化时重新加载
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && Date.now() - lastLoadTime > 5000) loadProducts();
   });

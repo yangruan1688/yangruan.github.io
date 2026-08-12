@@ -87,8 +87,10 @@ body {
   font-size: 15px; font-weight: 600; letter-spacing: 2px;
   text-decoration: none; transition: all 0.3s; cursor: pointer;
   box-shadow: 0 4px 16px rgba(184,134,11,0.3);
+  user-select: none; /* 防止长按选中文本 */
 }
 .buy-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+.buy-btn:active { transform: translateY(0); }
 .back-link {
   display: inline-flex; align-items: center; gap: 6px;
   color: var(--text-light); text-decoration: none; font-size: 13px;
@@ -186,6 +188,11 @@ body {
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO = 'yangruan.github.io';
   const container = document.getElementById('detailContainer');
+  
+  // ==========================================
+  // ⬇️ 请在这里修改你的微信号 ⬇️
+  const WECHAT_ID = 'fff9570950'; 
+  // ==========================================
 
   function escapeHtml(str) {
     return str == null ? '' : String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -291,7 +298,6 @@ body {
       resetZoom();
     } else {
       lbScale = 2.5;
-      // 以点击位置为中心缩放
       const rect = lbImg.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
@@ -309,19 +315,16 @@ body {
     updateLbImage();
   }
 
-  // 关闭按钮
   document.getElementById('lbClose').addEventListener('click', closeLightbox);
   lbPrev.addEventListener('click', (e) => { e.stopPropagation(); navigateLb(-1); });
   lbNext.addEventListener('click', (e) => { e.stopPropagation(); navigateLb(1); });
 
-  // 点击遮罩关闭（仅在未缩放时）
   lbOverlay.addEventListener('click', (e) => {
     if (e.target === lbOverlay || e.target === lbWrap) {
       if (lbScale <= 1) closeLightbox();
     }
   });
 
-  // 键盘支持
   document.addEventListener('keydown', (e) => {
     if (!lbOverlay.classList.contains('active')) return;
     if (e.key === 'Escape') closeLightbox();
@@ -329,26 +332,22 @@ body {
     if (e.key === 'ArrowRight') navigateLb(1);
   });
 
-  // 双击缩放
   lbImg.addEventListener('dblclick', (e) => {
     e.preventDefault();
     toggleZoom(e);
   });
 
-  // 触摸手势：双击检测 + 拖拽平移 + 左右滑动切换
   let touchStartDist = 0;
   let touchStartScale = 1;
 
   lbImg.addEventListener('touchstart', (e) => {
     if (e.touches.length === 2) {
-      // 双指捏合开始
       touchStartDist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
       touchStartScale = lbScale;
     } else if (e.touches.length === 1) {
-      // 双击检测
       const now = Date.now();
       if (now - lbLastTap < 300) {
         e.preventDefault();
@@ -356,7 +355,6 @@ body {
       }
       lbLastTap = now;
 
-      // 拖拽开始
       if (lbScale > 1) {
         lbDragging = true;
         lbDragStart = { x: e.touches[0].clientX - lbTranslate.x, y: e.touches[0].clientY - lbTranslate.y };
@@ -367,7 +365,6 @@ body {
 
   lbImg.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2) {
-      // 双指缩放
       e.preventDefault();
       const dist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
@@ -377,7 +374,6 @@ body {
       if (lbScale <= 1.05) { lbScale = 1; lbTranslate = { x: 0, y: 0 }; }
       applyTransform();
     } else if (lbDragging && e.touches.length === 1) {
-      // 拖拽平移
       e.preventDefault();
       lbTranslate = {
         x: e.touches[0].clientX - lbDragStart.x,
@@ -390,11 +386,9 @@ body {
   lbImg.addEventListener('touchend', (e) => {
     lbDragging = false;
     lbImg.style.cursor = lbScale > 1 ? 'grab' : 'zoom-in';
-    // 回弹：如果缩放接近1则归位
     if (lbScale <= 1.05) resetZoom();
   });
 
-  // 鼠标拖拽平移（桌面端）
   lbImg.addEventListener('mousedown', (e) => {
     if (lbScale <= 1) return;
     e.preventDefault();
@@ -425,7 +419,6 @@ body {
     const images = (product.images || []).map(resolveImageUrl);
     const coverUrl = resolveImageUrl(product.cover);
 
-    // 将完整图片列表存入灯箱
     lbImages = images.length > 0 ? images : (coverUrl ? [coverUrl] : []);
 
     let galleryHtml = '';
@@ -451,10 +444,34 @@ body {
         <div class="product-price">¥${safePrice}</div>
         <span class="product-category">${safeCategory}</span>
         <div class="product-desc">${safeDesc || '暂无详细描述'}</div>
-        <a class="buy-btn" href="https://weidian.com/s/xxxxxxxxx" target="_blank" rel="noopener">前往微店购买</a>
+        
+        <!-- 修改后的按钮：添加微信 -->
+        <a class="buy-btn" id="addWechatBtn" href="javascript:void(0)">添加微信咨询</a>
+        
         <a class="back-link" href="./index.html">← 返回产品列表</a>
       </div>
     `;
+
+    // === 绑定添加微信按钮事件 ===
+    const wechatBtn = document.getElementById('addWechatBtn');
+    if (wechatBtn) {
+      wechatBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const wxId = WECHAT_ID;
+        
+        // 尝试复制到剪贴板
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(wxId).then(() => {
+            alert(`微信号已复制: ${wxId}\n\n请打开微信搜索添加好友咨询详情~`);
+          }).catch(() => {
+            prompt('请手动复制微信号添加好友:', wxId);
+          });
+        } else {
+          // 降级方案
+          prompt('请手动复制微信号添加好友:', wxId);
+        }
+      });
+    }
 
     // 主图点击打开灯箱
     const mainImg = document.getElementById('galleryMain');
@@ -462,7 +479,7 @@ body {
       mainImg.addEventListener('click', () => openLightbox(0));
     }
 
-    // 缩略图切换 + 点击打开灯箱
+    // 缩略图切换
     if (lbImages.length > 1) {
       const thumbs = document.getElementById('galleryThumbs');
       thumbs.addEventListener('click', (e) => {
@@ -474,7 +491,6 @@ body {
         thumb.classList.add('active');
       });
 
-      // 缩略图也可长按/双击打开灯箱（这里用 click 主图触发即可）
       mainImg.addEventListener('click', () => {
         const activeThumb = thumbs.querySelector('.gallery-thumb.active');
         const idx = activeThumb ? parseInt(activeThumb.dataset.index) : 0;

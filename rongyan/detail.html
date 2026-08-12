@@ -87,10 +87,11 @@ body {
   font-size: 15px; font-weight: 600; letter-spacing: 2px;
   text-decoration: none; transition: all 0.3s; cursor: pointer;
   box-shadow: 0 4px 16px rgba(184,134,11,0.3);
-  user-select: none; /* 防止长按选中文本 */
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 .buy-btn:hover { background: var(--primary-light); transform: translateY(-1px); }
-.buy-btn:active { transform: translateY(0); }
+.buy-btn:active { transform: translateY(0); opacity: 0.9; }
 .back-link {
   display: inline-flex; align-items: center; gap: 6px;
   color: var(--text-light); text-decoration: none; font-size: 13px;
@@ -188,11 +189,10 @@ body {
   const GITHUB_OWNER = 'yangruan1688';
   const GITHUB_REPO = 'yangruan.github.io';
   const container = document.getElementById('detailContainer');
-  
-  // ==========================================
-  // ⬇️ 请在这里修改你的微信号 ⬇️
-  const WECHAT_ID = 'fff9570950'; 
-  // ==========================================
+
+  // ✅ 微信号已配置
+  const WECHAT_ID = 'fff9570950';
+  let isCopying = false; // 防抖标志位
 
   function escapeHtml(str) {
     return str == null ? '' : String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -444,31 +444,33 @@ body {
         <div class="product-price">¥${safePrice}</div>
         <span class="product-category">${safeCategory}</span>
         <div class="product-desc">${safeDesc || '暂无详细描述'}</div>
-        
-        <!-- 修改后的按钮：添加微信 -->
-        <a class="buy-btn" id="addWechatBtn" href="javascript:void(0)">添加微信咨询</a>
-        
+        <a class="buy-btn" id="addWechatBtn" href="#" role="button">添加微信咨询</a>
         <a class="back-link" href="./index.html">← 返回产品列表</a>
       </div>
     `;
 
-    // === 绑定添加微信按钮事件 ===
+    // === 绑定添加微信按钮事件（含防抖）===
     const wechatBtn = document.getElementById('addWechatBtn');
     if (wechatBtn) {
       wechatBtn.addEventListener('click', function(e) {
         e.preventDefault();
+        if (isCopying) return; // 防抖：阻止重复点击
+        isCopying = true;
+
         const wxId = WECHAT_ID;
-        
-        // 尝试复制到剪贴板
+        const successMsg = `微信号已复制: ${wxId}\n\n请打开微信 → 搜索 → 添加好友咨询详情~`;
+
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(wxId).then(() => {
-            alert(`微信号已复制: ${wxId}\n\n请打开微信搜索添加好友咨询详情~`);
+            alert(successMsg);
           }).catch(() => {
-            prompt('请手动复制微信号添加好友:', wxId);
+            prompt('复制失败，请手动复制微信号:', wxId);
+          }).finally(() => {
+            setTimeout(() => { isCopying = false; }, 1500);
           });
         } else {
-          // 降级方案
           prompt('请手动复制微信号添加好友:', wxId);
+          setTimeout(() => { isCopying = false; }, 1500);
         }
       });
     }

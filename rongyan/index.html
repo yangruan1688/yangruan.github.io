@@ -27,7 +27,7 @@ body {
                'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   background: var(--bg); color: var(--text);
   -webkit-font-smoothing: antialiased; min-height: 100vh;
-  padding-bottom: 80px; outline: none; /* 防止body聚焦时出现边框 */
+  padding-bottom: 80px; outline: none;
 }
 
 /* 顶部标题栏 */
@@ -48,6 +48,9 @@ body {
   background: none; border: none; cursor: pointer;
 }
 .header-nav-btn:hover { background: rgba(184,134,11,0.1); color: var(--primary); }
+/* 清除按钮特殊样式 */
+#clearSearchBtn { color: #e74c3c; }
+#clearSearchBtn:hover { background: rgba(231,76,60,0.1); color: #c0392b; }
 
 /* 底部悬浮导航栏 */
 .bottom-nav {
@@ -90,7 +93,7 @@ body {
 .dropdown-item:hover { background: rgba(184,134,11,0.08); color: var(--primary); }
 .dropdown-item.active { color: var(--primary); font-weight: 600; }
 
-/* ✅ 搜索框 - 增加过渡动画 */
+/* 搜索框 */
 .search-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.5);
   z-index: 300; display: flex; align-items: flex-start; justify-content: center;
@@ -118,7 +121,6 @@ body {
 }
 .search-input::placeholder { color: #ccc; }
 
-/* ✅ 新增搜索按钮样式 */
 .search-submit-btn {
   flex-shrink: 0; background: var(--primary); color: #fff;
   border: none; border-radius: 18px; padding: 8px 18px;
@@ -173,7 +175,9 @@ body {
 <header class="header">
   <a href="../index.html" class="header-nav-btn">首页</a>
   <h1>✦ 绒颜 ✦</h1>
-  <a href="./admin.html" class="header-nav-btn">管理</a>
+  <!-- ✅ 方案一：新增清除搜索按钮，默认隐藏 -->
+  <button class="header-nav-btn" id="clearSearchBtn" style="display:none;">✕ 清除</button>
+  <a href="./admin.html" class="header-nav-btn" id="adminBtn">管理</a>
 </header>
 
 <!-- 产品网格 -->
@@ -213,13 +217,13 @@ body {
 
 <!-- 搜索遮罩 -->
 <div class="search-overlay" id="searchOverlay">
-  <div class="search-box">
+  <!-- ✅ 初始添加 inert 属性防止隐藏时被 Tab 聚焦 -->
+  <div class="search-box" id="searchBox" inert>
     <div class="search-input-wrapper">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"></circle>
         <path d="m21 21-4.35-4.35"></path>
       </svg>
-      <!-- ✅ 新增搜索按钮 -->
       <input type="text" class="search-input" id="searchInput" placeholder="搜索产品名称...">
       <button class="search-submit-btn" id="searchSubmitBtn">搜索</button>
     </div>
@@ -248,15 +252,27 @@ body {
   const categoryDropdown = document.getElementById('categoryDropdown');
   const searchBtn = document.getElementById('searchBtn');
   const searchOverlay = document.getElementById('searchOverlay');
+  const searchBox = document.getElementById('searchBox');
   const searchInput = document.getElementById('searchInput');
   const searchSubmitBtn = document.getElementById('searchSubmitBtn');
   const searchCloseBtn = document.getElementById('searchCloseBtn');
   const sortBtn = document.getElementById('sortBtn');
   const sortDropdown = document.getElementById('sortDropdown');
+  
+  // ✅ 方案一：获取顶部按钮
+  const clearSearchBtn = document.getElementById('clearSearchBtn');
+  const adminBtn = document.getElementById('adminBtn');
 
   function escapeHtml(str) {
     if (str == null) return '';
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
+    return String(str)
+      .replace(/\\/g, '&#92;')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/`/g, '&#96;');
   }
 
   function resolveImageUrl(url) {
@@ -332,6 +348,15 @@ body {
   }
 
   function renderProducts() {
+    // ✅ 方案一：根据是否有搜索词切换顶部按钮显隐
+    if (currentSearch) {
+        clearSearchBtn.style.display = '';
+        adminBtn.style.display = 'none';
+    } else {
+        clearSearchBtn.style.display = 'none';
+        adminBtn.style.display = '';
+    }
+
     const filtered = filterAndSortProducts();
     if (filtered.length === 0) {
       productGrid.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>未找到匹配的产品</p></div>';
@@ -373,46 +398,56 @@ body {
   });
 
   // ========== ✅ 搜索功能（按钮触发 + 自动关闭） ==========
+  function openSearch() {
+    searchOverlay.classList.add('show');
+    searchBox.inert = false; // 使用 JS 属性赋值，兼容性更好
+    setTimeout(() => searchInput.focus(), 150);
+  }
+
+  function closeSearch(reset) {
+    searchOverlay.classList.remove('show');
+    searchBox.inert = true;
+    if (reset) {
+      searchInput.value = '';
+      currentSearch = '';
+      renderProducts();
+    }
+    // 先 blur 输入框再聚焦 body，确保 iOS Safari 收起键盘
+    searchInput.blur();
+    document.body.focus();
+  }
+
   function doSearch() {
     currentSearch = searchInput.value.trim();
     renderProducts();
-    // 搜索后自动关闭弹窗，直接展示结果
-    searchOverlay.classList.remove('show');
-    document.body.focus(); // 释放焦点，收起移动端键盘
+    closeSearch(false);
   }
 
-  searchBtn.addEventListener('click', () => {
-    searchOverlay.classList.add('show');
-    setTimeout(() => searchInput.focus(), 100);
-  });
-
+  searchBtn.addEventListener('click', openSearch);
   searchSubmitBtn.addEventListener('click', doSearch);
 
   searchInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); doSearch(); }
   });
 
-  searchCloseBtn.addEventListener('click', () => {
-    searchOverlay.classList.remove('show');
-    searchInput.value = '';
-    currentSearch = '';
-    renderProducts();
-    document.body.focus();
-  });
+  searchCloseBtn.addEventListener('click', () => closeSearch(true));
 
   searchOverlay.addEventListener('click', (e) => {
-    if (e.target === searchOverlay) {
-      searchOverlay.classList.remove('show');
-      document.body.focus();
+    if (e.target === searchOverlay) closeSearch(false);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && searchOverlay.classList.contains('show')) {
+      closeSearch(false);
     }
   });
 
-  // ESC 键关闭搜索
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && searchOverlay.classList.contains('show')) {
-      searchOverlay.classList.remove('show');
-      document.body.focus();
-    }
+  // ✅ 方案一：清除搜索按钮事件
+  clearSearchBtn.addEventListener('click', () => {
+      currentSearch = '';
+      searchInput.value = '';
+      renderProducts();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
   // ========== 排序 ==========

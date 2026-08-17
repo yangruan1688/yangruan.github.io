@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="baidu-site-verification" content="codeva-DotF2W9orI" />
-    <meta name="description" content="绒颜|扬州绒花缠花文创品牌，以传统蚕丝铜丝技法制作绒花发饰、缠花饰品，将古典东方美学融入日常穿搭。">
+    <meta name="description" content="绒颜 | 扬州绒花缠花文创品牌，以现代审美与传统技法结合制作绒花、缠花饰品，将古典东方美学融入日常穿搭。">
     <title>绒颜 | 扬州绒花缠花文创品牌</title>
     <script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "https://hm.baidu.com/hm.js?27ed30b0376b4f8d7d5c87def16a6c79";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?27ed30b0376b4f8d7d5c87def16a6c79";
+            var s = document.getElementsByTagName("script")[0]; 
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
 
+    <!-- 请确保 logo.jpg 存在于根目录，否则浏览器会报404 -->
     <link rel="icon" href="logo.jpg" type="image/jpeg">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -70,42 +71,101 @@ var _hmt = _hmt || [];
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             background-color: #eaddcf;
-            /* 修复：明确容器高度，防止图片未加载时塌陷 */
             min-height: 220px;
+            user-select: none; 
+            -webkit-user-select: none;
+            /* 防止触摸时的默认行为 */
+            touch-action: pan-y; 
         }
 
         .gallery-track {
             display: flex;
             flex-wrap: nowrap;
-            /* 修复：移除 will-change，避免与 overflow:hidden 冲突 */
-            /* 仅保留最基本的 GPU 提示 */
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
+            will-change: transform;
         }
 
         .gallery-item {
             flex: 0 0 auto;
             width: 280px;
-            min-width: 280px; /* 修复：防止被压缩 */
+            min-width: 280px;
             margin: 0 15px;
             cursor: pointer;
             border-radius: 6px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s;
+            position: relative;
+            aspect-ratio: 280 / 220;
+            background-color: #d9c4a9;
         }
         .gallery-item:hover { transform: scale(1.03); }
 
         .gallery-item img {
             width: 100%; 
-            height: 220px; 
+            height: 100%; 
             object-fit: cover; 
             display: block;
-            background-color: #d9c4a9;
             opacity: 0;
             transition: opacity 0.6s ease-in;
         }
         .gallery-item img.loaded { opacity: 1; }
+
+        /* 图片加载失败时的占位提示样式 */
+        .gallery-item .img-fallback {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #8B4513;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 1rem;
+            pointer-events: none;
+        }
+        .gallery-item .img-fallback svg {
+            width: 36px; height: 36px; margin-bottom: 6px; opacity: 0.5;
+        }
+        .gallery-item.img-error .img-fallback { display: flex; }
+        .gallery-item.img-error img { display: none; }
+
+        /* 文章卡片专属样式 */
+        .gallery-item.article-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #8B4513 0%, #6B3410 100%);
+            padding: 24px 20px;
+            text-align: center;
+            aspect-ratio: auto;
+        }
+
+        .gallery-item.article-item a {
+            text-decoration: none;
+            color: #fff;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gallery-item.article-item .article-title {
+            font-size: 1rem;
+            line-height: 1.6;
+            font-weight: 500;
+            letter-spacing: 1px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .gallery-item.article-item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 16px rgba(139, 69, 19, 0.3);
+        }
 
         .view-all {
             display: block; text-align: center; color: var(--dark-brown); font-weight: 500;
@@ -122,7 +182,7 @@ var _hmt = _hmt || [];
         }
         .modal-content { max-width: 90%; max-height: 90%; }
         .modal-content img { max-width: 100%; max-height: 90vh; object-fit: contain; border: 3px solid var(--golden); border-radius: 4px; }
-        .close { position: absolute; top: 20px; right: 30px; color: white; font-size: 2.5rem; font-weight: bold; cursor: pointer; transition: color 0.3s; }
+        .close { position: absolute; top: 20px; right: 30px; color: white; font-size: 2.5rem; font-weight: bold; cursor: pointer; transition: color 0.3s; z-index: 1001; }
         .close:hover { color: var(--golden); }
 
         .footer { background-color: var(--dark-brown); color: white; padding: 2.5rem 5%; text-align: center; }
@@ -140,15 +200,13 @@ var _hmt = _hmt || [];
             .company-name { font-size: 1.5rem; }
             .business-type { font-size: 1rem; }
             .gallery-container { min-height: 180px; }
-            .gallery-item { width: 220px; min-width: 220px; margin: 0 10px; }
-            .gallery-item img { height: 180px; }
+            .gallery-item { width: 220px; min-width: 220px; margin: 0 10px; aspect-ratio: 220 / 180; }
             .gallery-title { font-size: 1.5rem; }
         }
 
         @media (max-width: 480px) {
             .gallery-container { min-height: 150px; }
-            .gallery-item { width: 180px; min-width: 180px; margin: 0 8px; }
-            .gallery-item img { height: 150px; }
+            .gallery-item { width: 180px; min-width: 180px; margin: 0 8px; aspect-ratio: 180 / 150; }
             .gallery-title { font-size: 1.3rem; }
             .intro h2 { font-size: 1.3rem; }
             .intro p { font-size: 1rem; }
@@ -161,15 +219,15 @@ var _hmt = _hmt || [];
             <div class="brand-text">
                 <h1 class="company-name">扬软<sup>&reg;</sup>共创</h1>
                 <div class="business-type">"扬古韵今风•琢时光入软"</div>
-                <div class="business-type">"Blending ancient elegance with modern freshness, gently shaping every beautiful moment"</div>
+                <div class="business-type">"Blending ancient elegance with modern freshness"</div>
             </div>
         </div>
     </header>
 
     <section class="intro">
-        <h2>文创品牌：绒颜<sup>&reg;</sup>（May the blossoms bloom in your hair）</h2>
-        <p>●绒花，以细腻的铜丝为骨，彩色蚕丝为绒，经过剪裁、卷曲、烫制、组装等繁复工序，将花朵的柔美与丰盈定格于时光之中。每一朵绒花都仿佛带着丝绸的温润光泽，如真花般灵动，又比真花更添一份永恒的美，为生活注入典雅的东方韵味。</p>
-        <p>●缠花，选取坚韧铜丝或铁丝为骨架，用多色丝线层层缠绕，勾勒出花鸟虫鱼的灵动画卷。技法融合编织与雕塑的精髓，看似纤细的丝线在指尖流转，最终化作立体生动的艺术品，展现出手工创作的无限巧思。</p>
+        <h2>文创品牌：绒颜<sup>&reg;</sup></h2>
+        <p>●绒花，以细腻的铜丝为骨，彩色蚕丝为绒，经过剪裁、卷曲、烫制、组装等繁复工序，将花朵的柔美与丰盈定格于时光之中。</p>
+        <p>●缠花，选取坚韧铜丝或铁丝为骨架，用多色丝线层层缠绕，勾勒出花鸟虫鱼的灵动画卷。</p>
         <p>●绒颜，将以现代审美与传统技法结合，创作这些绒花/缠花作品，将古典之美融入日常。</p>
     </section>
 
@@ -177,10 +235,22 @@ var _hmt = _hmt || [];
         <h2 class="gallery-title">绒颜•绒花馆</h2>
         <div class="gallery-container">
             <div class="gallery-track">
-                <div class="gallery-item"><img src="img/r1.webp" alt="绒花作品" width="280" height="220"></div>
-                <div class="gallery-item"><img src="img/r2.webp" alt="绒花作品" width="280" height="220"></div>
-                <div class="gallery-item"><img src="img/r3.webp" alt="绒花作品" width="280" height="220"></div>
-                <div class="gallery-item"><img src="img/qd.webp" alt="绒花作品" width="280" height="220"></div>
+                <div class="gallery-item">
+                    <img src="img/r1.webp" alt="绒花作品1" width="280" height="220">
+                    <div class="img-fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>图片加载中…</span></div>
+                </div>
+                <div class="gallery-item">
+                    <img src="img/r2.webp" alt="绒花作品2" width="280" height="220">
+                    <div class="img-fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>图片加载中…</span></div>
+                </div>
+                <div class="gallery-item">
+                    <img src="img/r3.webp" alt="绒花作品3" width="280" height="220">
+                    <div class="img-fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>图片加载中…</span></div>
+                </div>
+                <div class="gallery-item">
+                    <img src="img/qd.webp" alt="绒花作品4" width="280" height="220">
+                    <div class="img-fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>图片加载中…</span></div>
+                </div>
             </div>
         </div>
         <a href="rongyan/index.html" class="view-all">查看更多</a>
@@ -190,26 +260,54 @@ var _hmt = _hmt || [];
         <h2 class="gallery-title">绒颜•缠花馆</h2>
         <div class="gallery-container">
             <div class="gallery-track">
-                <div class="gallery-item"><img src="img/c1.webp" alt="缠花作品" width="280" height="220"></div>
-                <div class="gallery-item"><img src="img/c2.webp" alt="缠花作品" width="280" height="220"></div>
-                <div class="gallery-item"><img src="img/c3.webp" alt="缠花作品" width="280" height="220"></div>
-                <div class="gallery-item"><img src="img/qd.webp" alt="缠花作品" width="280" height="220"></div>
+                <div class="gallery-item">
+                    <img src="img/c1.webp" alt="缠花作品1" width="280" height="220">
+                    <div class="img-fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>图片加载中…</span></div>
+                </div>
+                <div class="gallery-item">
+                    <img src="img/s2.webp" alt="缠花作品2" width="280" height="220">
+                    <div class="img-fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>图片加载中…</span></div>
+                </div>
+                <div class="gallery-item">
+                    <img src="img/s3.webp" alt="缠花作品3" width="280" height="220">
+                    <div class="img-fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>图片加载中…</span></div>
+                </div>
+                <div class="gallery-item">
+                    <img src="img/qd.webp" alt="缠花作品4" width="280" height="220">
+                    <div class="img-fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>图片加载中…</span></div>
+                </div>
             </div>
         </div>
         <a href="rongyan/index.html" class="view-all">查看更多</a>
     </section>
 
     <section class="gallery-section">
-        <h2 class="gallery-title">绒颜•饰品馆</h2>
+        <h2 class="gallery-title">绒颜•信息栏</h2>
         <div class="gallery-container">
             <div class="gallery-track">
-                <div class="gallery-item"><img src="img/s1.webp" alt="饰品作品" width="280" height="220"></div>
-                <div class="gallery-item"><img src="img/s2.webp" alt="饰品作品" width="280" height="220"></div>
-                <div class="gallery-item"><img src="img/s3.webp" alt="饰品作品" width="280" height="220"></div>
-                <div class="gallery-item"><img src="img/qd.webp" alt="饰品作品" width="280" height="220"></div>
+                <div class="gallery-item article-item">
+                    <a href="https://mp.weixin.qq.com/s/md-ioeSlTJLXDLQrHi5a9A" target="_blank" rel="noopener">
+                        <span class="article-title">品牌初心</span>
+                    </a>
+                </div>
+                <div class="gallery-item article-item">
+                    <a href="https://mp.weixin.qq.com/s/JQwIS7nu0kemw8cBP1GK3g" target="_blank" rel="noopener">
+                        <span class="article-title">她的婚纱上别了一朵永不凋零的花</span>
+                    </a>
+                </div>
+                <div class="gallery-item article-item">
+                    <a href="https://mp.weixin.qq.com/s/-sQ6fARPT-tvaGCTy_4Kmg" target="_blank" rel="noopener">
+                        <span class="article-title">绒颜新品首发 | 昙花</span>
+                    </a>
+                </div>
+                <div class="gallery-item article-item">
+                    <a href="https://mp.weixin.qq.com/s/UzPar4sJ3gZqe2E32Wa0WQ" target="_blank" rel="noopener">
+                        <span class="article-title">曼陀罗</span>
+                    </a>
+                </div>
             </div>
         </div>
-        <a href="rongyan/index.html" class="view-all">查看更多</a>
+        <a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzkyMzcxODU0Mw==&action=getalbum&album_id=3528207531585339403#wechat_redirect" class="view-all">查看更多（需在微信中打开）</a>
     </section>
 
     <footer class="footer">
@@ -237,104 +335,130 @@ var _hmt = _hmt || [];
         var modal = document.getElementById('imageModal');
         var modalImg = document.getElementById('modalImage');
         var closeBtn = document.querySelector('.close');
-        var tracks = document.querySelectorAll('.gallery-track');
-        var containers = document.querySelectorAll('.gallery-container');
+        // 转换为数组以确保兼容性
+        var tracks = Array.from(document.querySelectorAll('.gallery-track'));
+        var containers = Array.from(document.querySelectorAll('.gallery-container'));
 
-        // 动画状态管理
         var animations = new Map();
 
-        // 图片淡入效果
+        // ========== 图片淡入 + 加载失败兜底 ==========
         function applyFadeIn() {
             document.querySelectorAll('.gallery-item img').forEach(function(img) {
-                if (img.complete && img.naturalWidth > 0) {
-                    img.classList.add('loaded');
-                } else {
-                    img.addEventListener('load', function() {
-                        this.classList.add('loaded');
-                    }, { once: true });
-                    img.addEventListener('error', function() {
-                        this.classList.add('loaded');
-                        this.style.backgroundColor = '#ccc';
-                    }, { once: true });
+                if (img.dataset.fadeBound === 'true') return;
+                img.dataset.fadeBound = 'true';
+
+                // 辅助函数：处理单张图片的状态
+                function handleImageState(imageElement) {
+                    if (imageElement.complete && imageElement.naturalWidth > 0) {
+                        imageElement.classList.add('loaded');
+                    } else if (imageElement.complete) {
+                        // 已加载但失败
+                        var item = imageElement.closest('.gallery-item');
+                        if (item) item.classList.add('img-error');
+                        imageElement.classList.add('loaded');
+                    } else {
+                        // 正在加载
+                        imageElement.addEventListener('load', function() {
+                            this.classList.add('loaded');
+                        }, { once: true });
+
+                        imageElement.addEventListener('error', function() {
+                            var item = this.closest('.gallery-item');
+                            if (item) item.classList.add('img-error');
+                            this.classList.add('loaded');
+                            console.warn('Image load failed:', this.src);
+                        }, { once: true });
+                    }
                 }
+
+                handleImageState(img);
             });
         }
         applyFadeIn();
 
-        // 核心：requestAnimationFrame 滚动动画
+        // ========== 核心滚动动画 ==========
         function animateTrack(track, timestamp) {
             var state = animations.get(track);
             if (!state) return;
 
-            // 计算时间差（秒）
             if (!state.lastTime) state.lastTime = timestamp;
             var delta = (timestamp - state.lastTime) / 1000;
             state.lastTime = timestamp;
 
-            // 限制最大 delta，防止切后台回来跳太远
-            if (delta > 0.1) delta = 0.016;
+            // 防止标签页切换后 delta 过大导致跳跃
+            if (delta > 0.1) {
+                delta = 0.016;
+            }
 
             if (state.running) {
-                // 更新偏移量（向左移动）
                 state.offset -= state.speed * delta;
-
-                // 无缝循环：当偏移量达到一组内容的宽度时归零
                 if (state.offset <= -state.oneLoop) {
                     state.offset += state.oneLoop;
                 }
-
-                // 直接操作 transform，绕过 CSS 动画所有限制
                 track.style.transform = 'translate3d(' + state.offset + 'px, 0, 0)';
             }
 
-            // 继续下一帧
             state.rafId = requestAnimationFrame(function(ts) {
                 animateTrack(track, ts);
             });
         }
 
-        // 初始化单个 gallery
         function initGallery(track) {
+            // 重置逻辑
             if (track.dataset.initialized === 'true') {
-                // 清理旧状态
                 var oldState = animations.get(track);
                 if (oldState) {
                     cancelAnimationFrame(oldState.rafId);
                     animations.delete(track);
                 }
-                
                 var originalCount = parseInt(track.dataset.originalCount);
+                // 安全地移除克隆节点
                 while (track.children.length > originalCount) {
                     track.removeChild(track.lastChild);
                 }
                 track.style.transform = '';
                 track.style.width = '';
-                void track.offsetWidth; // 强制重排
+                // 强制重排
+                void track.offsetWidth;
             }
 
             var children = Array.from(track.children);
             track.dataset.originalCount = children.length;
 
-            // 克隆内容实现无缝循环
+            // 克隆节点以形成无缝循环
             children.forEach(function(child) {
                 var clone = child.cloneNode(true);
+                // 处理克隆图片的显示状态
+                var originalImg = child.querySelector('img');
                 var cloneImg = clone.querySelector('img');
+                
                 if (cloneImg) {
-                    // 修复：克隆的图片强制设为 eager，确保加载
                     cloneImg.setAttribute('loading', 'eager');
-                    // 立即触发淡入
-                    if (cloneImg.complete && cloneImg.naturalWidth > 0) {
+                    cloneImg.dataset.fadeBound = 'true';
+                    
+                    // 如果原图已经加载成功，直接显示克隆图
+                    if (originalImg && originalImg.classList.contains('loaded') && !child.classList.contains('img-error')) {
                         cloneImg.classList.add('loaded');
                     } else {
-                        cloneImg.addEventListener('load', function() {
-                            this.classList.add('loaded');
-                        }, { once: true });
+                        // 否则监听克隆图的加载
+                        if (cloneImg.complete && cloneImg.naturalWidth > 0) {
+                            cloneImg.classList.add('loaded');
+                        } else {
+                            cloneImg.addEventListener('load', function() {
+                                this.classList.add('loaded');
+                            }, { once: true });
+                            cloneImg.addEventListener('error', function() {
+                                var item = this.closest('.gallery-item');
+                                if (item) item.classList.add('img-error');
+                                this.classList.add('loaded');
+                            }, { once: true });
+                        }
                     }
                 }
                 track.appendChild(clone);
             });
 
-            // 计算原始内容的总宽度
+            // 计算一轮滚动的宽度
             var oneLoop = 0;
             children.forEach(function(child) {
                 var rect = child.getBoundingClientRect();
@@ -345,21 +469,16 @@ var _hmt = _hmt || [];
                 oneLoop += itemWidth;
             });
 
-            // 安全检查：如果宽度为 0，说明图片还没加载，稍后重试
             if (oneLoop === 0) {
-                setTimeout(function() {
-                    initGallery(track);
-                }, 500);
+                setTimeout(function() { initGallery(track); }, 500);
                 return;
             }
 
-            // 设置 track 宽度
             track.style.width = (oneLoop * 2) + 'px';
 
-            // 创建动画状态
             var state = {
                 offset: 0,
-                speed: 40, // 每秒移动 40 像素
+                speed: 40, // 滚动速度
                 oneLoop: oneLoop,
                 running: true,
                 rafId: null,
@@ -367,41 +486,34 @@ var _hmt = _hmt || [];
             };
 
             animations.set(track, state);
-
-            // 启动动画循环
             state.rafId = requestAnimationFrame(function(ts) {
                 animateTrack(track, ts);
             });
-
             track.dataset.initialized = 'true';
         }
 
-        // 等待图片加载后初始化
         function waitForImages(container) {
             var imgs = container.querySelectorAll('img');
             var promises = Array.from(imgs).map(function(img) {
-                // 修复：强制所有图片立即加载，不使用 lazy
                 img.setAttribute('loading', 'eager');
-                
                 if (img.complete && img.naturalWidth > 0) {
                     return Promise.resolve();
                 }
                 return new Promise(function(resolve) {
                     img.addEventListener('load', resolve, { once: true });
                     img.addEventListener('error', resolve, { once: true });
-                    // 缩短超时时间，避免等待过久
-                    setTimeout(resolve, 1000);
+                    // 超时保护，避免某张图卡死整个轮播
+                    setTimeout(resolve, 1500);
                 });
             });
             return Promise.all(promises);
         }
 
-        // 初始化所有 gallery
         async function setupAllGalleries() {
             for (var i = 0; i < tracks.length; i++) {
                 var track = tracks[i];
+                // 等待当前轮播内的图片基本加载完成再初始化滚动，避免抖动
                 await waitForImages(track);
-                // 等待至少 2 帧，确保布局完成
                 await new Promise(function(resolve) { 
                     requestAnimationFrame(function() {
                         requestAnimationFrame(resolve);
@@ -411,45 +523,62 @@ var _hmt = _hmt || [];
             }
         }
 
-        // 启动初始化
         setupAllGalleries();
 
-        // 点击放大
+        // ========== 点击事件处理 ==========
         containers.forEach(function(container) {
             container.addEventListener('click', function(e) {
+                // 如果刚刚发生了拖动，阻止本次点击
+                if (container.dataset.justDragged === 'true') {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    return;
+                }
+
                 var item = e.target.closest('.gallery-item');
                 if (!item) return;
-                
+
+                var link = item.querySelector('a');
+                if (link) return; // 有链接则允许默认跳转
+
                 var img = item.querySelector('img');
                 if (!img) return;
+
+                // 如果图片加载失败，不打开模态框
+                if (item.classList.contains('img-error')) return;
 
                 modalImg.src = img.src;
                 modal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
-                
+
                 // 暂停所有动画
                 animations.forEach(function(state) {
                     state.running = false;
                 });
-            });
+            }, true); // 使用捕获阶段
         });
 
         function closeModal() {
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
-            // 恢复所有动画
+            // 恢复动画
             animations.forEach(function(state) {
                 state.running = true;
-                state.lastTime = 0; // 重置时间戳防止大跳
+                state.lastTime = performance.now(); 
             });
         }
 
-        closeBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) closeModal();
-        });
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeModal);
+        }
+        
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeModal();
+            });
+        }
 
-        // 窗口 resize 重新计算
+        // 窗口大小改变时重新计算
         var resizeTimer;
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
@@ -463,27 +592,35 @@ var _hmt = _hmt || [];
             }, 300);
         });
 
-        // 触屏滑动支持
+        // ========== 触摸拖动处理 ==========
         containers.forEach(function(container, index) {
             var track = tracks[index];
             var startX = 0;
             var startOffset = 0;
             var isDragging = false;
+            var hasMoved = false;
 
             container.addEventListener('touchstart', function(e) {
                 var state = animations.get(track);
                 if (!state) return;
                 isDragging = true;
+                hasMoved = false;
                 startX = e.touches[0].clientX;
                 startOffset = state.offset;
                 state.running = false;
+                state.lastTime = 0;
             }, { passive: true });
 
             container.addEventListener('touchmove', function(e) {
                 if (!isDragging) return;
                 var state = animations.get(track);
                 if (!state) return;
-                var dx = e.touches[0].clientX - startX;
+                
+                var currentX = e.touches[0].clientX;
+                var dx = currentX - startX;
+                
+                if (Math.abs(dx) > 5) hasMoved = true;
+
                 state.offset = startOffset + dx;
                 track.style.transform = 'translate3d(' + state.offset + 'px, 0, 0)';
             }, { passive: true });
@@ -491,26 +628,35 @@ var _hmt = _hmt || [];
             function endDrag() {
                 if (!isDragging) return;
                 isDragging = false;
+
+                if (hasMoved) {
+                    container.dataset.justDragged = 'true';
+                    setTimeout(function() {
+                        container.dataset.justDragged = 'false';
+                    }, 300);
+                }
+                
+                // 延迟恢复自动滚动，给用户一点时间查看
                 setTimeout(function() {
                     var state = animations.get(track);
                     if (state && modal.style.display !== 'flex') {
                         state.running = true;
-                        state.lastTime = 0;
+                        state.lastTime = performance.now();
                     }
-                }, 1200);
+                }, 1000);
             }
 
             container.addEventListener('touchend', endDrag, { passive: true });
             container.addEventListener('touchcancel', endDrag, { passive: true });
         });
 
-        // 页面可见性恢复
+        // 页面可见性变化处理
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
                 animations.forEach(function(state) {
                     if (modal.style.display !== 'flex') {
                         state.running = true;
-                        state.lastTime = 0;
+                        state.lastTime = performance.now();
                     }
                 });
             }
@@ -519,4 +665,3 @@ var _hmt = _hmt || [];
     </script>
 </body>
 </html>
-

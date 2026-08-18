@@ -324,13 +324,17 @@
         var animations = new Map();
         var lastFocusedElement = null;
         
-        // ⭐ 全局唯一拖拽状态（解决多容器并发冲突 + window事件重复绑定）
+        // ⭐ 全局唯一拖拽状态（引入 RAF 节流与链接保护）
         var globalDrag = {
             active: false,
             container: null,
             track: null,
             startX: 0, startY: 0, startOffset: 0,
-            hasMoved: false, directionLocked: false, isHorizontal: false, threshold: 10
+            currentX: 0, currentY: 0, // ⭐ 新增：用于 RAF 节流
+            hasMoved: false, directionLocked: false, isHorizontal: false, 
+            threshold: 15, // ⭐ 终极修复：阈值从 8px 提升至 15px，大幅降低手抖误判
+            rafId: null,
+            targetIsLink: false // ⭐ 新增：记录 mousedown 目标是否为链接
         };
         
         var modalCleanup = {
@@ -461,11 +465,8 @@
                 if (clone.id) clone.removeAttribute('id');
                 clone.querySelectorAll('[id]').forEach(function(el) { el.removeAttribute('id'); });
                 clone.querySelectorAll('[for]').forEach(function(el) { el.removeAttribute('for'); });
-                
-                // ⭐ 终极修复：使用 data-source-index 精准映射，彻底解决动态增减卡片导致的索引错位
                 clone.dataset.clone = 'true';
                 clone.dataset.sourceIndex = index;
-                
                 var origImg = child.querySelector('img');
                 var cloneImg = clone.querySelector('img');
                 if (cloneImg) {
@@ -571,18 +572,23 @@
             if (img && img.src && img.src.trim()) openModal(img.src, item);
         }
 
-        // ⭐ 点击事件：支持克隆节点点击映射回原始数据
+        // ⭐ 点击事件：支持克隆节点点击映射，并精准保护链接跳转
         containers.forEach(function(container) {
             container.addEventListener('click', function(e) {
-                if (container.dataset.justDragged === 'true') {
-                    // ⭐ 终极修复：仅阻止默认行为，不使用 stopImmediatePropagation 避免误杀其他监听器
-                    e.preventDefault(); 
-                    return;
-                }
                 var item = e.target.closest('.gallery-item');
                 if (!item) return;
                 
-                // 如果点到的是克隆节点，通过 data-source-index 精准找到原始节点
+                // ⭐ 终极修复：如果点击目标是文章卡片内的 <a> 标签，绝对不阻止默认行为，确保链接正常跳转
+                var isLinkClick = e.target.closest('a');
+                if (isLinkClick && item.classList.contains('gallery-item--article')) {
+                    return; // 放行链接跳转
+                }
+
+                if (container.dataset.justDragged === 'true') {
+                    e.preventDefault(); 
+                    return;
+                }
+                
                 if (item.dataset.clone === 'true') {
                     var track = container.querySelector('.gallery-track');
                     var sourceIndex = parseInt(item.dataset.sourceIndex);
@@ -630,44 +636,67 @@
             }, 300);
         });
 
-        // ⭐ 统一拖拽逻辑（全局单例，避免重复绑定和多容器冲突）
-        function onDragStart(container, track, x, y) {
+        // ⭐ 统一拖拽逻辑（引入 RAF 节流，确保 60fps 丝滑）
+        function onDragStart(container, track, x, y, target) {
             var s = animations.get(track);
             if (!s) return;
             if (s.resumeTimer) { clearTimeout(s.resumeTimer); s.resumeTimer = null; }
-            var w = container.offsetWidth;
+            
             globalDrag.active = true;
             globalDrag.container = container;
             globalDrag.track = track;
             globalDrag.startX = x;
             globalDrag.startY = y;
+            globalDrag.currentX = x;
+            globalDrag.currentY = y;
             globalDrag.startOffset = s.offset;
             globalDrag.hasMoved = false;
             globalDrag.directionLocked = false;
             globalDrag.isHorizontal = false;
-            globalDrag.threshold = Math.max(8, Math.min(20, w * 0.02));
+            // ⭐ 记录 mousedown 目标是否为链接，用于后续判断
+            globalDrag.targetIsLink = !!target.closest('a'); 
+            
             s.running = false;
             s.lastTime = 0;
             container.classList.add('is-dragging');
         }
 
-        function onDragMove(x, y, e) {
-            if (!globalDrag.active) return;
+        function applyDragTransform() {
+            if (!globalDrag.active || !globalDrag.directionLocked || !globalDrag.isHorizontal) return;
             var s = animations.get(globalDrag.track);
             if (!s) return;
+            
+            var dx = globalDrag.currentX - globalDrag.startX;
+            s.offset = globalDrag.startOffset + dx;
+            globalDrag.track.style.transform = 'translateX(' + s.offset + 'px) translateZ(0)';
+        }
+
+        function onDragMove(x, y, e) {
+            if (!globalDrag.active) return;
+            
             var dx = x - globalDrag.startX;
             var dy = y - globalDrag.startY;
+            
             if (!globalDrag.directionLocked) {
                 if (Math.abs(dx) > globalDrag.threshold || Math.abs(dy) > globalDrag.threshold) {
                     globalDrag.directionLocked = true;
                     globalDrag.isHorizontal = Math.abs(dx) > Math.abs(dy);
                 }
             }
+            
             if (globalDrag.directionLocked && globalDrag.isHorizontal) {
                 globalDrag.hasMoved = true;
                 if (e && e.cancelable) e.preventDefault();
-                s.offset = globalDrag.startOffset + dx;
-                globalDrag.track.style.transform = 'translateX(' + s.offset + 'px) translateZ(0)';
+                
+                // ⭐ 终极修复：RAF 节流，避免高频 mousemove 导致主线程阻塞掉帧
+                globalDrag.currentX = x;
+                globalDrag.currentY = y;
+                if (!globalDrag.rafId) {
+                    globalDrag.rafId = requestAnimationFrame(function() {
+                        applyDragTransform();
+                        globalDrag.rafId = null;
+                    });
+                }
             }
         }
 
@@ -676,11 +705,22 @@
             var container = globalDrag.container;
             var track = globalDrag.track;
             var hasMoved = globalDrag.hasMoved;
+            var wasLink = globalDrag.targetIsLink;
+            
+            if (globalDrag.rafId) {
+                cancelAnimationFrame(globalDrag.rafId);
+                globalDrag.rafId = null;
+            }
             
             container.classList.remove('is-dragging');
             globalDrag.active = false;
             globalDrag.container = null;
             globalDrag.track = null;
+
+            // ⭐ 终极修复：如果拖拽的是链接，且位移极小（< 30px），不视为拖拽，不拦截后续 click
+            if (hasMoved && wasLink && Math.abs(globalDrag.currentX - globalDrag.startX) < 30) {
+                hasMoved = false; 
+            }
 
             if (hasMoved) {
                 container.dataset.justDragged = 'true';
@@ -695,12 +735,11 @@
             }
         }
 
-        // 触摸事件（每个容器独立监听入口）
         containers.forEach(function(container) {
             var track = container.querySelector('.gallery-track');
             if (!track) return;
             container.addEventListener('touchstart', function(e) {
-                onDragStart(container, track, e.touches[0].clientX, e.touches[0].clientY);
+                onDragStart(container, track, e.touches[0].clientX, e.touches[0].clientY, e.target);
             }, { passive: true });
             container.addEventListener('touchmove', function(e) {
                 onDragMove(e.touches[0].clientX, e.touches[0].clientY, e);
@@ -709,12 +748,11 @@
             container.addEventListener('touchcancel', onDragEnd, { passive: true });
             container.addEventListener('mousedown', function(e) {
                 if (e.button !== 0) return;
-                onDragStart(container, track, e.clientX, e.clientY);
+                onDragStart(container, track, e.clientX, e.clientY, e.target);
             });
             container.addEventListener('dragstart', function(e) { e.preventDefault(); });
         });
 
-        // ⭐ window 级鼠标事件只绑定一次（解决内存泄漏）
         window.addEventListener('mousemove', function(e) {
             if (!globalDrag.active) return;
             onDragMove(e.clientX, e.clientY, e);
@@ -723,7 +761,7 @@
             if (globalDrag.active) onDragEnd();
         });
 
-        // ⭐ 终极修复：全局失焦保护（解决拖拽时 Alt+Tab 导致轮播永久卡死的问题）
+        // ⭐ 状态机竞态修复：blur 仅负责释放拖拽锁，visibilitychange 统一接管动画恢复
         window.addEventListener('blur', function() {
             if (globalDrag.active) onDragEnd();
         });
@@ -732,7 +770,10 @@
             if (!document.hidden) {
                 restartAllAnimations();
                 animations.forEach(function(s) {
-                    if (!modal.classList.contains('show')) { s.running = true; s.skipNextDelta = true; }
+                    if (!modal.classList.contains('show')) { 
+                        s.running = true; 
+                        s.skipNextDelta = true; 
+                    }
                 });
             }
         });

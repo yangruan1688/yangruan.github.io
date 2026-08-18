@@ -7,11 +7,6 @@
     <meta name="description" content="绒颜 | 扬州绒花缠花文创品牌，以现代审美与传统技法结合制作绒花、缠花饰品，将古典东方美学融入日常穿搭。">
     <title>绒颜 | 扬州绒花缠花文创品牌</title>
     
-    <!-- 
-      ⚠️ 部署前请务必修改 og:image 的链接！
-      将 'https://yourdomain.com/logo.jpg' 替换为你网站实际可访问的绝对路径图片 URL。
-      社交软件（如微信、微博）分享时依赖此标签生成预览卡片。
-    -->
     <meta property="og:title" content="绒颜 | 扬州绒花缠花文创品牌">
     <meta property="og:description" content="以现代审美与传统技法结合制作绒花、缠花饰品，将古典东方美学融入日常穿搭。">
     <meta property="og:image" content="https://www.yangruan.com/fm.jpg"> 
@@ -73,7 +68,9 @@
             touch-action: pan-y; 
             padding: 0 15px;
             overscroll-behavior-x: contain;
+            cursor: grab;
         }
+        .gallery-container.is-dragging { cursor: grabbing; }
         .gallery-container::before {
             content: '';
             position: absolute; top: 50%; left: 50%;
@@ -327,11 +324,17 @@
         var animations = new Map();
         var lastFocusedElement = null;
         
+        // ⭐ 全局唯一拖拽状态（解决多容器并发冲突 + window事件重复绑定）
+        var globalDrag = {
+            active: false,
+            container: null,
+            track: null,
+            startX: 0, startY: 0, startOffset: 0,
+            hasMoved: false, directionLocked: false, isHorizontal: false, threshold: 10
+        };
+        
         var modalCleanup = {
-            timer: null,
-            transitionHandler: null,
-            focusReturned: false,
-            
+            timer: null, transitionHandler: null, focusReturned: false,
             cancelPending: function() {
                 if (this.timer) { clearTimeout(this.timer); this.timer = null; }
                 if (this.transitionHandler) {
@@ -339,12 +342,10 @@
                     this.transitionHandler = null;
                 }
             },
-            
             scheduleReturnFocus: function() {
                 this.cancelPending();
                 this.focusReturned = false;
                 var self = this;
-                
                 this.transitionHandler = function onEnd() {
                     if (modal.classList.contains('show')) return;
                     modal.removeEventListener('transitionend', onEnd);
@@ -352,13 +353,11 @@
                     self.doReturnFocus();
                 };
                 modal.addEventListener('transitionend', this.transitionHandler);
-                
                 this.timer = setTimeout(function() {
                     if (modal.classList.contains('show')) return;
                     self.doReturnFocus();
                 }, 350);
             },
-            
             doReturnFocus: function() {
                 if (this.focusReturned) return;
                 this.focusReturned = true;
@@ -366,13 +365,8 @@
                 modal.style.display = 'none'; 
                 modalImg.src = '';
                 var mc = modal.querySelector('.modal-content');
-                if (mc) {
-                    mc.classList.remove('img-error');
-                    mc.classList.remove('loading');
-                }
-                if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
-                    lastFocusedElement.focus();
-                }
+                if (mc) { mc.classList.remove('img-error'); mc.classList.remove('loading'); }
+                if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') lastFocusedElement.focus();
             }
         };
 
@@ -403,16 +397,13 @@
         function animateTrack(track, timestamp) {
             var state = animations.get(track);
             if (!state) return;
-
             if (!state.lastTime || state.skipNextDelta) {
                 state.lastTime = timestamp;
                 state.skipNextDelta = false;
             }
-
             var delta = (timestamp - state.lastTime) / 1000;
             state.lastTime = timestamp;
             if (delta > 0.1) delta = 0.016;
-
             if (state.running) {
                 state.offset -= state.speed * delta;
                 if (state.oneLoop > 0) {
@@ -421,12 +412,7 @@
                 }
                 track.style.transform = 'translateX(' + state.offset + 'px) translateZ(0)';
             }
-
-            if (document.hidden) {
-                state.rafId = null;
-                return;
-            }
-
+            if (document.hidden) { state.rafId = null; return; }
             state.rafId = requestAnimationFrame(function(ts) { animateTrack(track, ts); });
         }
 
@@ -447,116 +433,67 @@
 
         function initGallery(container, retryCount) {
             retryCount = retryCount || 0;
-            
-            if (retryTimers.has(container)) {
-                clearTimeout(retryTimers.get(container));
-                retryTimers.delete(container);
-            }
-            
+            if (retryTimers.has(container)) { clearTimeout(retryTimers.get(container)); retryTimers.delete(container); }
             var track = container.querySelector('.gallery-track');
             if (!track) return;
-
             var oldState = animations.get(track);
             var prevOffsetRatio = 0;
-
             if (track.dataset.initialized === 'true') {
                 container.classList.remove('loaded');
-                
                 var originalCount = parseInt(track.dataset.originalCount) || 0;
                 if (oldState && oldState.oneLoop > 0) {
                     prevOffsetRatio = (((oldState.offset % oldState.oneLoop) + oldState.oneLoop) % oldState.oneLoop) / oldState.oneLoop;
                 }
                 if (oldState) {
                     if (oldState.rafId) cancelAnimationFrame(oldState.rafId);
-                    if (oldState.resumeTimer) {
-                        clearTimeout(oldState.resumeTimer);
-                        oldState.resumeTimer = null;
-                    }
+                    if (oldState.resumeTimer) { clearTimeout(oldState.resumeTimer); oldState.resumeTimer = null; }
                     animations.delete(track);
                 }
-                if (originalCount > 0) {
-                    while (track.children.length > originalCount) {
-                        track.removeChild(track.lastChild);
-                    }
-                }
-                track.style.transform = '';
-                track.style.width = '';
-                void track.offsetWidth;
+                if (originalCount > 0) { while (track.children.length > originalCount) track.removeChild(track.lastChild); }
+                track.style.transform = ''; track.style.width = ''; void track.offsetWidth;
             }
-
             var children = Array.from(track.children);
             if (children.length === 0) return;
             track.dataset.originalCount = children.length;
-
-            children.forEach(function(child) {
+            children.forEach(function(child, index) {
                 var clone = child.cloneNode(true);
-                clone.removeAttribute('tabindex');
-                clone.removeAttribute('role');
-                clone.setAttribute('aria-hidden', 'true');
-                
+                clone.removeAttribute('tabindex'); clone.removeAttribute('role'); clone.setAttribute('aria-hidden', 'true');
                 if (clone.id) clone.removeAttribute('id');
+                clone.querySelectorAll('[id]').forEach(function(el) { el.removeAttribute('id'); });
+                clone.querySelectorAll('[for]').forEach(function(el) { el.removeAttribute('for'); });
                 
-                clone.querySelectorAll('[id]').forEach(function(el) {
-                    el.removeAttribute('id');
-                });
-                clone.querySelectorAll('[for]').forEach(function(el) {
-                    el.removeAttribute('for');
-                });
+                // ⭐ 终极修复：使用 data-source-index 精准映射，彻底解决动态增减卡片导致的索引错位
+                clone.dataset.clone = 'true';
+                clone.dataset.sourceIndex = index;
                 
-                clone.style.pointerEvents = 'none';
-
                 var origImg = child.querySelector('img');
                 var cloneImg = clone.querySelector('img');
-                
                 if (cloneImg) {
                     delete cloneImg.dataset.fadeBound;
-                    
                     if (origImg && origImg.classList.contains('loaded') && !child.classList.contains('img-error')) {
-                        cloneImg.classList.add('loaded');
-                        bindImageState(cloneImg);
+                        cloneImg.classList.add('loaded'); bindImageState(cloneImg);
                     } else if (origImg && child.classList.contains('img-error')) {
                         var cloneItem = cloneImg.closest('.gallery-item');
                         if (cloneItem) cloneItem.classList.add('img-error');
                         cloneImg.classList.add('loaded');
-                    } else {
-                        bindImageState(cloneImg);
-                    }
+                    } else { bindImageState(cloneImg); }
                 }
                 track.appendChild(clone);
             });
-
             var oneLoop = 0;
-            children.forEach(function(child) {
-                oneLoop += getItemFullWidth(child);
-            });
-
+            children.forEach(function(child) { oneLoop += getItemFullWidth(child); });
             if (oneLoop === 0) {
                 if (retryCount < 5) {
                     var delay = Math.min(500 * Math.pow(2, retryCount), 8000);
-                    var timer = setTimeout(function() { 
-                        retryTimers.delete(container);
-                        initGallery(container, retryCount + 1); 
-                    }, delay);
+                    var timer = setTimeout(function() { retryTimers.delete(container); initGallery(container, retryCount + 1); }, delay);
                     retryTimers.set(container, timer);
                 }
                 return;
             }
-
             container.classList.add('loaded');
-
             track.style.width = (oneLoop * 2) + 'px';
             var restoredOffset = prevOffsetRatio * oneLoop * -1;
-
-            var state = {
-                offset: restoredOffset,
-                speed: 40,
-                oneLoop: oneLoop,
-                running: true,
-                rafId: null,
-                lastTime: 0,
-                skipNextDelta: true,
-                resumeTimer: null
-            };
+            var state = { offset: restoredOffset, speed: 40, oneLoop: oneLoop, running: true, rafId: null, lastTime: 0, skipNextDelta: true, resumeTimer: null };
             animations.set(track, state);
             state.rafId = requestAnimationFrame(function(ts) { animateTrack(track, ts); });
             track.dataset.initialized = 'true';
@@ -572,23 +509,15 @@
                     setTimeout(resolve, 1200);
                 });
             });
-            
-            var globalTimeout = new Promise(function(resolve) {
-                setTimeout(resolve, 2000);
-            });
-            
+            var globalTimeout = new Promise(function(resolve) { setTimeout(resolve, 2000); });
             return Promise.race([Promise.all(imgPromises), globalTimeout]);
         }
 
         function setupAllGalleries() {
             containers.forEach(function(container) {
                 waitForImages(container).then(function() {
-                    return new Promise(function(r) {
-                        requestAnimationFrame(function() { requestAnimationFrame(r); });
-                    });
-                }).then(function() {
-                    initGallery(container);
-                });
+                    return new Promise(function(r) { requestAnimationFrame(function() { requestAnimationFrame(r); }); });
+                }).then(function() { initGallery(container); });
             });
         }
         setupAllGalleries();
@@ -597,61 +526,31 @@
             var mc = modal.querySelector('.modal-content');
             if (!mc) return;
             mc.classList.remove('loading');
-            if (isError) {
-                mc.classList.add('img-error');
-            } else {
-                mc.classList.remove('img-error');
-            }
+            if (isError) mc.classList.add('img-error'); else mc.classList.remove('img-error');
         }
-
         modalImg.addEventListener('load', function() { handleModalImageReady(false); });
         modalImg.addEventListener('error', function() { handleModalImageReady(true); });
 
         function trapFocus(e) {
             if (e.key !== 'Tab') return;
-            
             var focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
             var focusableElements = modal.querySelectorAll(focusableSelectors);
             if (focusableElements.length === 0) return;
-            
-            var firstEl = focusableElements[0];
-            var lastEl = focusableElements[focusableElements.length - 1];
-            
-            if (e.shiftKey) {
-                if (document.activeElement === firstEl) {
-                    e.preventDefault();
-                    lastEl.focus();
-                }
-            } else {
-                if (document.activeElement === lastEl) {
-                    e.preventDefault();
-                    firstEl.focus();
-                }
-            }
+            var firstEl = focusableElements[0], lastEl = focusableElements[focusableElements.length - 1];
+            if (e.shiftKey) { if (document.activeElement === firstEl) { e.preventDefault(); lastEl.focus(); } }
+            else { if (document.activeElement === lastEl) { e.preventDefault(); firstEl.focus(); } }
         }
 
         function openModal(src, triggerEl) {
             modalCleanup.cancelPending();
-            
             lastFocusedElement = triggerEl || document.activeElement;
             var mc = modal.querySelector('.modal-content');
-            if (mc) {
-                mc.classList.remove('img-error');
-                mc.classList.add('loading');
-            }
+            if (mc) { mc.classList.remove('img-error'); mc.classList.add('loading'); }
             modalImg.src = src;
-            
-            if (modalImg.complete && modalImg.naturalWidth > 0) {
-                handleModalImageReady(false);
-            } else if (modalImg.complete) {
-                handleModalImageReady(true);
-            }
-            
+            if (modalImg.complete && modalImg.naturalWidth > 0) handleModalImageReady(false);
+            else if (modalImg.complete) handleModalImageReady(true);
             modal.style.display = 'flex';
-            requestAnimationFrame(function() { 
-                modal.classList.add('show'); 
-                closeBtn.focus();
-            });
+            requestAnimationFrame(function() { modal.classList.add('show'); closeBtn.focus(); });
             document.body.style.overflow = 'hidden';
             document.addEventListener('keydown', trapFocus);
             animations.forEach(function(s) { s.running = false; });
@@ -660,14 +559,9 @@
         function closeModal() {
             modal.classList.remove('show');
             document.removeEventListener('keydown', trapFocus);
-            
             modalCleanup.scheduleReturnFocus();
-            
             document.body.style.overflow = 'auto';
-            animations.forEach(function(s) {
-                s.running = true;
-                s.skipNextDelta = true;
-            });
+            animations.forEach(function(s) { s.running = true; s.skipNextDelta = true; });
         }
 
         function handleItemActivation(item) {
@@ -677,15 +571,26 @@
             if (img && img.src && img.src.trim()) openModal(img.src, item);
         }
 
+        // ⭐ 点击事件：支持克隆节点点击映射回原始数据
         containers.forEach(function(container) {
             container.addEventListener('click', function(e) {
                 if (container.dataset.justDragged === 'true') {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
+                    // ⭐ 终极修复：仅阻止默认行为，不使用 stopImmediatePropagation 避免误杀其他监听器
+                    e.preventDefault(); 
                     return;
                 }
                 var item = e.target.closest('.gallery-item');
                 if (!item) return;
+                
+                // 如果点到的是克隆节点，通过 data-source-index 精准找到原始节点
+                if (item.dataset.clone === 'true') {
+                    var track = container.querySelector('.gallery-track');
+                    var sourceIndex = parseInt(item.dataset.sourceIndex);
+                    var originalCount = parseInt(track.dataset.originalCount) || 0;
+                    if (!isNaN(sourceIndex) && sourceIndex >= 0 && sourceIndex < originalCount) {
+                        item = track.children[sourceIndex];
+                    }
+                }
                 handleItemActivation(item);
             }, true);
 
@@ -693,30 +598,22 @@
                 if (e.key !== 'Enter' && e.key !== ' ') return;
                 var item = e.target.closest('.gallery-item');
                 if (!item || item.classList.contains('gallery-item--article')) return;
-                e.preventDefault();
-                handleItemActivation(item);
+                e.preventDefault(); handleItemActivation(item);
             });
         });
 
         if (closeBtn) {
             closeBtn.addEventListener('click', closeModal);
             closeBtn.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    closeModal();
-                }
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeModal(); }
             });
         }
-        
         if (modal) {
             modal.addEventListener('click', function(e) { 
                 var content = modal.querySelector('.modal-content');
-                if (e.target === modal || e.target === modalImg || (content && e.target === content)) {
-                    closeModal();
-                }
+                if (e.target === modal || e.target === modalImg || (content && e.target === content)) closeModal();
             });
         }
-        
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && modal.classList.contains('show')) closeModal();
         });
@@ -733,103 +630,109 @@
             }, 300);
         });
 
+        // ⭐ 统一拖拽逻辑（全局单例，避免重复绑定和多容器冲突）
+        function onDragStart(container, track, x, y) {
+            var s = animations.get(track);
+            if (!s) return;
+            if (s.resumeTimer) { clearTimeout(s.resumeTimer); s.resumeTimer = null; }
+            var w = container.offsetWidth;
+            globalDrag.active = true;
+            globalDrag.container = container;
+            globalDrag.track = track;
+            globalDrag.startX = x;
+            globalDrag.startY = y;
+            globalDrag.startOffset = s.offset;
+            globalDrag.hasMoved = false;
+            globalDrag.directionLocked = false;
+            globalDrag.isHorizontal = false;
+            globalDrag.threshold = Math.max(8, Math.min(20, w * 0.02));
+            s.running = false;
+            s.lastTime = 0;
+            container.classList.add('is-dragging');
+        }
+
+        function onDragMove(x, y, e) {
+            if (!globalDrag.active) return;
+            var s = animations.get(globalDrag.track);
+            if (!s) return;
+            var dx = x - globalDrag.startX;
+            var dy = y - globalDrag.startY;
+            if (!globalDrag.directionLocked) {
+                if (Math.abs(dx) > globalDrag.threshold || Math.abs(dy) > globalDrag.threshold) {
+                    globalDrag.directionLocked = true;
+                    globalDrag.isHorizontal = Math.abs(dx) > Math.abs(dy);
+                }
+            }
+            if (globalDrag.directionLocked && globalDrag.isHorizontal) {
+                globalDrag.hasMoved = true;
+                if (e && e.cancelable) e.preventDefault();
+                s.offset = globalDrag.startOffset + dx;
+                globalDrag.track.style.transform = 'translateX(' + s.offset + 'px) translateZ(0)';
+            }
+        }
+
+        function onDragEnd() {
+            if (!globalDrag.active) return;
+            var container = globalDrag.container;
+            var track = globalDrag.track;
+            var hasMoved = globalDrag.hasMoved;
+            
+            container.classList.remove('is-dragging');
+            globalDrag.active = false;
+            globalDrag.container = null;
+            globalDrag.track = null;
+
+            if (hasMoved) {
+                container.dataset.justDragged = 'true';
+                setTimeout(function() { container.dataset.justDragged = 'false'; }, 150);
+            }
+            var s = animations.get(track);
+            if (s) {
+                s.resumeTimer = setTimeout(function() {
+                    s.resumeTimer = null;
+                    if (!modal.classList.contains('show')) { s.running = true; s.skipNextDelta = true; }
+                }, 1000);
+            }
+        }
+
+        // 触摸事件（每个容器独立监听入口）
         containers.forEach(function(container) {
             var track = container.querySelector('.gallery-track');
             if (!track) return;
-
-            var startX = 0;
-            var startY = 0;
-            var startOffset = 0;
-            var isDragging = false;
-            var hasMoved = false;
-            var directionLocked = false;
-            var isHorizontal = false;
-            var threshold = 10;
-
             container.addEventListener('touchstart', function(e) {
-                var s = animations.get(track);
-                if (!s) return;
-
-                if (s.resumeTimer) {
-                    clearTimeout(s.resumeTimer);
-                    s.resumeTimer = null;
-                }
-
-                var w = container.offsetWidth;
-                threshold = Math.max(8, Math.min(20, w * 0.02));
-
-                isDragging = true;
-                hasMoved = false;
-                directionLocked = false;
-                isHorizontal = false;
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-                startOffset = s.offset;
-                s.running = false;
-                s.lastTime = 0;
+                onDragStart(container, track, e.touches[0].clientX, e.touches[0].clientY);
             }, { passive: true });
-
             container.addEventListener('touchmove', function(e) {
-                if (!isDragging) return;
-                var s = animations.get(track);
-                if (!s) return;
-                
-                var currentX = e.touches[0].clientX;
-                var currentY = e.touches[0].clientY;
-                var dx = currentX - startX;
-                var dy = currentY - startY;
-
-                if (!directionLocked) {
-                    if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
-                        directionLocked = true;
-                        isHorizontal = Math.abs(dx) > Math.abs(dy);
-                    }
-                }
-
-                if (directionLocked && isHorizontal) {
-                    hasMoved = true;
-                    if (e.cancelable) e.preventDefault();
-                    s.offset = startOffset + dx;
-                    track.style.transform = 'translateX(' + s.offset + 'px) translateZ(0)';
-                }
+                onDragMove(e.touches[0].clientX, e.touches[0].clientY, e);
             }, { passive: false });
+            container.addEventListener('touchend', onDragEnd, { passive: true });
+            container.addEventListener('touchcancel', onDragEnd, { passive: true });
+            container.addEventListener('mousedown', function(e) {
+                if (e.button !== 0) return;
+                onDragStart(container, track, e.clientX, e.clientY);
+            });
+            container.addEventListener('dragstart', function(e) { e.preventDefault(); });
+        });
 
-            function endDrag() {
-                if (!isDragging) return;
-                isDragging = false;
-                directionLocked = false;
+        // ⭐ window 级鼠标事件只绑定一次（解决内存泄漏）
+        window.addEventListener('mousemove', function(e) {
+            if (!globalDrag.active) return;
+            onDragMove(e.clientX, e.clientY, e);
+        });
+        window.addEventListener('mouseup', function() {
+            if (globalDrag.active) onDragEnd();
+        });
 
-                if (hasMoved) {
-                    container.dataset.justDragged = 'true';
-                    setTimeout(function() {
-                        container.dataset.justDragged = 'false';
-                    }, 150);
-                }
-
-                var s = animations.get(track);
-                if (s) {
-                    s.resumeTimer = setTimeout(function() {
-                        s.resumeTimer = null;
-                        if (!modal.classList.contains('show')) {
-                            s.running = true;
-                            s.skipNextDelta = true;
-                        }
-                    }, 1000);
-                }
-            }
-
-            container.addEventListener('touchend', endDrag, { passive: true });
-            container.addEventListener('touchcancel', endDrag, { passive: true });
+        // ⭐ 终极修复：全局失焦保护（解决拖拽时 Alt+Tab 导致轮播永久卡死的问题）
+        window.addEventListener('blur', function() {
+            if (globalDrag.active) onDragEnd();
         });
 
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
                 restartAllAnimations();
                 animations.forEach(function(s) {
-                    if (!modal.classList.contains('show')) {
-                        s.running = true;
-                        s.skipNextDelta = true;
-                    }
+                    if (!modal.classList.contains('show')) { s.running = true; s.skipNextDelta = true; }
                 });
             }
         });

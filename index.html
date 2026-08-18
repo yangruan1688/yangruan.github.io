@@ -487,7 +487,7 @@
                 cloneLinks.forEach(function(link) {
                     link.setAttribute('tabindex', '-1');
                     link.setAttribute('aria-hidden', 'true');
-                    link.removeAttribute('href'); 
+                    link.setAttribute('href', 'javascript:void(0)'); 
                 });
                 
                 var origImg = child.querySelector('img');

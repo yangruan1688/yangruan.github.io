@@ -14,16 +14,21 @@
     <meta property="og:image" content="https://www.yangruan.com/fm.jpg"> 
     <meta property="og:type" content="website">
     <meta property="og:locale" content="zh_CN">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Brand",
-  "name": "绒颜",
-  "description": "绒颜是扬州绒花缠花文创品牌，以现代审美与传统技法结合制作绒花、缠花饰品，将古典东方美学融入日常穿搭。提供发饰、胸针、耳饰及定制服务。",
-  "url": "https://www.yangruan.com/",
-  "logo": "https://www.yangruan.com/logo.jpg"
-}
-</script>
+    <!-- ✅ 修改2: 将 Brand 替换为 ImageObject，这是搜索结果出图的关键 -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ImageObject",
+      "contentUrl": "https://www.yangruan.com/fm.jpg",
+      "url": "https://www.yangruan.com/",
+      "description": "绒颜品牌首页展示图，体现扬州绒花缠花文创品牌的东方美学风格。",
+      "author": {
+        "@type": "Organization",
+        "name": "绒颜"
+      }
+    }
+    </script>
+
     <!-- ✅ 优化4：增加多图预加载与预获取 -->
     <link rel="preload" as="image" href="img/r1.webp" fetchpriority="high">
     <link rel="prefetch" as="image" href="img/r2.webp"> 

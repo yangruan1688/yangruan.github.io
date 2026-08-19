@@ -19,7 +19,7 @@
   "@context": "https://schema.org",
   "@type": "Brand",
   "name": "绒颜",
-  "description": "扬州绒花缠花文创品牌...",
+  "description": "绒颜是扬州绒花缠花文创品牌，以现代审美与传统技法结合制作绒花、缠花饰品，将古典东方美学融入日常穿搭。提供发饰、胸针、耳饰及定制服务。",
   "url": "https://www.yangruan.com/",
   "logo": "https://www.yangruan.com/logo.jpg"
 }
@@ -143,9 +143,8 @@
         .gallery-item.img-error .img-fallback { display:flex; }
         .gallery-item.img-error img { display:none; }
         
-        /* ✅ 修改4：克隆节点SEO与渲染性能优化 */
+        /* ✅ 修复：移除 content-visibility: hidden，确保克隆节点在拖拽和滚动时可见 */
         .gallery-item[data-clone="true"] {
-            content-visibility: hidden;
             contain-intrinsic-size: 280px 220px;
         }
         

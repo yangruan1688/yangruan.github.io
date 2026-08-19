@@ -14,22 +14,33 @@
     <meta property="og:image" content="https://www.yangruan.com/fm.jpg"> 
     <meta property="og:type" content="website">
     <meta property="og:locale" content="zh_CN">
-    <!-- ✅ 修改2: 将 Brand 替换为 ImageObject，这是搜索结果出图的关键 -->
+    
+    <!-- ✅ 修改4：Schema.org 结构化数据升级为 Organization，嵌套 ImageObject -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "ImageObject",
-      "contentUrl": "https://www.yangruan.com/fm.jpg",
+      "@type": "Organization",
+      "name": "绒颜",
       "url": "https://www.yangruan.com/",
-      "description": "绒颜品牌首页展示图，体现扬州绒花缠花文创品牌的东方美学风格。",
-      "author": {
-        "@type": "Organization",
-        "name": "绒颜"
+      "logo": "https://www.yangruan.com/logo.jpg",
+      "description": "绒颜 | 扬州绒花缠花文创品牌，以现代审美与传统技法结合制作绒花、缠花饰品，将古典东方美学融入日常穿搭。",
+      "image": {
+        "@type": "ImageObject",
+        "contentUrl": "https://www.yangruan.com/fm.jpg",
+        "url": "https://www.yangruan.com/",
+        "description": "绒颜品牌首页展示图，体现扬州绒花缠花文创品牌的东方美学风格。"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+86-173-2797-3794",
+        "email": "10210917@qq.com",
+        "contactType": "customer service",
+        "areaServed": "CN",
+        "availableLanguage": "Chinese"
       }
     }
     </script>
 
-    <!-- ✅ 优化4：增加多图预加载与预获取 -->
     <link rel="preload" as="image" href="img/r1.webp" fetchpriority="high">
     <link rel="prefetch" as="image" href="img/r2.webp"> 
     <link rel="prefetch" as="image" href="img/r3.webp">
@@ -148,7 +159,6 @@
         .gallery-item.img-error .img-fallback { display:flex; }
         .gallery-item.img-error img { display:none; }
         
-        /* ✅ 修复：移除 content-visibility: hidden，确保克隆节点在拖拽和滚动时可见 */
         .gallery-item[data-clone="true"] {
             contain-intrinsic-size: 280px 220px;
         }
@@ -223,7 +233,6 @@
         .modal-content.img-error .modal-error { display: block; }
         .modal-content.img-error.loading::before { display: none; }
         
-        /* ✅ 优化2：Modal 关闭按钮基础样式调整，适配安全区 */
         .close {
             position:absolute; 
             top: calc(env(safe-area-inset-top, 0px) + 15px); 
@@ -257,7 +266,6 @@
             .gallery-item[data-clone="true"] { contain-intrinsic-size: 220px 180px; }
             .gallery-title { font-size:1.5rem; }
             
-            /* ✅ 优化2：小屏幕下关闭按钮更大，并适配安全区 */
             .close {
                 top: calc(env(safe-area-inset-top, 10px) + 5px);
                 right: max(10px, env(safe-area-inset-right));
@@ -283,7 +291,6 @@
     </style>
 </head>
 <body>
-    <!-- ✅ 优化7：增加 main 标签包裹主体内容，方便 Modal 打开时屏蔽背景朗读 -->
     <main id="main-content">
         <header class="header">
             <div class="brand-area">
@@ -300,12 +307,10 @@
             <p>●绒颜，将以现代审美与传统技法结合，创作这些绒花/缠花作品，将古典之美融入日常。</p>
         </section>
 
-        <!-- ✅ 优化7：轮播容器增加 aria-live="off" 防止自动滚动时屏幕阅读器频繁播报 -->
         <section class="gallery-section" aria-label="绒花作品展示">
             <h2 class="gallery-title">绒颜•绒花馆</h2>
             <div class="gallery-container" role="region" aria-label="绒花作品轮播，可左右拖动或使用键盘Tab浏览" aria-live="off">
                 <div class="gallery-track">
-                    <!-- ✅ 优化7：图片 alt 文本更具描述性 -->
                     <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒花发饰作品大图"><img src="img/r1.webp" alt="传统绒花发饰作品" width="280" height="220" fetchpriority="high"><div class="img-fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>暂无图片</span></div></div>
                     <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒花胸针作品大图"><img src="img/r2.webp" alt="手工绒花胸针" width="280" height="220"><div class="img-fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>暂无图片</span></div></div>
                     <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒花耳饰作品大图"><img src="img/r3.webp" alt="古典绒花耳饰" width="280" height="220"><div class="img-fallback"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>暂无图片</span></div></div>
@@ -347,11 +352,11 @@
                 <div class="contact-details">
                     <p>tel：<a href="tel:+8617327973794">+86 173 2797 3794</a></p>
                     <p>mail：10210917@qq.com</p>
-                    <p>map：①东关街 ②（筹划中）</p>
+                    <p>map：①东关街  ②筹划中</p>
                 </div>
             </div>
-            <!-- ✅ 修改8：版权年份增加HTML默认兜底值，防止JS禁用时内容为空 -->
-            <div class="copyright"><p id="copyright-text">&copy; 2026 扬软<sup>&reg;</sup> 扬古韵今风•琢时光入软</p></div>
+            <!-- ✅ 修改5：HTML兜底文案统一使用间隔号 • ，与JS动态内容保持一致 -->
+            <div class="copyright"><p id="copyright-text">&copy; 2026 扬软<sup>&reg;</sup> 扬古韵今风，琢时光入软</p></div>
         </footer>
     </main>
 
@@ -367,10 +372,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         var copyrightEl = document.getElementById('copyright-text');
         if (copyrightEl) {
+            // ✅ 修改5：JS动态文案统一使用间隔号 • ，与HTML兜底保持一致
             copyrightEl.innerHTML = '&copy; ' + new Date().getFullYear() + ' 扬软<sup>&reg;</sup> 扬古韵今风，琢时光入软';
         }
 
-        var mainContent = document.getElementById('main-content'); // ✅ 优化7
+        var mainContent = document.getElementById('main-content');
         var modal = document.getElementById('imageModal');
         var modalImg = document.getElementById('modalImage');
         var closeBtn = document.querySelector('.close');
@@ -420,7 +426,6 @@
                 var mc = modal.querySelector('.modal-content');
                 if (mc) { mc.classList.remove('img-error'); mc.classList.remove('loading'); }
                 
-                // ✅ 优化7：恢复主体内容的无障碍访问
                 if (mainContent) mainContent.setAttribute('aria-hidden', 'false');
                 
                 if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') lastFocusedElement.focus();
@@ -467,7 +472,6 @@
                     if (state.offset <= -state.oneLoop) state.offset += state.oneLoop;
                     if (state.offset > 0) state.offset -= state.oneLoop;
                 }
-                // ✅ 优化4：使用 Math.round 消除亚像素渲染导致的边缘模糊和微跳跃
                 track.style.transform = 'translateX(' + Math.round(state.offset) + 'px) translateZ(0)';
             }
             if (document.hidden) { state.rafId = null; return; }
@@ -625,7 +629,6 @@
             document.addEventListener('keydown', trapFocus);
             animations.forEach(function(s) { s.running = false; });
             
-            // ✅ 优化7：Modal 打开时隐藏背景内容，防止屏幕阅读器读取
             if (mainContent) mainContent.setAttribute('aria-hidden', 'true');
         }
 
@@ -670,7 +673,6 @@
                     var originalCount = parseInt(track.dataset.originalCount) || 0;
                     
                     if (!isNaN(sourceIndex) && sourceIndex >= 0 && sourceIndex < originalCount) {
-                        // ✅ 优化1：使用 querySelectorAll 精准获取原始节点，避免 DOM 结构变化导致的索引错位
                         var originalItems = track.querySelectorAll(':scope > .gallery-item:not([data-clone])');
                         var originalItem = originalItems[sourceIndex];
                         
@@ -699,7 +701,6 @@
                     var originalCount = parseInt(track.dataset.originalCount) || 0;
                     
                     if (!isNaN(sourceIndex) && sourceIndex >= 0 && sourceIndex < originalCount) {
-                        // ✅ 优化1：同上
                         var originalItems = track.querySelectorAll(':scope > .gallery-item:not([data-clone])');
                         var originalItem = originalItems[sourceIndex];
                         
@@ -723,9 +724,10 @@
             });
         }
         if (modal) {
+            // ✅ 修改2：移除 modalImg 点击关闭逻辑，仅保留遮罩层和内容区空白处关闭
             modal.addEventListener('click', function(e) { 
                 var content = modal.querySelector('.modal-content');
-                if (e.target === modal || e.target === modalImg || (content && e.target === content)) closeModal();
+                if (e.target === modal || (content && e.target === content)) closeModal();
             });
         }
         document.addEventListener('keydown', function(e) {
@@ -760,6 +762,9 @@
             globalDrag.directionLocked = false;
             globalDrag.isHorizontal = false;
             
+            // ✅ 修改3：开始新拖拽时强制清除旧的误触防护标记，防止状态残留
+            container.dataset.justDragged = 'false';
+            
             var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
             var baseThreshold = isTouchDevice ? w * 0.05 : w * 0.02;
             globalDrag.threshold = isTouchDevice 
@@ -788,7 +793,6 @@
                 globalDrag.lastX = x;
                 if (e && e.cancelable) e.preventDefault();
                 s.offset = globalDrag.startOffset + dx;
-                // ✅ 优化4：拖拽时同样使用 Math.round 保证清晰度
                 globalDrag.track.style.transform = 'translateX(' + Math.round(s.offset) + 'px) translateZ(0)';
             }
         }
@@ -807,7 +811,6 @@
             var actualMoveDistance = Math.abs(globalDrag.startX - globalDrag.lastX);
             if (hasMoved && actualMoveDistance > 10) {
                 container.dataset.justDragged = 'true';
-                // ✅ 优化3：延长误触防护时间至 350ms，避免低端设备 touchend 后 click 事件延迟触发导致误开 Modal
                 setTimeout(function() { 
                     if (container.dataset.justDragged === 'true') {
                         container.dataset.justDragged = 'false'; 

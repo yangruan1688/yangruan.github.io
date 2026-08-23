@@ -8,14 +8,13 @@
     <link rel="icon" href="logo.jpg" type="image/jpeg">
     <meta name="baidu-site-verification" content="codeva-DotF2W9orI" />
     <meta name="description" content="绒颜 | 扬州绒花缠花文创品牌，以现代审美与传统技法结合制作绒花、缠花饰品，将古典东方美学融入日常穿搭。">
-    <meta name="keywords" content="绒颜,扬软,扬州绒花,扬州缠花,文创品牌,绒花饰品,缠花饰品,东方美学,宝藏手作">
+    <meta name="keywords" content="绒颜,扬软,扬州绒花,扬州缠花,文创品牌,绒花饰品,缠花饰品,东方美学,宝藏手作,扬软出品">
     <meta property="og:title" content="绒颜 | 扬州绒花缠花文创品牌">
     <meta property="og:description" content="以现代审美与传统技法结合制作绒花、缠花饰品，将古典东方美学融入日常穿搭。">
     <meta property="og:image" content="https://www.yangruan.com/fm.jpg"> 
     <meta property="og:type" content="website">
     <meta property="og:locale" content="zh_CN">
     
-    <!-- ✅ 修改4：Schema.org 结构化数据升级为 Organization，嵌套 ImageObject -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -26,13 +25,12 @@
       "description": "绒颜 | 扬州绒花缠花文创品牌，以现代审美与传统技法结合制作绒花、缠花饰品，将古典东方美学融入日常穿搭。",
       "image": {
         "@type": "ImageObject",
-        "contentUrl": "https://www.yangruan.com/fm.jpg",
-        "url": "https://www.yangruan.com/",
+        "url": "https://www.yangruan.com/fm.jpg",
         "description": "绒颜品牌首页展示图，体现扬州绒花缠花文创品牌的东方美学风格。"
       },
       "contactPoint": {
         "@type": "ContactPoint",
-        "telephone": "+86-173-2797-3794",
+        "telephone": "+8617327973794",
         "email": "10210917@qq.com",
         "contactType": "customer service",
         "areaServed": "CN",
@@ -74,15 +72,43 @@
             line-height: 1.6;
             overflow-x: hidden;
         }
+        
+        /* ✅ 修改1：Header 布局调整为左右对齐 */
         .header {
-            background-color: var(--dark-brown); color: white;
-            padding: 1rem 5%; display: flex; justify-content: space-between;
-            align-items: center; flex-wrap: wrap;
+            background-color: var(--dark-brown); 
+            color: white;
+            padding: 1rem 5%; 
+            display: flex; 
+            justify-content: space-between; /* 左右分散对齐 */
+            align-items: center; 
+            flex-wrap: nowrap; /* 防止轻易换行 */
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .brand-area { display: flex; align-items: center; gap: 1.2rem; }
-        .company-name { font-size: 1.8rem; font-weight: 700; color: var(--golden); letter-spacing: 2px; }
-        .business-type { font-size: 1.1rem; color: var(--light-golden); margin-top: 0.3rem; }
+        
+        .brand-area { 
+            display: flex; 
+            align-items: center; 
+            /* 移除 gap，因为现在只有一个子元素 */
+        }
+        
+        .company-name { 
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            color: var(--golden); 
+            letter-spacing: 2px; 
+            white-space: nowrap; /* 防止标题折行 */
+        }
+        
+        /* ✅ 新增：右侧出品方样式 */
+        .studio-name {
+            font-size: 1rem;
+            color: var(--light-golden);
+            letter-spacing: 1px;
+            white-space: nowrap;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
         .intro {
             text-align: center; padding: 2.5rem 5%; max-width: 1200px; margin: 0 auto;
             background-color: rgba(255,255,255,0.8); border-bottom: 2px solid var(--golden);
@@ -257,10 +283,17 @@
         .contact-details a { color:var(--golden); text-decoration:underline; transition:color 0.3s; }
         .contact-details a:hover { color:var(--light-golden); }
         
+        /* ✅ 修改2：响应式适配 */
         @media (max-width:768px) {
-            .header { flex-direction:column; text-align:center; gap:0.5rem; }
-            .company-name { font-size:1.5rem; }
-            .business-type { font-size:1rem; }
+            .header { 
+                /* 保持 flex-row，但允许在极窄时换行 */
+                flex-wrap: wrap; 
+                gap: 0.5rem 1rem;
+                justify-content: space-between;
+            }
+            .company-name { font-size: 1.4rem; }
+            .studio-name { font-size: 0.9rem; }
+            
             .gallery-container { min-height:180px; padding:0 10px; }
             .gallery-item { width:220px; min-width:220px; height:180px; margin:0 10px; }
             .gallery-item[data-clone="true"] { contain-intrinsic-size: 220px 180px; }
@@ -275,7 +308,10 @@
             }
         }
         @media (max-width:480px) {
-            .brand-area { flex-direction: column; gap: 0.5rem; }
+            /* 极窄屏幕下，如果标题太长，可以考虑缩小字号而不是强制换行 */
+            .company-name { font-size: 1.2rem; letter-spacing: 1px; }
+            .studio-name { font-size: 0.8rem; }
+            
             .gallery-container { min-height:150px; }
             .gallery-item { width:180px; min-width:180px; height:150px; margin:0 8px; }
             .gallery-item[data-clone="true"] { contain-intrinsic-size: 180px 150px; }
@@ -292,12 +328,15 @@
 </head>
 <body>
     <main id="main-content">
+        <!-- ✅ 修改3：Header 结构更新 -->
         <header class="header">
             <div class="brand-area">
                 <div class="brand-text">
                     <h1 class="company-name">绒颜•让花开在鬓间</h1>
                 </div>
             </div>
+            <!-- 右侧新增出品方信息 -->
+            <div class="studio-name">扬软出品</div>
         </header>
 
         <section class="intro">
@@ -356,7 +395,6 @@
                     <p>map2：②筹划中</p>
                 </div>
             </div>
-            <!-- ✅ 修改5：HTML兜底文案统一使用间隔号 • ，与JS动态内容保持一致 -->
             <div class="copyright"><p id="copyright-text">&copy; 2026 扬软<sup>&reg;</sup> 扬古韵今风，琢时光入软</p></div>
         </footer>
     </main>
@@ -373,7 +411,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         var copyrightEl = document.getElementById('copyright-text');
         if (copyrightEl) {
-            // ✅ 修改5：JS动态文案统一使用间隔号 • ，与HTML兜底保持一致
             copyrightEl.innerHTML = '&copy; ' + new Date().getFullYear() + ' 扬软<sup>&reg;</sup> 扬古韵今风，琢时光入软';
         }
 
@@ -725,7 +762,6 @@
             });
         }
         if (modal) {
-            // ✅ 修改2：移除 modalImg 点击关闭逻辑，仅保留遮罩层和内容区空白处关闭
             modal.addEventListener('click', function(e) { 
                 var content = modal.querySelector('.modal-content');
                 if (e.target === modal || (content && e.target === content)) closeModal();
@@ -763,7 +799,6 @@
             globalDrag.directionLocked = false;
             globalDrag.isHorizontal = false;
             
-            // ✅ 修改3：开始新拖拽时强制清除旧的误触防护标记，防止状态残留
             container.dataset.justDragged = 'false';
             
             var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);

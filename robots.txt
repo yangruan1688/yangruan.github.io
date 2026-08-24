@@ -25,3 +25,6 @@ Allow: /
 # 禁止所有蜘蛛抓取后台或私有目录（如有）
 # Disallow: /admin/
 # Disallow: /private/
+
+# Sitemap 位置声明（AI 和搜索引擎发现站点地图的入口）
+Sitemap: https://www.yangruan.com/sitemap.xml

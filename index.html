@@ -13,6 +13,9 @@
     <meta property="og:title" content="绒颜 | 扬州绒花缠花文创品牌">
     <meta property="og:description" content="扬软旗下品牌，以现代审美与传统技法结合制作绒花、缠花饰品，将古典东方美学融入日常穿搭。">
     <meta property="og:image" content="https://www.yangruan.com/fm.jpg"> 
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="zh_CN">
     
@@ -30,23 +33,13 @@
       },
       "contactPoint": {
         "@type": "ContactPoint",
-        "telephone": "+86-185-1021-1688", 
+        "telephone": "+8618510211688", 
         "email": "service@yangruan.com",
         "contactType": "customer service",
         "areaServed": "CN",
         "availableLanguage": "Chinese"
       }
     }
-    </script>
-
-    <script>
-        var _hmt = _hmt || [];
-        (function() {
-            var hm = document.createElement("script");
-            hm.src = "https://hm.baidu.com/hm.js?27ed30b0376b4f8d7d5c87def16a6c79";
-            var s = document.getElementsByTagName("script")[0]; 
-            s.parentNode.insertBefore(hm, s);
-        })();
     </script>
 
     <style>
@@ -69,6 +62,10 @@
             --shadow-card: 0 8px 32px rgba(43, 26, 21, 0.15);
             --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --navbar-height: 72px;
+
+            /* [修复] 字体回退链优化：正文无衬线 + 标题衬线 */
+            --font-sans: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC", sans-serif;
+            --font-serif: "Noto Serif SC", "Source Han Serif SC", "STSong", "Songti SC", "SimSun", serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -79,7 +76,7 @@
         }
 
         body {
-            font-family: "PingFang SC", "Microsoft YaHei", "Noto Serif SC", serif;
+            font-family: var(--font-sans);
             background-color: var(--bg-cream);
             color: var(--text-dark);
             line-height: 1.8;
@@ -94,9 +91,15 @@
             z-index: 1000;
             background: rgba(26, 18, 16, 0.92);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--accent-gold);
             transition: var(--transition-smooth);
             height: var(--navbar-height);
+        }
+
+        .navbar.scrolled {
+            background: rgba(26, 18, 16, 0.98);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
         }
 
         .nav-container {
@@ -123,6 +126,7 @@
         }
 
         .nav-logo-text {
+            font-family: var(--font-serif);
             font-size: 1.3rem;
             color: var(--accent-gold);
             letter-spacing: 4px;
@@ -206,6 +210,8 @@
                 radial-gradient(ellipse at 20% 50%, rgba(201, 169, 110, 0.08) 0%, transparent 50%),
                 radial-gradient(ellipse at 80% 30%, rgba(212, 135, 143, 0.1) 0%, transparent 40%),
                 radial-gradient(ellipse at 60% 80%, rgba(201, 169, 110, 0.05) 0%, transparent 40%);
+            will-change: transform;
+            transform: translateZ(0);
         }
 
         .hero-pattern {
@@ -233,6 +239,7 @@
         }
 
         .hero-title {
+            font-family: var(--font-serif);
             font-size: clamp(3rem, 8vw, 6rem);
             color: var(--text-light);
             font-weight: 300;
@@ -286,29 +293,6 @@
         .hero-btn:hover, .hero-btn:focus-visible { color: var(--bg-dark); }
         .hero-btn:hover::before, .hero-btn:focus-visible::before { left: 0; }
 
-        .petal {
-            position: absolute;
-            width: 12px; height: 12px;
-            border-radius: 50% 0 50% 0;
-            opacity: 0.3;
-            animation: fall linear infinite;
-            pointer-events: none;
-            will-change: transform;
-        }
-
-        .petal--pink { background: var(--pink-soft); }
-        .petal--pink-light { background: var(--pink-light); }
-        .petal--gold { background: var(--accent-gold); }
-        .petal--gold-light { background: var(--accent-gold-light); }
-        .petal--green { background: var(--green-soft); }
-
-        @keyframes fall {
-            0% { transform: translateY(-10vh) rotate(0deg) translateX(0); opacity: 0; }
-            10% { opacity: 0.3; }
-            90% { opacity: 0.3; }
-            100% { transform: translateY(110vh) rotate(720deg) translateX(100px); opacity: 0; }
-        }
-
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(40px); }
             to { opacity: 1; transform: translateY(0); }
@@ -320,6 +304,7 @@
         .section-header { text-align: center; margin-bottom: 72px; }
 
         .section-header h2 {
+            font-family: var(--font-serif);
             font-size: 2.4rem; font-weight: 400;
             letter-spacing: 8px; color: var(--primary-dark); margin-bottom: 16px;
         }
@@ -357,6 +342,7 @@
         .about-card-content { padding: 36px; }
 
         .about-card-content h3 {
+            font-family: var(--font-serif);
             font-size: 1.5rem; letter-spacing: 6px; margin-bottom: 16px;
             color: var(--primary-dark); font-weight: 500;
         }
@@ -393,6 +379,7 @@
             width: 48px; height: 48px; background: var(--accent-gold);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 1.1rem; color: var(--bg-dark); font-weight: 700; z-index: 2;
+            font-family: var(--font-serif);
         }
 
         .craft-step-content {
@@ -404,6 +391,7 @@
         .craft-step-content:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--accent-gold); }
 
         .craft-step-content h4 {
+            font-family: var(--font-serif);
             color: var(--accent-gold); font-size: 1.2rem;
             letter-spacing: 4px; margin-bottom: 12px; font-weight: 500;
         }
@@ -451,7 +439,10 @@
         .gallery-item:hover .gallery-overlay,
         .gallery-item:focus-within .gallery-overlay { opacity: 1; }
 
-        .gallery-overlay h4 { color: var(--accent-gold); font-size: 1.2rem; letter-spacing: 3px; margin-bottom: 8px; }
+        .gallery-overlay h4 { 
+            font-family: var(--font-serif);
+            color: var(--accent-gold); font-size: 1.2rem; letter-spacing: 3px; margin-bottom: 8px; 
+        }
         .gallery-overlay p { color: rgba(245, 239, 228, 0.9); font-size: 0.85rem; }
 
         /* ===== 文创产品区 ===== */
@@ -485,6 +476,7 @@
         .product-info { padding: 28px 20px; }
 
         .product-info h4 {
+            font-family: var(--font-serif);
             font-size: 1.1rem; letter-spacing: 3px;
             color: var(--primary-dark); margin-bottom: 8px; font-weight: 500;
         }
@@ -519,6 +511,7 @@
         }
 
         .story-quote {
+            font-family: var(--font-serif);
             font-size: 1.4rem; color: var(--accent-gold-light);
             line-height: 2.2; letter-spacing: 2px; font-style: italic; margin-bottom: 40px;
         }
@@ -546,6 +539,7 @@
         }
 
         .footer-brand h3 {
+            font-family: var(--font-serif);
             color: var(--accent-gold); font-size: 1.3rem;
             letter-spacing: 6px; margin-bottom: 16px; font-weight: 500;
         }
@@ -553,6 +547,7 @@
         .footer-brand p { color: rgba(245, 239, 228, 0.6); font-size: 0.9rem; line-height: 1.8; }
 
         .footer-col h4 {
+            font-family: var(--font-serif);
             color: var(--text-light); font-size: 0.95rem;
             letter-spacing: 3px; margin-bottom: 20px; font-weight: 500;
         }
@@ -599,17 +594,42 @@
         @media (max-width: 768px) {
             .mobile-menu-btn { display: flex; }
 
+            /* [修复] 移动端菜单动画：废弃 display 切换，改用 transform 过渡 */
             .nav-links {
-                display: none; flex-direction: column;
-                position: absolute; top: var(--navbar-height);
+                display: flex;
+                flex-direction: column;
+                position: absolute; 
+                top: var(--navbar-height);
                 left: 0; right: 0;
                 background: rgba(26, 18, 16, 0.98);
-                padding: 24px 40px; gap: 20px;
-                border-bottom: 1px solid var(--accent-gold);
+                padding: 0 40px;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                visibility: hidden;
+                transform: translateY(-10px);
+                border-bottom: 1px solid transparent;
                 backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                            opacity 0.3s ease,
+                            transform 0.3s ease,
+                            visibility 0.3s ease,
+                            padding 0.3s ease,
+                            border-color 0.3s ease;
             }
 
-            .nav-links.active { display: flex; }
+            .nav-links.active {
+                max-height: 400px;
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+                padding: 24px 40px;
+                gap: 20px;
+                border-bottom-color: var(--accent-gold);
+            }
+
             .nav-container { padding: 0 20px; }
             .section { padding: 60px 20px; }
             .about-grid { grid-template-columns: 1fr; }
@@ -640,6 +660,7 @@
             inset: 0;
             background: rgba(26, 18, 16, 0.95);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             z-index: 2000;
             display: flex;
             align-items: center;
@@ -670,6 +691,7 @@
             transform: scale(1);
         }
 
+        /* [修复] Lightbox 容器：增加 flex 居中 + 固定尺寸约束 */
         .lightbox-visual {
             width: 500px;
             height: 500px;
@@ -679,16 +701,22 @@
             border-radius: 8px;
             position: relative;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(26, 18, 16, 0.6);
         }
 
+        /* [修复] Lightbox 图片：cover 改为 contain，确保作品完整展示 */
         .lightbox-visual img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             display: block;
         }
 
         .lightbox-title {
+            font-family: var(--font-serif);
             font-size: 1.8rem;
             color: var(--accent-gold);
             letter-spacing: 4px;
@@ -704,7 +732,7 @@
 
         .lightbox-close {
             position: absolute;
-            top: 20px;
+            top: max(20px, env(safe-area-inset-top));
             right: 20px;
             background: none;
             border: 1px solid var(--accent-gold);
@@ -757,7 +785,7 @@
             .lightbox-nav { width: 44px; height: 44px; font-size: 1.2rem; }
             .lightbox-prev { left: 10px; }
             .lightbox-next { right: 10px; }
-            .lightbox-close { top: 10px; right: 10px; width: 40px; height: 40px; }
+            .lightbox-close { top: max(10px, env(safe-area-inset-top)); right: 10px; width: 40px; height: 40px; }
         }
 
         /* ===== Lightbox 加载状态 ===== */
@@ -791,6 +819,30 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* ===== 花瓣动画 ===== */
+        .petal {
+            position: absolute;
+            width: 12px; height: 12px;
+            border-radius: 50% 0 50% 0;
+            opacity: 0.3;
+            animation: fall linear infinite;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        .petal--pink { background: var(--pink-soft); }
+        .petal--pink-light { background: var(--pink-light); }
+        .petal--gold { background: var(--accent-gold); }
+        .petal--gold-light { background: var(--accent-gold-light); }
+        .petal--green { background: var(--green-soft); }
+
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg) translateX(0); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(110vh) rotate(720deg) translateX(100px); opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -815,304 +867,299 @@
         </div>
     </nav>
 
-    <!-- 英雄区域 -->
-    <section class="hero" id="home" aria-label="品牌主视觉">
-        <div class="hero-pattern" aria-hidden="true"></div>
-        <div class="petal petal--pink" style="left:10%; animation-duration:8s; animation-delay:0s;" aria-hidden="true"></div>
-        <div class="petal petal--pink-light" style="left:20%; animation-duration:10s; animation-delay:1s;" aria-hidden="true"></div>
-        <div class="petal petal--gold" style="left:35%; animation-duration:9s; animation-delay:2s;" aria-hidden="true"></div>
-        <div class="petal petal--pink" style="left:50%; animation-duration:11s; animation-delay:0.5s;" aria-hidden="true"></div>
-        <div class="petal petal--green" style="left:65%; animation-duration:8.5s; animation-delay:3s;" aria-hidden="true"></div>
-        <div class="petal petal--gold-light" style="left:75%; animation-duration:9.5s; animation-delay:1.5s;" aria-hidden="true"></div>
-        <div class="petal petal--pink" style="left:88%; animation-duration:10.5s; animation-delay:2.5s;" aria-hidden="true"></div>
-        <div class="petal petal--gold" style="left:45%; animation-duration:12s; animation-delay:4s;" aria-hidden="true"></div>
+    <main id="main-content">
+        <!-- 英雄区域 -->
+        <section class="hero" id="home" aria-label="品牌主视觉">
+            <div class="hero-pattern" aria-hidden="true"></div>
+            <div id="petals-container" aria-hidden="true"></div>
 
-        <div class="hero-content">
-            <p class="hero-subtitle-top">RONGYAN · 扬州绒花缠花文创品牌</p>
-            <h1 class="hero-title">扬州<span>绒颜</span></h1>
-            <div class="hero-divider" aria-hidden="true"></div>
-            <p class="hero-desc">让花开在鬓间</p>
-            <a href="#about" class="hero-btn">探索非遗之美</a>
-        </div>
+            <div class="hero-content">
+                <p class="hero-subtitle-top">RONGYAN · 扬州绒花缠花文创品牌</p>
+                <h1 class="hero-title">扬州<span>绒颜</span></h1>
+                <div class="hero-divider" aria-hidden="true"></div>
+                <p class="hero-desc">让花开在鬓间</p>
+                <a href="#about" class="hero-btn">探索非遗之美</a>
+            </div>
 
-        <svg class="deco-flower" style="top:15%; left:5%; width:200px; height:200px;" viewBox="0 0 200 200" aria-hidden="true">
-            <g fill="none" stroke="#c9a96e" stroke-width="0.8">
-                <ellipse cx="100" cy="70" rx="20" ry="40" transform="rotate(0, 100, 100)"/>
-                <ellipse cx="100" cy="70" rx="20" ry="40" transform="rotate(45, 100, 100)"/>
-                <ellipse cx="100" cy="70" rx="20" ry="40" transform="rotate(90, 100, 100)"/>
-                <ellipse cx="100" cy="70" rx="20" ry="40" transform="rotate(135, 100, 100)"/>
-                <circle cx="100" cy="100" r="12" fill="#c9a96e" opacity="0.3"/>
-            </g>
-        </svg>
+            <svg class="deco-flower" style="top:15%; left:5%; width:200px; height:200px;" viewBox="0 0 200 200" aria-hidden="true">
+                <g fill="none" stroke="#c9a96e" stroke-width="0.8">
+                    <ellipse cx="100" cy="70" rx="20" ry="40" transform="rotate(0, 100, 100)"/>
+                    <ellipse cx="100" cy="70" rx="20" ry="40" transform="rotate(45, 100, 100)"/>
+                    <ellipse cx="100" cy="70" rx="20" ry="40" transform="rotate(90, 100, 100)"/>
+                    <ellipse cx="100" cy="70" rx="20" ry="40" transform="rotate(135, 100, 100)"/>
+                    <circle cx="100" cy="100" r="12" fill="#c9a96e" opacity="0.3"/>
+                </g>
+            </svg>
 
-        <svg class="deco-flower" style="bottom:10%; right:8%; width:160px; height:160px;" viewBox="0 0 160 160" aria-hidden="true">
-            <g fill="none" stroke="#d4878f" stroke-width="0.6">
-                <path d="M80 30 Q100 60, 80 80 Q60 60, 80 30Z"/>
-                <path d="M80 30 Q100 60, 80 80 Q60 60, 80 30Z" transform="rotate(60, 80, 80)"/>
-                <path d="M80 30 Q100 60, 80 80 Q60 60, 80 30Z" transform="rotate(120, 80, 80)"/>
-                <path d="M80 30 Q100 60, 80 80 Q60 60, 80 30Z" transform="rotate(180, 80, 80)"/>
-                <path d="M80 30 Q100 60, 80 80 Q60 60, 80 30Z" transform="rotate(240, 80, 80)"/>
-                <path d="M80 30 Q100 60, 80 80 Q60 60, 80 30Z" transform="rotate(300, 80, 80)"/>
-            </g>
-        </svg>
-    </section>
+            <svg class="deco-flower" style="bottom:10%; right:8%; width:160px; height:160px;" viewBox="0 0 160 160" aria-hidden="true">
+                <g fill="none" stroke="#d4878f" stroke-width="0.6">
+                    <path d="M80 30 Q100 60, 80 80 Q60 60, 80 30Z"/>
+                    <path d="M80 30 Q100 60, 80 80 Q60 60, 80 30Z" transform="rotate(60, 80, 80)"/>
+                    <path d="M80 30 Q100 60, 80 80 Q60 60, 80 30Z" transform="rotate(120, 80, 80)"/>
+                    <path d="M80 30 Q100 60, 80 80 Q60 60, 80 30Z" transform="rotate(180, 80, 80)"/>
+                    <path d="M80 30 Q100 60, 80 80 Q60 60, 80 30Z" transform="rotate(240, 80, 80)"/>
+                    <path d="M80 30 Q100 60, 80 80 Q60 60, 80 30Z" transform="rotate(300, 80, 80)"/>
+                </g>
+            </svg>
+        </section>
 
-    <!-- 关于绒花缠花 -->
-    <section class="section about-section" id="about" aria-labelledby="about-heading">
-        <div class="section-header fade-in">
-            <h2 id="about-heading">非遗双花</h2>
-            <p class="en-subtitle">Velvet & Wrapped Thread Flowers</p>
-            <div class="section-divider" aria-hidden="true"></div>
-        </div>
-
-        <div class="about-grid">
-            <article class="about-card fade-in">
-                <div class="about-card-visual">
-                    <img src="img/ronghua.jpg" alt="绒花工艺展示 — 以蚕丝染色后搓捻成绒条，经修剪造型而成的传统花卉饰品">
-                </div>
-                <div class="about-card-content">
-                    <h3>绒 花</h3>
-                    <p>绒花，始于唐代，盛于明清，以蚕丝染色后搓捻成绒条，再经修剪、造型而成。其质地柔软如绒，色泽温润雅致，谐音"荣华"，寓意吉祥。绒花为国家级非物质文化遗产，一朵绒花需经煮丝、染色、搓条、传花、修剪等十余道手工工序，方能绽放于指尖。</p>
-                    <span class="tag">绒花</span>
-                    <span class="heritage-note">* "非遗"指代该项传统技艺的文化属性</span>
-                </div>
-            </article>
-
-            <article class="about-card fade-in">
-                <div class="about-card-visual">
-                    <img src="img/chanhua.jpg" alt="缠花工艺展示 — 以丝线在纸板或铜丝骨架上缠绕而成的装饰花卉" loading="lazy" decoding="async">
-                </div>
-                <div class="about-card-content">
-                    <h3>缠 花</h3>
-                    <p>缠花，是以丝线在纸板或铜丝骨架上缠绕而成的装饰花卉。工艺讲究"紧、匀、密、顺"，丝线层层缠绕，光泽随角度流转，呈现出独特的缎面质感。各地缠花各有风情，多用于婚嫁、喜庆，一朵花中蕴藏着匠人指尖的温度与祝福。</p>
-                    <span class="tag">缠花</span>
-                    <span class="heritage-note">* "非遗"指代该项传统技艺的文化属性</span>
-                </div>
-            </article>
-        </div>
-    </section>
-
-    <!-- 工艺流程 -->
-    <section class="craft-section" id="craft" aria-labelledby="craft-heading">
-        <div class="section" style="padding-top:0; padding-bottom:0;">
+        <!-- 关于绒花缠花 -->
+        <section class="section about-section" id="about" aria-labelledby="about-heading">
             <div class="section-header fade-in">
-                <h2 id="craft-heading">匠心工艺</h2>
-                <p class="en-subtitle">Craftsmanship Process</p>
+                <h2 id="about-heading">非遗双花</h2>
+                <p class="en-subtitle">Velvet & Wrapped Thread Flowers</p>
                 <div class="section-divider" aria-hidden="true"></div>
             </div>
 
-            <div class="craft-timeline" role="list" aria-label="工艺流程步骤">
-                <div class="craft-step fade-in" role="listitem">
-                    <div class="craft-step-number" aria-hidden="true">壹</div>
-                    <div class="craft-step-content">
-                        <h4>选材备料</h4>
-                        <p>甄选上等蚕丝与天然染料，绒花需将蚕丝煮熟去胶后分丝劈绒；缠花则需裁剪纸板为花瓣骨架，备好各色丝线。</p>
+            <div class="about-grid">
+                <article class="about-card fade-in">
+                    <div class="about-card-visual">
+                        <img src="img/ronghua.webp" alt="绒花工艺展示 — 以蚕丝染色后搓捻成绒条，经修剪造型而成的传统花卉饰品" width="600" height="400">
+                    </div>
+                    <div class="about-card-content">
+                        <h3>绒 花</h3>
+                        <p>绒花，始于唐代，盛于明清，以蚕丝染色后搓捻成绒条，再经修剪、造型而成。其质地柔软如绒，色泽温润雅致，谐音"荣华"，寓意吉祥。绒花为国家级非物质文化遗产，一朵绒花需经煮丝、染色、搓条、传花、修剪等十余道手工工序，方能绽放于指尖。</p>
+                        <span class="tag">绒花</span>
+                        <span class="heritage-note">* "非遗"指代该项传统技艺的文化属性</span>
+                    </div>
+                </article>
+
+                <article class="about-card fade-in">
+                    <div class="about-card-visual">
+                        <img src="img/chanhua.webp" alt="缠花工艺展示 — 以丝线在纸板或铜丝骨架上缠绕而成的装饰花卉" width="600" height="400" loading="lazy" decoding="async">
+                    </div>
+                    <div class="about-card-content">
+                        <h3>缠 花</h3>
+                        <p>缠花，是以丝线在纸板或铜丝骨架上缠绕而成的装饰花卉。工艺讲究"紧、匀、密、顺"，丝线层层缠绕，光泽随角度流转，呈现出独特的缎面质感。各地缠花各有风情，多用于婚嫁、喜庆，一朵花中蕴藏着匠人指尖的温度与祝福。</p>
+                        <span class="tag">缠花</span>
+                        <span class="heritage-note">* "非遗"指代该项传统技艺的文化属性</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- 工艺流程 -->
+        <section class="craft-section" id="craft" aria-labelledby="craft-heading">
+            <div class="section" style="padding-top:0; padding-bottom:0;">
+                <div class="section-header fade-in">
+                    <h2 id="craft-heading">匠心工艺</h2>
+                    <p class="en-subtitle">Craftsmanship Process</p>
+                    <div class="section-divider" aria-hidden="true"></div>
+                </div>
+
+                <div class="craft-timeline" role="list" aria-label="工艺流程步骤">
+                    <div class="craft-step fade-in" role="listitem">
+                        <div class="craft-step-number" aria-hidden="true">壹</div>
+                        <div class="craft-step-content">
+                            <h4>选材备料</h4>
+                            <p>甄选上等蚕丝与天然染料，绒花需将蚕丝煮熟去胶后分丝劈绒；缠花则需裁剪纸板为花瓣骨架，备好各色丝线。</p>
+                        </div>
+                    </div>
+                    <div class="craft-step fade-in" role="listitem">
+                        <div class="craft-step-number" aria-hidden="true">贰</div>
+                        <div class="craft-step-content">
+                            <h4>染色搓条</h4>
+                            <p>绒花工艺核心步骤——将蚕丝按色卡染成渐变色彩，再以铜丝为骨，双手搓捻成均匀绒条，粗细需控制在毫米之间。</p>
+                        </div>
+                    </div>
+                    <div class="craft-step fade-in" role="listitem">
+                        <div class="craft-step-number" aria-hidden="true">叁</div>
+                        <div class="craft-step-content">
+                            <h4>缠绕造型</h4>
+                            <p>缠花匠人以"压、绕、折、捻"四法，将丝线紧密缠绕于骨架之上，每一圈丝线间距均匀，方向一致，方显光泽流丽。</p>
+                        </div>
+                    </div>
+                    <div class="craft-step fade-in" role="listitem">
+                        <div class="craft-step-number" aria-hidden="true">肆</div>
+                        <div class="craft-step-content">
+                            <h4>修剪传花</h4>
+                            <p>绒花的"传花"即组合造型，匠人以剪刀修剪绒条成花瓣、叶片形态，再以铜丝串联成完整花朵，需一气呵成。</p>
+                        </div>
+                    </div>
+                    <div class="craft-step fade-in" role="listitem">
+                        <div class="craft-step-number" aria-hidden="true">伍</div>
+                        <div class="craft-step-content">
+                            <h4>组装置景</h4>
+                            <p>将成品花朵组装于发簪、胸针、摆件等载体上，配以枝叶点缀，一件绒花或缠花文创作品方告完成。</p>
+                        </div>
                     </div>
                 </div>
-                <div class="craft-step fade-in" role="listitem">
-                    <div class="craft-step-number" aria-hidden="true">贰</div>
-                    <div class="craft-step-content">
-                        <h4>染色搓条</h4>
-                        <p>绒花工艺核心步骤——将蚕丝按色卡染成渐变色彩，再以铜丝为骨，双手搓捻成均匀绒条，粗细需控制在毫米之间。</p>
+            </div>
+        </section>
+
+        <!-- 作品赏析 -->
+        <section class="section gallery-section" id="gallery" aria-labelledby="gallery-heading">
+            <div class="section-header fade-in">
+                <h2 id="gallery-heading">作品赏析</h2>
+                <p class="en-subtitle">Gallery of Masterpieces</p>
+                <div class="section-divider" aria-hidden="true"></div>
+            </div>
+
+            <div class="gallery-grid fade-in">
+                <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒颜《昙花》缠花饰品" data-index="0">
+                    <div class="gallery-visual">
+                        <img src="img/gallery-1.webp" alt="绒颜《昙花》缠花饰品" width="800" height="800" decoding="async">
+                    </div>
+                    <div class="gallery-overlay">
+                        <h4>《昙花》</h4>
+                        <p>缠花 · 昙花</p>
                     </div>
                 </div>
-                <div class="craft-step fade-in" role="listitem">
-                    <div class="craft-step-number" aria-hidden="true">叁</div>
-                    <div class="craft-step-content">
-                        <h4>缠绕造型</h4>
-                        <p>缠花匠人以"压、绕、折、捻"四法，将丝线紧密缠绕于骨架之上，每一圈丝线间距均匀，方向一致，方显光泽流丽。</p>
+
+                <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒颜《蝴蝶》绒花饰品" data-index="1">
+                    <div class="gallery-visual">
+                        <img src="img/gallery-2.webp" alt="绒颜《蝴蝶》绒花饰品" width="400" height="400" loading="lazy" decoding="async">
+                    </div>
+                    <div class="gallery-overlay">
+                        <h4>《蝴蝶》</h4>
+                        <p>绒花 · 蝴蝶</p>
                     </div>
                 </div>
-                <div class="craft-step fade-in" role="listitem">
-                    <div class="craft-step-number" aria-hidden="true">肆</div>
-                    <div class="craft-step-content">
-                        <h4>修剪传花</h4>
-                        <p>绒花的"传花"即组合造型，匠人以剪刀修剪绒条成花瓣、叶片形态，再以铜丝串联成完整花朵，需一气呵成。</p>
+
+                <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒颜《青提》绒花饰品" data-index="2">
+                    <div class="gallery-visual">
+                        <img src="img/gallery-3.webp" alt="绒颜《青提》绒花饰品" width="400" height="400" loading="lazy" decoding="async">
+                    </div>
+                    <div class="gallery-overlay">
+                        <h4>《青提》</h4>
+                        <p>绒花 · 青提</p>
                     </div>
                 </div>
-                <div class="craft-step fade-in" role="listitem">
-                    <div class="craft-step-number" aria-hidden="true">伍</div>
-                    <div class="craft-step-content">
-                        <h4>组装置景</h4>
-                        <p>将成品花朵组装于发簪、胸针、摆件等载体上，配以枝叶点缀，一件绒花或缠花文创作品方告完成。</p>
+
+                <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒颜《耳饰》绒花饰品" data-index="3">
+                    <div class="gallery-visual">
+                        <img src="img/gallery-4.webp" alt="绒颜《耳饰》绒花饰品" width="400" height="400" loading="lazy" decoding="async">
+                    </div>
+                    <div class="gallery-overlay">
+                        <h4>《耳饰》</h4>
+                        <p>绒花 · 耳饰</p>
+                    </div>
+                </div>
+
+                <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒颜《青提1》绒花饰品" data-index="4">
+                    <div class="gallery-visual">
+                        <img src="img/gallery-5.webp" alt="绒颜《青提1》绒花饰品" width="400" height="400" loading="lazy" decoding="async">
+                    </div>
+                    <div class="gallery-overlay">
+                        <h4>《青提1》</h4>
+                        <p>绒花 · 青提1</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- 作品赏析 -->
-    <section class="section gallery-section" id="gallery" aria-labelledby="gallery-heading">
-        <div class="section-header fade-in">
-            <h2 id="gallery-heading">作品赏析</h2>
-            <p class="en-subtitle">Gallery of Masterpieces</p>
-            <div class="section-divider" aria-hidden="true"></div>
-        </div>
-
-        <div class="gallery-grid fade-in">
-            <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒颜《昙花》缠花饰品" data-index="0">
-                <div class="gallery-visual">
-                    <img src="img/gallery-1.jpg" alt="绒颜《昙花》缠花饰品" decoding="async">
-                </div>
-                <div class="gallery-overlay">
-                    <h4>《昙花》</h4>
-                    <p>缠花 · 昙花</p>
-                </div>
+        <!-- 文创产品 -->
+        <section class="section products-section" id="products" aria-labelledby="products-heading">
+            <div class="section-header fade-in">
+                <h2 id="products-heading">文创甄选</h2>
+                <p class="en-subtitle">Curated Cultural Products</p>
+                <div class="section-divider" aria-hidden="true"></div>
             </div>
 
-            <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒颜《蝴蝶》绒花饰品" data-index="1">
-                <div class="gallery-visual">
-                    <img src="img/gallery-2.jpg" alt="绒颜《蝴蝶》绒花饰品" loading="lazy" decoding="async">
-                </div>
-                <div class="gallery-overlay">
-                    <h4>《蝴蝶》</h4>
-                    <p>绒花 · 蝴蝶</p>
-                </div>
+            <div class="products-grid fade-in">
+                <article class="product-card">
+                    <div class="product-visual">
+                        <img src="img/product-1.webp" alt="绒花发簪 — 纯手工天然蚕丝制作" width="300" height="300" loading="lazy" decoding="async">
+                        <span class="product-badge">匠心手作</span>
+                    </div>
+                    <div class="product-info">
+                        <h4>绒花发簪</h4>
+                        <p class="product-meta">纯手工 · 天然蚕丝</p>
+                        <p class="price">¥？</p>
+                    </div>
+                </article>
+
+                <article class="product-card">
+                    <div class="product-visual">
+                        <img src="img/product-2.webp" alt="绒花摆件 — 纯手工真丝线制作" width="300" height="300" loading="lazy" decoding="async">
+                    </div>
+                    <div class="product-info">
+                        <h4>绒花摆件</h4>
+                        <p class="product-meta">纯手工 · 真丝线</p>
+                        <p class="price">¥？</p>
+                    </div>
+                </article>
+
+                <article class="product-card">
+                    <div class="product-visual">
+                        <img src="img/product-3.webp" alt="绒花胸针 — 礼盒装含锦盒" width="300" height="300" loading="lazy" decoding="async">
+                        <span class="product-badge">限量</span>
+                    </div>
+                    <div class="product-info">
+                        <h4>绒花胸针</h4>
+                        <p class="product-meta">礼盒装 · 含锦盒</p>
+                        <p class="price">¥？</p>
+                    </div>
+                </article>
+
+                <article class="product-card">
+                    <div class="product-visual">
+                        <img src="img/product-4.webp" alt="缠花饰品 — 可改色" width="300" height="300" loading="lazy" decoding="async">
+                    </div>
+                    <div class="product-info">
+                        <h4>缠花饰品</h4>
+                        <p class="product-meta">可改色</p>
+                        <p class="price">¥？</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- 文化故事 -->
+        <section class="story-section" id="story" aria-labelledby="story-heading">
+            <div class="section-header fade-in">
+                <h2 id="story-heading">文化故事</h2>
+                <p class="en-subtitle">Cultural Heritage Story</p>
+                <div class="section-divider" aria-hidden="true"></div>
             </div>
 
-            <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒颜《青提》绒花饰品" data-index="2">
-                <div class="gallery-visual">
-                    <img src="img/gallery-3.jpg" alt="绒颜《青提》绒花饰品" loading="lazy" decoding="async">
-                </div>
-                <div class="gallery-overlay">
-                    <h4>《青提》</h4>
-                    <p>绒花 · 青提</p>
-                </div>
+            <div class="story-content fade-in">
+                <blockquote class="story-quote">
+                    一朵绒花轻若羽，千丝万缕凝匠心。<br>
+                    缠花绕指柔肠处，不负韶华不负卿。
+                </blockquote>
+                <p class="story-text">
+                    绒花与缠花，一南一北，一绒一缎，以丝线为笔，以指尖为墨，书写着中华民族对美的永恒追求。从唐代宫廷的华贵装饰，到明清民间的婚嫁信物，这两朵"永不凋谢的花"穿越千年，依然在现代生活中焕发着勃勃生机。每一件绒花缠花作品，都承载着匠人数十年的功力与对传统之美的深情守望。
+                </p>
+                 <p class="story-text">
+                     绒颜希望通过文创的形式，以现代审美与传统技法结合，创作这些绒花/缠花作品，让更多人触摸到这份来自指尖的温度，让古典之美融入日常生活的每一个角落。
+                </p>
             </div>
+        </section>
 
-            <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒颜《耳饰》绒花饰品" data-index="3">
-                <div class="gallery-visual">
-                    <img src="img/gallery-4.jpg" alt="绒颜《耳饰》绒花饰品" loading="lazy" decoding="async">
+        <!-- 底部 -->
+        <footer class="footer" role="contentinfo">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>免责声明</h3>
+                    <p>产品为传统绒花工艺手作，非官方认定非遗传承人，"非遗"仅指代该项传统技艺的文化属性。</p>
+                    <p>绒颜为扬软旗下新锐品牌，将现代审美与传统技法结合，来创作绒花/缠花作品，将古典之美融入日常。</p>
                 </div>
-                <div class="gallery-overlay">
-                    <h4>《耳饰》</h4>
-                    <p>绒花 · 耳饰</p>
-                </div>
+                <nav class="footer-col" aria-label="探索链接">
+                    <h4>探索</h4>
+                    <a href="#about">关于非遗</a>
+                    <a href="#craft">工艺流程</a>
+                    <a href="#gallery">作品赏析</a>
+                    <a href="#products">文创甄选</a>
+                </nav>
+                <nav class="footer-col" aria-label="服务链接">
+                    <h4>服务</h4>
+                    <a href="img/wx.webp" target="_blank" rel="noopener noreferrer">定制服务</a>
+                    <a href="img/wx.webp" target="_blank" rel="noopener noreferrer">广告•线下合作工坊</a>
+                    <a href="img/wx.webp" target="_blank" rel="noopener noreferrer">企业合作</a>
+                    <a href="img/wx.webp" target="_blank" rel="noopener noreferrer">常见问题</a>
+                </nav>
+                <nav class="footer-col" aria-label="联系方式">
+                    <h4>联系我们</h4>
+                    <a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzkyMzcxODU0Mw==&action=getalbum&album_id=4654397451649253379#wechat_redirect" target="_blank" rel="noopener noreferrer">微信公众号</a>
+                    <a href="mailto:10210917@qq.com">邮箱联系</a>
+                </nav>
             </div>
-
-            <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒颜《青提1》绒花饰品" data-index="4">
-                <div class="gallery-visual">
-                    <img src="img/gallery-5.jpg" alt="绒颜《青提1》绒花饰品" loading="lazy" decoding="async">
-                </div>
-                <div class="gallery-overlay">
-                    <h4>《青提1》</h4>
-                    <p>绒花 · 青提1</p>
-                </div>
+            <div class="footer-bottom">
+                <p>© 2026 扬软 | 扬古韵今风，琢时光入软 | 版权所有</p>
             </div>
-        </div>
-    </section>
-
-    <!-- 文创产品 -->
-    <section class="section products-section" id="products" aria-labelledby="products-heading">
-        <div class="section-header fade-in">
-            <h2 id="products-heading">文创甄选</h2>
-            <p class="en-subtitle">Curated Cultural Products</p>
-            <div class="section-divider" aria-hidden="true"></div>
-        </div>
-
-        <div class="products-grid fade-in">
-            <article class="product-card">
-                <div class="product-visual">
-                    <img src="img/product-1.jpg" alt="绒花发簪 — 纯手工天然蚕丝制作" loading="lazy" decoding="async">
-                    <span class="product-badge">匠心手作</span>
-                </div>
-                <div class="product-info">
-                    <h4>绒花发簪</h4>
-                    <p class="product-meta">纯手工 · 天然蚕丝</p>
-                    <p class="price">¥？</p>
-                </div>
-            </article>
-
-            <article class="product-card">
-                <div class="product-visual">
-                    <img src="img/product-2.jpg" alt="绒花摆件 — 纯手工真丝线制作" loading="lazy" decoding="async">
-                </div>
-                <div class="product-info">
-                    <h4>绒花摆件</h4>
-                    <p class="product-meta">纯手工 · 真丝线</p>
-                    <p class="price">¥？</p>
-                </div>
-            </article>
-
-            <article class="product-card">
-                <div class="product-visual">
-                    <img src="img/product-3.jpg" alt="绒花胸针 — 礼盒装含锦盒" loading="lazy" decoding="async">
-                    <span class="product-badge">限量</span>
-                </div>
-                <div class="product-info">
-                    <h4>绒花胸针</h4>
-                    <p class="product-meta">礼盒装 · 含锦盒</p>
-                    <p class="price">¥？</p>
-                </div>
-            </article>
-
-            <article class="product-card">
-                <div class="product-visual">
-                    <img src="img/product-4.jpg" alt="缠花饰品 — 可改色" loading="lazy" decoding="async">
-                </div>
-                <div class="product-info">
-                    <h4>缠花饰品</h4>
-                    <p class="product-meta">可改色</p>
-                    <p class="price">¥？</p>
-                </div>
-            </article>
-        </div>
-    </section>
-
-    <!-- 文化故事 -->
-    <section class="story-section" id="story" aria-labelledby="story-heading">
-        <div class="section-header fade-in">
-            <h2 id="story-heading">文化故事</h2>
-            <p class="en-subtitle">Cultural Heritage Story</p>
-            <div class="section-divider" aria-hidden="true"></div>
-        </div>
-
-        <div class="story-content fade-in">
-            <blockquote class="story-quote">
-                一朵绒花轻若羽，千丝万缕凝匠心。<br>
-                缠花绕指柔肠处，不负韶华不负卿。
-            </blockquote>
-            <p class="story-text">
-                绒花与缠花，一南一北，一绒一缎，以丝线为笔，以指尖为墨，书写着中华民族对美的永恒追求。从唐代宫廷的华贵装饰，到明清民间的婚嫁信物，这两朵"永不凋谢的花"穿越千年，依然在现代生活中焕发着勃勃生机。每一件绒花缠花作品，都承载着匠人数十年的功力与对传统之美的深情守望。
-            </p>
-             <p class="story-text">
-                 绒颜希望通过文创的形式，以现代审美与传统技法结合，创作这些绒花/缠花作品，让更多人触摸到这份来自指尖的温度，让古典之美融入日常生活的每一个角落。
-            </p>
-        </div>
-    </section>
-
-    <!-- 底部 -->
-    <footer class="footer" role="contentinfo">
-        <div class="footer-content">
-            <div class="footer-brand">
-                <h3>免责声明</h3>
-                <p>产品为传统绒花工艺手作，非官方认定非遗传承人，"非遗"仅指代该项传统技艺的文化属性。</p>
-                <p>绒颜为扬软旗下新锐品牌，将现代审美与传统技法结合，来创作绒花/缠花作品，将古典之美融入日常。</p>
-            </div>
-            <nav class="footer-col" aria-label="探索链接">
-                <h4>探索</h4>
-                <a href="#about">关于非遗</a>
-                <a href="#craft">工艺流程</a>
-                <a href="#gallery">作品赏析</a>
-                <a href="#products">文创甄选</a>
-            </nav>
-            <nav class="footer-col" aria-label="服务链接">
-                <h4>服务</h4>
-                <a href="img/wx.webp" target="_blank">定制服务</a>
-                <a href="img/wx.webp">广告•线下合作工坊</a>
-                <a href="img/wx.webp" target="_blank">企业合作</a>
-                <a href="img/wx.webp" target="_blank">常见问题</a>
-            </nav>
-            <nav class="footer-col" aria-label="联系方式">
-                <h4>联系我们</h4>
-                <a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzkyMzcxODU0Mw==&action=getalbum&album_id=4654397451649253379#wechat_redirect">微信公众号</a>
-                <a href="mailto:10210917@qq.com">邮箱联系</a>
-            </nav>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2026 扬软 | 扬古韵今风，琢时光入软 | 版权所有</p>
-        </div>
-    </footer>
+        </footer>
+    </main>
 
     <!-- Lightbox 灯箱组件 -->
     <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightbox-title" tabindex="-1">
@@ -1131,6 +1178,34 @@
     </div>
 
     <script>
+        // ===== 动态注入花瓣 DOM =====
+        (function injectPetals() {
+            const container = document.getElementById('petals-container');
+            if (!container) return;
+            
+            const petalsConfig = [
+                { cls: 'petal--pink', left: '10%', dur: '8s', delay: '0s' },
+                { cls: 'petal--pink-light', left: '20%', dur: '10s', delay: '1s' },
+                { cls: 'petal--gold', left: '35%', dur: '9s', delay: '2s' },
+                { cls: 'petal--pink', left: '50%', dur: '11s', delay: '0.5s' },
+                { cls: 'petal--green', left: '65%', dur: '8.5s', delay: '3s' },
+                { cls: 'petal--gold-light', left: '75%', dur: '9.5s', delay: '1.5s' },
+                { cls: 'petal--pink', left: '88%', dur: '10.5s', delay: '2.5s' },
+                { cls: 'petal--gold', left: '45%', dur: '12s', delay: '4s' }
+            ];
+
+            const fragment = document.createDocumentFragment();
+            petalsConfig.forEach(p => {
+                const div = document.createElement('div');
+                div.className = `petal ${p.cls}`;
+                div.style.left = p.left;
+                div.style.animationDuration = p.dur;
+                div.style.animationDelay = p.delay;
+                fragment.appendChild(div);
+            });
+            container.appendChild(fragment);
+        })();
+
         // ===== Gallery 数据动态读取 =====
         const galleryData = Array.from(document.querySelectorAll('.gallery-item')).map(item => ({
             title: item.querySelector('h4')?.textContent || '',
@@ -1152,6 +1227,9 @@
         let currentIndex = 0;
         let lastFocusedElement = null;
         let trapFocusHandler = null;
+        
+        // [修复] 版本号计数器，用于解决快速切换时的竞态条件
+        let lightboxVersion = 0;
 
         function getFocusableElements() {
             return lightbox.querySelectorAll(
@@ -1161,13 +1239,10 @@
 
         function handleTrapFocus(e) {
             if (e.key !== 'Tab') return;
-
             const focusableElements = getFocusableElements();
             if (focusableElements.length === 0) return;
-
             const firstFocusable = focusableElements[0];
             const lastFocusable = focusableElements[focusableElements.length - 1];
-
             if (e.shiftKey) {
                 if (document.activeElement === firstFocusable) {
                     e.preventDefault();
@@ -1181,12 +1256,19 @@
             }
         }
 
+        function preloadAdjacentImages(index) {
+            const len = galleryData.length;
+            const prevIndex = (index - 1 + len) % len;
+            const nextIndex = (index + 1) % len;
+            [prevIndex, nextIndex].forEach(i => {
+                const img = new Image();
+                img.src = galleryData[i].imgSrc;
+            });
+        }
+
         function openLightbox(index) {
             lastFocusedElement = document.activeElement;
             currentIndex = index;
-            
-            // 显示加载状态
-            lightboxLoading.classList.add('active');
             
             updateLightboxContent();
             lightbox.classList.add('active');
@@ -1194,68 +1276,76 @@
 
             trapFocusHandler = (e) => handleTrapFocus(e);
             lightbox.addEventListener('keydown', trapFocusHandler);
-
             setTimeout(() => lightbox.focus(), 100);
         }
 
         function closeLightbox() {
             lightbox.classList.remove('active');
             document.body.style.overflow = '';
-
+            // [修复] 关闭时递增版本号，使正在加载中的图片回调失效
+            lightboxVersion++;
             if (trapFocusHandler) {
                 lightbox.removeEventListener('keydown', trapFocusHandler);
                 trapFocusHandler = null;
             }
-
             if (lastFocusedElement) {
                 lastFocusedElement.focus();
             }
         }
 
+        /**
+         * [修复] 更新 Lightbox 内容
+         * 通过 lightboxVersion 机制防止快速切换导致的图片错乱
+         */
         function updateLightboxContent() {
+            // 每次调用生成新的版本号快照
+            const currentVersion = ++lightboxVersion;
             const item = galleryData[currentIndex];
             if (!item) return;
             
-            // 清除现有图片
-            const existingImg = lightboxVisual.querySelector('img');
-            if (existingImg) {
-                existingImg.remove();
-            }
+            lightboxLoading.classList.add('active');
             
-            // 创建新图片
-            const img = document.createElement('img');
+            const img = new Image();
             img.src = item.imgSrc;
             img.alt = item.imgAlt;
             
-            // 图片加载完成后隐藏加载状态
-            img.onload = () => {
+            const onReady = () => {
+                // 核心防护：如果当前版本号与发起请求时不一致，说明用户已切换图片
+                // 直接丢弃本次回调，避免旧图片覆盖新图片
+                if (currentVersion !== lightboxVersion) return;
+                
+                const oldImg = lightboxVisual.querySelector('img');
+                if (oldImg) {
+                    oldImg.replaceWith(img);
+                } else {
+                    lightboxVisual.appendChild(img);
+                }
+                
+                lightboxTitle.textContent = item.title;
+                lightboxDesc.textContent = item.desc;
                 lightboxLoading.classList.remove('active');
+                
+                preloadAdjacentImages(currentIndex);
             };
             
-            // 图片加载失败也隐藏加载状态
-            img.onerror = () => {
-                lightboxLoading.classList.remove('active');
-            };
-            
-            lightboxVisual.appendChild(img);
-            
-            lightboxTitle.textContent = item.title;
-            lightboxDesc.textContent = item.desc;
+            if (img.complete && img.naturalWidth > 0) {
+                onReady();
+            } else {
+                img.onload = onReady;
+                img.onerror = onReady;
+            }
         }
 
         function nextSlide() {
             currentIndex = (currentIndex + 1) % galleryData.length;
-            lightboxLoading.classList.add('active');
             updateLightboxContent();
         }
 
         function prevSlide() {
             currentIndex = (currentIndex - 1 + galleryData.length) % galleryData.length;
-            lightboxLoading.classList.add('active');
             updateLightboxContent();
         }
 
-        // Gallery 点击事件
         galleryItems.forEach((item, index) => {
             item.addEventListener('click', () => openLightbox(index));
             item.addEventListener('keydown', (e) => {
@@ -1266,12 +1356,10 @@
             });
         });
 
-        // Lightbox 控制
         lightboxClose.addEventListener('click', closeLightbox);
         lightboxPrev.addEventListener('click', prevSlide);
         lightboxNext.addEventListener('click', nextSlide);
 
-        // 点击遮罩关闭
         lightbox.addEventListener('click', (e) => {
             if (e.target === lightbox) closeLightbox();
         });
@@ -1279,59 +1367,57 @@
         // ===== 键盘导航 =====
         const menuBtn = document.querySelector('.mobile-menu-btn');
         const navLinks = document.querySelector('.nav-links');
+        const mainContent = document.getElementById('main-content');
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                // 优先关闭灯箱
                 if (lightbox.classList.contains('active')) {
                     closeLightbox();
                     return;
                 }
-                // 其次关闭移动端菜单
                 if (navLinks.classList.contains('active')) {
-                    navLinks.classList.remove('active');
-                    menuBtn.classList.remove('active');
-                    menuBtn.setAttribute('aria-expanded', 'false');
-                    menuBtn.setAttribute('aria-label', '打开导航菜单');
-                    document.body.style.overflow = '';
+                    toggleMobileMenu(false);
                     menuBtn.focus();
                 }
             }
-            // 灯箱内左右键导航
             if (!lightbox.classList.contains('active')) return;
             if (e.key === 'ArrowLeft') prevSlide();
             if (e.key === 'ArrowRight') nextSlide();
         });
 
-        // ===== 移动端菜单切换 =====
-        menuBtn.addEventListener('click', () => {
-            const isActive = navLinks.classList.toggle('active');
-            menuBtn.classList.toggle('active');
+        // ===== 移动端菜单切换与可访问性增强 =====
+        function toggleMobileMenu(forceState) {
+            const isActive = typeof forceState === 'boolean' ? forceState : !navLinks.classList.contains('active');
+            
+            navLinks.classList.toggle('active', isActive);
+            navLinks.setAttribute('aria-hidden', !isActive);
+            menuBtn.classList.toggle('active', isActive);
             menuBtn.setAttribute('aria-expanded', isActive);
             menuBtn.setAttribute('aria-label', isActive ? '关闭导航菜单' : '打开导航菜单');
             document.body.style.overflow = isActive ? 'hidden' : '';
-        });
+            
+            if (mainContent) {
+                if (isActive) {
+                    mainContent.setAttribute('inert', '');
+                } else {
+                    mainContent.removeAttribute('inert');
+                }
+            }
+        }
+
+        menuBtn.addEventListener('click', () => toggleMobileMenu());
 
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                menuBtn.classList.remove('active');
-                menuBtn.setAttribute('aria-expanded', 'false');
-                menuBtn.setAttribute('aria-label', '打开导航菜单');
-                document.body.style.overflow = '';
+                toggleMobileMenu(false);
             });
         });
 
-        // ===== 点击外部关闭移动端菜单 =====
         document.addEventListener('click', (e) => {
             if (navLinks.classList.contains('active') && 
                 !navLinks.contains(e.target) && 
                 !menuBtn.contains(e.target)) {
-                navLinks.classList.remove('active');
-                menuBtn.classList.remove('active');
-                menuBtn.setAttribute('aria-expanded', 'false');
-                menuBtn.setAttribute('aria-label', '打开导航菜单');
-                document.body.style.overflow = '';
+                toggleMobileMenu(false);
             }
         });
 
@@ -1351,15 +1437,14 @@
             document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
         }
 
-        // ===== 导航栏滚动效果 =====
+        // ===== 导航栏滚动效果（优化为 class 切换） =====
+        const navbar = document.querySelector('.navbar');
+        let isScrolled = false;
         window.addEventListener('scroll', () => {
-            const navbar = document.querySelector('.navbar');
-            if (window.pageYOffset > 100) {
-                navbar.style.background = 'rgba(26, 18, 16, 0.98)';
-                navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.3)';
-            } else {
-                navbar.style.background = 'rgba(26, 18, 16, 0.92)';
-                navbar.style.boxShadow = 'none';
+            const shouldBeScrolled = window.pageYOffset > 100;
+            if (shouldBeScrolled !== isScrolled) {
+                isScrolled = shouldBeScrolled;
+                navbar.classList.toggle('scrolled', isScrolled);
             }
         }, { passive: true });
 
@@ -1374,7 +1459,6 @@
                 e.preventDefault();
                 const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height'));
                 const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight;
-
                 const startPosition = window.pageYOffset;
                 const distance = targetPosition - startPosition;
                 const duration = 600;
@@ -1402,6 +1486,17 @@
                 petals.forEach(p => p.style.animationPlayState = 'running');
             }
         });
+    </script>
+
+    <!-- [优化] 百度统计移至 body 底部，不阻塞渲染 -->
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?27ed30b0376b4f8d7d5c87def16a6c79";
+            var s = document.getElementsByTagName("script")[0]; 
+            s.parentNode.insertBefore(hm, s);
+        })();
     </script>
 </body>
 </html>

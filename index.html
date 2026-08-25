@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>绒颜 · 扬州绒花缠花文创品牌</title>
     <link rel="canonical" href="https://www.yangruan.com/" />
-    <link rel="icon" href="logo.png" type="image/png" sizes="32x32">
-    <link rel="apple-touch-icon" href="logo.png" sizes="180x180">
+    <link rel="icon" href="/logo.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/logo.png" sizes="180x180">
     <meta name="baidu-site-verification" content="codeva-DotF2W9orI" />
     <meta name="description" content="绒颜 | 扬软旗下扬州绒花缠花文创品牌，以现代审美与传统技法结合制作绒花、缠花饰品，将古典东方美学融入日常穿搭。">
     <meta name="keywords" content="绒颜,扬软,扬州绒花,扬州缠花,文创品牌,绒花饰品,缠花饰品,东方美学,宝藏手作,扬软出品">
@@ -30,7 +30,7 @@
       },
       "contactPoint": {
         "@type": "ContactPoint",
-        "telephone": "+86-400-000-0000", 
+        "telephone": "+86-185-1021-1688", 
         "email": "service@yangruan.com",
         "contactType": "customer service",
         "areaServed": "CN",
@@ -63,6 +63,7 @@
             --text-muted: #6b5a52;
             --text-lighter: #999999;
             --pink-soft: #d4878f;
+            --pink-light: #e8b8c0;
             --green-soft: #6a8e6b;
             --gradient-hero: linear-gradient(135deg, #2b1a15 0%, #4a2828 40%, #6b3535 70%, #8c2a2e 100%);
             --shadow-card: 0 8px 32px rgba(43, 26, 21, 0.15);
@@ -116,10 +117,10 @@
         }
 
         .nav-logo-icon { 
-    width: 40px; 
-    height: 40px; 
-    object-fit: contain; /* 新增：防止图片被拉伸变形 */
-}
+            width: 40px; 
+            height: 40px; 
+            object-fit: contain;
+        }
 
         .nav-logo-text {
             font-size: 1.3rem;
@@ -294,6 +295,12 @@
             pointer-events: none;
             will-change: transform;
         }
+
+        .petal--pink { background: var(--pink-soft); }
+        .petal--pink-light { background: var(--pink-light); }
+        .petal--gold { background: var(--accent-gold); }
+        .petal--gold-light { background: var(--accent-gold-light); }
+        .petal--green { background: var(--green-soft); }
 
         @keyframes fall {
             0% { transform: translateY(-10vh) rotate(0deg) translateX(0); opacity: 0; }
@@ -752,6 +759,38 @@
             .lightbox-next { right: 10px; }
             .lightbox-close { top: 10px; right: 10px; width: 40px; height: 40px; }
         }
+
+        /* ===== Lightbox 加载状态 ===== */
+        .lightbox-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(26, 18, 16, 0.8);
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .lightbox-loading.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(201, 169, 110, 0.3);
+            border-top-color: var(--accent-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -760,7 +799,7 @@
     <nav class="navbar" role="navigation" aria-label="主导航">
         <div class="nav-container">
             <a href="#" class="nav-logo" aria-label="绒颜 - 返回首页">
-               <img class="nav-logo-icon" src="logo.png" alt="绒颜Logo" width="40" height="40">
+               <img class="nav-logo-icon" src="/logo.png" alt="绒颜Logo" width="40" height="40">
                 <span class="nav-logo-text">绒颜</span>
             </a>
             <button class="mobile-menu-btn" aria-label="打开导航菜单" aria-expanded="false" aria-controls="main-nav">
@@ -779,17 +818,17 @@
     <!-- 英雄区域 -->
     <section class="hero" id="home" aria-label="品牌主视觉">
         <div class="hero-pattern" aria-hidden="true"></div>
-        <div class="petal" style="left:10%; animation-duration:8s; animation-delay:0s; background:#d4878f;" aria-hidden="true"></div>
-        <div class="petal" style="left:20%; animation-duration:10s; animation-delay:1s; background:#e8b8c0;" aria-hidden="true"></div>
-        <div class="petal" style="left:35%; animation-duration:9s; animation-delay:2s; background:#c9a96e;" aria-hidden="true"></div>
-        <div class="petal" style="left:50%; animation-duration:11s; animation-delay:0.5s; background:#d4878f;" aria-hidden="true"></div>
-        <div class="petal" style="left:65%; animation-duration:8.5s; animation-delay:3s; background:#6a8e6b;" aria-hidden="true"></div>
-        <div class="petal" style="left:75%; animation-duration:9.5s; animation-delay:1.5s; background:#e8d5a3;" aria-hidden="true"></div>
-        <div class="petal" style="left:88%; animation-duration:10.5s; animation-delay:2.5s; background:#d4878f;" aria-hidden="true"></div>
-        <div class="petal" style="left:45%; animation-duration:12s; animation-delay:4s; background:#c9a96e;" aria-hidden="true"></div>
+        <div class="petal petal--pink" style="left:10%; animation-duration:8s; animation-delay:0s;" aria-hidden="true"></div>
+        <div class="petal petal--pink-light" style="left:20%; animation-duration:10s; animation-delay:1s;" aria-hidden="true"></div>
+        <div class="petal petal--gold" style="left:35%; animation-duration:9s; animation-delay:2s;" aria-hidden="true"></div>
+        <div class="petal petal--pink" style="left:50%; animation-duration:11s; animation-delay:0.5s;" aria-hidden="true"></div>
+        <div class="petal petal--green" style="left:65%; animation-duration:8.5s; animation-delay:3s;" aria-hidden="true"></div>
+        <div class="petal petal--gold-light" style="left:75%; animation-duration:9.5s; animation-delay:1.5s;" aria-hidden="true"></div>
+        <div class="petal petal--pink" style="left:88%; animation-duration:10.5s; animation-delay:2.5s;" aria-hidden="true"></div>
+        <div class="petal petal--gold" style="left:45%; animation-duration:12s; animation-delay:4s;" aria-hidden="true"></div>
 
         <div class="hero-content">
-            <p class="hero-subtitle-top">RONGYAN · 扬州绒花缠花品牌</p>
+            <p class="hero-subtitle-top">RONGYAN · 扬州绒花缠花文创品牌</p>
             <h1 class="hero-title">扬州<span>绒颜</span></h1>
             <div class="hero-divider" aria-hidden="true"></div>
             <p class="hero-desc">让花开在鬓间</p>
@@ -913,11 +952,11 @@
         <div class="gallery-grid fade-in">
             <div class="gallery-item" tabindex="0" role="button" aria-label="查看绒颜《昙花》缠花饰品" data-index="0">
                 <div class="gallery-visual">
-                    <img src="img/gallery-1.jpg" alt="绒颜《昙花》缠花饰品" loading="lazy" decoding="async">
+                    <img src="img/gallery-1.jpg" alt="绒颜《昙花》缠花饰品" decoding="async">
                 </div>
                 <div class="gallery-overlay">
                     <h4>《昙花》</h4>
-                    <p>缠花 ·昙花</p>
+                    <p>缠花 · 昙花</p>
                 </div>
             </div>
 
@@ -1034,7 +1073,10 @@
                 缠花绕指柔肠处，不负韶华不负卿。
             </blockquote>
             <p class="story-text">
-                绒花与缠花，一南一北，一绒一缎，以丝线为笔，以指尖为墨，书写着中华民族对美的永恒追求。从唐代宫廷的华贵装饰，到明清民间的婚嫁信物，这两朵"永不凋谢的花"穿越千年，依然在现代生活中焕发着勃勃生机。每一件绒花缠花作品，都承载着匠人数十年的功力与对传统之美的深情守望。绒颜希望通过文创的形式，以现代审美与传统技法结合，创作这些绒花/缠花作品，让更多人触摸到这份来自指尖的温度，让古典之美融入日常生活的每一个角落。
+                绒花与缠花，一南一北，一绒一缎，以丝线为笔，以指尖为墨，书写着中华民族对美的永恒追求。从唐代宫廷的华贵装饰，到明清民间的婚嫁信物，这两朵"永不凋谢的花"穿越千年，依然在现代生活中焕发着勃勃生机。每一件绒花缠花作品，都承载着匠人数十年的功力与对传统之美的深情守望。
+            </p>
+             <p class="story-text">
+                 绒颜希望通过文创的形式，以现代审美与传统技法结合，创作这些绒花/缠花作品，让更多人触摸到这份来自指尖的温度，让古典之美融入日常生活的每一个角落。
             </p>
         </div>
     </section>
@@ -1056,21 +1098,19 @@
             </nav>
             <nav class="footer-col" aria-label="服务链接">
                 <h4>服务</h4>
-                <a href="#">定制服务</a>
-                <a href="#">体验工坊</a>
-                <a href="#">企业合作</a>
-                <a href="#">常见问题</a>
+                <a href="img/wx.webp" target="_blank">定制服务</a>
+                <a href="img/wx.webp">广告•线下合作工坊</a>
+                <a href="img/wx.webp" target="_blank">企业合作</a>
+                <a href="img/wx.webp" target="_blank">常见问题</a>
             </nav>
             <nav class="footer-col" aria-label="联系方式">
                 <h4>联系我们</h4>
-                <a href="#">微信公众号</a>
-                <a href="#">小红书</a>
-                <a href="#">抖音号</a>
-                <a href="mailto:service@yangruan.com">邮箱联系</a>
+                <a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzkyMzcxODU0Mw==&action=getalbum&album_id=4654397451649253379#wechat_redirect">微信公众号</a>
+                <a href="mailto:10210917@qq.com">邮箱联系</a>
             </nav>
         </div>
         <div class="footer-bottom">
-            <p>© 2026 扬软 | 扬古韵今风，琢时光入软 | 本页面所有设计均为原创</p>
+            <p>© 2026 扬软 | 扬古韵今风，琢时光入软 | 版权所有</p>
         </div>
     </footer>
 
@@ -1080,46 +1120,24 @@
         <button class="lightbox-nav lightbox-prev" aria-label="上一张作品">‹</button>
         <button class="lightbox-nav lightbox-next" aria-label="下一张作品">›</button>
         <div class="lightbox-content">
-            <div class="lightbox-visual" id="lightbox-visual"></div>
+            <div class="lightbox-visual" id="lightbox-visual">
+                <div class="lightbox-loading" id="lightbox-loading">
+                    <div class="lightbox-spinner"></div>
+                </div>
+            </div>
             <h3 class="lightbox-title" id="lightbox-title"></h3>
             <p class="lightbox-desc" id="lightbox-desc"></p>
         </div>
     </div>
 
     <script>
-        // ===== Gallery 数据（已改为真实图片） =====
-        const galleryData = [
-            {
-                title: '《锦上添花》',
-                desc: '绒花 · 牡丹胸针 | 仿故宫馆藏牡丹纹样',
-                imgSrc: 'img/gallery-1.jpg',
-                imgAlt: '《锦上添花》— 绒花牡丹胸针'
-            },
-            {
-                title: '《幽兰清韵》',
-                desc: '缠花 · 兰花发簪',
-                imgSrc: 'img/gallery-2.jpg',
-                imgAlt: '《幽兰清韵》— 缠花兰花发簪'
-            },
-            {
-                title: '《金玉满堂》',
-                desc: '绒花 · 团花摆件',
-                imgSrc: 'img/gallery-3.jpg',
-                imgAlt: '《金玉满堂》— 绒花团花摆件'
-            },
-            {
-                title: '《紫气东来》',
-                desc: '缠花 · 紫藤耳环',
-                imgSrc: 'img/gallery-4.jpg',
-                imgAlt: '《紫气东来》— 缠花紫藤耳环'
-            },
-            {
-                title: '《水色清华》',
-                desc: '绒花缠花结合 · 胸花',
-                imgSrc: 'img/gallery-5.jpg',
-                imgAlt: '《水色清华》— 绒花缠花结合胸花'
-            }
-        ];
+        // ===== Gallery 数据动态读取 =====
+        const galleryData = Array.from(document.querySelectorAll('.gallery-item')).map(item => ({
+            title: item.querySelector('h4')?.textContent || '',
+            desc: item.querySelector('.gallery-overlay p')?.textContent || '',
+            imgSrc: item.querySelector('img')?.src || '',
+            imgAlt: item.querySelector('img')?.alt || ''
+        }));
 
         // ===== Lightbox 灯箱逻辑 =====
         const lightbox = document.getElementById('lightbox');
@@ -1129,9 +1147,11 @@
         const lightboxClose = lightbox.querySelector('.lightbox-close');
         const lightboxPrev = lightbox.querySelector('.lightbox-prev');
         const lightboxNext = lightbox.querySelector('.lightbox-next');
+        const lightboxLoading = document.getElementById('lightbox-loading');
         const galleryItems = document.querySelectorAll('.gallery-item');
         let currentIndex = 0;
         let lastFocusedElement = null;
+        let trapFocusHandler = null;
 
         function getFocusableElements() {
             return lightbox.querySelectorAll(
@@ -1164,11 +1184,16 @@
         function openLightbox(index) {
             lastFocusedElement = document.activeElement;
             currentIndex = index;
+            
+            // 显示加载状态
+            lightboxLoading.classList.add('active');
+            
             updateLightboxContent();
             lightbox.classList.add('active');
             document.body.style.overflow = 'hidden';
 
-            lightbox.addEventListener('keydown', handleTrapFocus);
+            trapFocusHandler = (e) => handleTrapFocus(e);
+            lightbox.addEventListener('keydown', trapFocusHandler);
 
             setTimeout(() => lightbox.focus(), 100);
         }
@@ -1177,26 +1202,41 @@
             lightbox.classList.remove('active');
             document.body.style.overflow = '';
 
-            lightbox.removeEventListener('keydown', handleTrapFocus);
+            if (trapFocusHandler) {
+                lightbox.removeEventListener('keydown', trapFocusHandler);
+                trapFocusHandler = null;
+            }
 
             if (lastFocusedElement) {
                 lastFocusedElement.focus();
             }
         }
 
-        // ✅ 已修复 XSS 风险：使用 DOM API 替代 innerHTML
         function updateLightboxContent() {
             const item = galleryData[currentIndex];
+            if (!item) return;
             
-            // 清空现有内容
-            while (lightboxVisual.firstChild) {
-                lightboxVisual.removeChild(lightboxVisual.firstChild);
+            // 清除现有图片
+            const existingImg = lightboxVisual.querySelector('img');
+            if (existingImg) {
+                existingImg.remove();
             }
             
-            // 使用 DOM API 安全创建图片元素
+            // 创建新图片
             const img = document.createElement('img');
             img.src = item.imgSrc;
             img.alt = item.imgAlt;
+            
+            // 图片加载完成后隐藏加载状态
+            img.onload = () => {
+                lightboxLoading.classList.remove('active');
+            };
+            
+            // 图片加载失败也隐藏加载状态
+            img.onerror = () => {
+                lightboxLoading.classList.remove('active');
+            };
+            
             lightboxVisual.appendChild(img);
             
             lightboxTitle.textContent = item.title;
@@ -1205,11 +1245,13 @@
 
         function nextSlide() {
             currentIndex = (currentIndex + 1) % galleryData.length;
+            lightboxLoading.classList.add('active');
             updateLightboxContent();
         }
 
         function prevSlide() {
             currentIndex = (currentIndex - 1 + galleryData.length) % galleryData.length;
+            lightboxLoading.classList.add('active');
             updateLightboxContent();
         }
 
@@ -1234,18 +1276,34 @@
             if (e.target === lightbox) closeLightbox();
         });
 
-        // 键盘导航
+        // ===== 键盘导航 =====
+        const menuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+
         document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                // 优先关闭灯箱
+                if (lightbox.classList.contains('active')) {
+                    closeLightbox();
+                    return;
+                }
+                // 其次关闭移动端菜单
+                if (navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    menuBtn.classList.remove('active');
+                    menuBtn.setAttribute('aria-expanded', 'false');
+                    menuBtn.setAttribute('aria-label', '打开导航菜单');
+                    document.body.style.overflow = '';
+                    menuBtn.focus();
+                }
+            }
+            // 灯箱内左右键导航
             if (!lightbox.classList.contains('active')) return;
-            if (e.key === 'Escape') closeLightbox();
             if (e.key === 'ArrowLeft') prevSlide();
             if (e.key === 'ArrowRight') nextSlide();
         });
 
         // ===== 移动端菜单切换 =====
-        const menuBtn = document.querySelector('.mobile-menu-btn');
-        const navLinks = document.querySelector('.nav-links');
-
         menuBtn.addEventListener('click', () => {
             const isActive = navLinks.classList.toggle('active');
             menuBtn.classList.toggle('active');
@@ -1262,6 +1320,19 @@
                 menuBtn.setAttribute('aria-label', '打开导航菜单');
                 document.body.style.overflow = '';
             });
+        });
+
+        // ===== 点击外部关闭移动端菜单 =====
+        document.addEventListener('click', (e) => {
+            if (navLinks.classList.contains('active') && 
+                !navLinks.contains(e.target) && 
+                !menuBtn.contains(e.target)) {
+                navLinks.classList.remove('active');
+                menuBtn.classList.remove('active');
+                menuBtn.setAttribute('aria-expanded', 'false');
+                menuBtn.setAttribute('aria-label', '打开导航菜单');
+                document.body.style.overflow = '';
+            }
         });
 
         // ===== 滚动显示动画 =====
